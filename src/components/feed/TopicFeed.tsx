@@ -12,6 +12,7 @@ interface TopicWithMetrics {
   responseCount: number;
   totalLikes: number;
   totalEndorsements: number;
+  commentCount: number;
   responses: {
     thinker: {
       id: string;
@@ -19,6 +20,10 @@ interface TopicWithMetrics {
       color: string;
       school: string;
     };
+  }[];
+  humanParticipants: {
+    id: string;
+    username: string;
   }[];
 }
 

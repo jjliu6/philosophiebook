@@ -27,6 +27,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     responseCount: number;
     totalLikes: number;
     totalEndorsements: number;
+    commentCount: number;
     responses: {
       thinker: {
         id: string;
@@ -34,6 +35,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         color: string;
         school: string;
       };
+    }[];
+    humanParticipants: {
+      id: string;
+      username: string;
     }[];
   }[] = [];
 
@@ -55,6 +60,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           },
           orderBy: { position: "asc" },
         },
+        comments: {
+          select: {
+            user: {
+              select: { id: true, username: true },
+            },
+          },
+        },
       },
     });
 
@@ -70,11 +82,24 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         0
       );
 
+      // Unique human commenters
+      const humanParticipants = topic.comments.reduce(
+        (acc, c) => {
+          if (!acc.find((u) => u.id === c.user.id)) {
+            acc.push(c.user);
+          }
+          return acc;
+        },
+        [] as { id: string; username: string }[]
+      );
+
       return {
         ...topic,
         responseCount,
         totalLikes,
         totalEndorsements,
+        commentCount: topic.comments.length,
+        humanParticipants,
       };
     });
 

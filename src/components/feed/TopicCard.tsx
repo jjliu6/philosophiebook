@@ -2,6 +2,21 @@ import Link from "next/link";
 import ThinkerAvatar from "@/components/thinker/ThinkerAvatar";
 import { timeAgo } from "@/lib/utils";
 
+/** Generate a consistent color from a string */
+function stringToColor(str: string): string {
+  const colors = [
+    "#6366f1", "#8b5cf6", "#a855f7", "#d946ef",
+    "#ec4899", "#f43f5e", "#ef4444", "#f97316",
+    "#eab308", "#84cc16", "#22c55e", "#14b8a6",
+    "#06b6d4", "#0ea5e9", "#3b82f6",
+  ];
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
 interface TopicCardProps {
   topic: {
     id: string;
@@ -12,6 +27,7 @@ interface TopicCardProps {
     responseCount: number;
     totalLikes: number;
     totalEndorsements: number;
+    commentCount?: number;
     responses: {
       thinker: {
         id: string;
@@ -19,6 +35,10 @@ interface TopicCardProps {
         color: string;
         school: string;
       };
+    }[];
+    humanParticipants?: {
+      id: string;
+      username: string;
     }[];
   };
   /** Index in the feed list (for folio display) */
@@ -36,6 +56,8 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
     },
     [] as { id: string; name: string; color: string; school: string }[]
   );
+
+  const humanParticipants = topic.humanParticipants || [];
 
   // Parse domain tags
   let domains: string[] = [];
@@ -81,28 +103,60 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           </p>
         )}
 
-        {/* Thinker avatars row */}
-        {uniqueThinkers.length > 0 && (
-          <div className="mt-4 flex items-center gap-1.5">
-            {uniqueThinkers.map((thinker) => (
-              <ThinkerAvatar
-                key={thinker.id}
-                name={thinker.name}
-                color={thinker.color}
-                thinkerId={thinker.id}
-                size="sm"
-              />
-            ))}
-            <span className="ml-2 text-xs text-muted/50">
-              {uniqueThinkers.length} thinker
-              {uniqueThinkers.length !== 1 ? "s" : ""}
-            </span>
-          </div>
-        )}
+        {/* Participants row — AI thinkers + Human users */}
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          {/* AI Thinkers */}
+          {uniqueThinkers.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              {uniqueThinkers.map((thinker) => (
+                <ThinkerAvatar
+                  key={thinker.id}
+                  name={thinker.name}
+                  color={thinker.color}
+                  thinkerId={thinker.id}
+                  size="sm"
+                />
+              ))}
+              <span className="ml-1 text-xs text-muted/50">
+                {uniqueThinkers.length} AI
+              </span>
+            </div>
+          )}
+
+          {/* Human Participants */}
+          {humanParticipants.length > 0 && (
+            <div className="flex items-center gap-1">
+              {humanParticipants.slice(0, 5).map((user) => (
+                <div
+                  key={user.id}
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-green-500/20 text-[11px] font-medium text-white"
+                  style={{ backgroundColor: stringToColor(user.username) }}
+                  title={user.username}
+                >
+                  {user.username[0].toUpperCase()}
+                </div>
+              ))}
+              {humanParticipants.length > 5 && (
+                <span className="ml-1 text-[11px] text-muted/40">
+                  +{humanParticipants.length - 5}
+                </span>
+              )}
+              <span className="ml-1 text-xs text-muted/50">
+                {humanParticipants.length} human{humanParticipants.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+          )}
+        </div>
 
         {/* Stats and meta — dot-separated */}
         <div className="mt-4 flex flex-wrap items-center gap-x-1.5 text-[12px] text-muted/50">
           <span>{topic.responseCount} responses</span>
+          {(topic.commentCount ?? 0) > 0 && (
+            <>
+              <span>&middot;</span>
+              <span>{topic.commentCount} comments</span>
+            </>
+          )}
           <span>&middot;</span>
           <span>{topic.totalLikes} likes</span>
           <span>&middot;</span>
