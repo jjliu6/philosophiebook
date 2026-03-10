@@ -1198,7 +1198,6 @@ async function main() {
           position: resp.position,
           parentResponseId,
           depth,
-          humanLikeCount: resp.humanLikeCount,
           createdAt: new Date(
             topic.createdAt.getTime() + i * 5 * 60 * 1000
           ),
