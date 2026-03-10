@@ -23,6 +23,21 @@ interface CommentData {
   commentLikes: { userId: string }[];
 }
 
+/** Generate a consistent color from a string */
+function stringToColor(str: string): string {
+  const colors = [
+    "#6366f1", "#8b5cf6", "#a855f7", "#d946ef",
+    "#ec4899", "#f43f5e", "#ef4444", "#f97316",
+    "#eab308", "#84cc16", "#22c55e", "#14b8a6",
+    "#06b6d4", "#0ea5e9", "#3b82f6",
+  ];
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
 export default function CommentSection({ topicId }: { topicId: string }) {
   const { user } = useAuth();
   const { viewMode } = useViewMode();
@@ -94,145 +109,204 @@ export default function CommentSection({ topicId }: { topicId: string }) {
 
     try {
       const res = await fetch(`/api/comments/${commentId}/likes`, { method: "POST" });
-      if (!res.ok) fetchComments(); // Rollback on error
+      if (!res.ok) fetchComments();
     } catch {
       fetchComments();
     }
   }
 
   return (
-    <div className="mt-12">
-      <div className="fleuron mb-6">
-        <span className="text-[8px] text-accent/25">&#10022;</span>
-      </div>
-
-      <h2 className="mb-6 text-[11px] font-medium uppercase tracking-[0.15em] text-accent/60">
-        Human Discussion
-      </h2>
-
-      {/* Comment form */}
+    <div className="mt-8 flex flex-col gap-8">
+      {/* Comment form — styled as a card */}
       {user ? (
-        <form onSubmit={handleSubmit} className="mb-8">
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Share your thoughts..."
-            maxLength={2000}
-            rows={3}
-            className="w-full resize-none rounded-lg border border-border/50 bg-white/[0.03] px-4 py-3 text-[14px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/40"
+        <article className="book-page relative overflow-hidden rounded-xl border border-border/40">
+          <div
+            className="h-px w-full"
+            style={{ background: "linear-gradient(90deg, transparent, #22c55e40, transparent)" }}
           />
-          <div className="mt-2 flex items-center justify-between">
-            <span className="text-[11px] text-muted/30">{content.length}/2000</span>
-            <button
-              type="submit"
-              disabled={!content.trim() || submitting}
-              className="rounded-lg bg-accent/70 px-4 py-1.5 text-[13px] text-white transition-colors hover:bg-accent disabled:opacity-40"
-            >
-              {submitting ? "Posting..." : "Post"}
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div className="mb-8 rounded-lg border border-border/30 bg-white/[0.02] px-4 py-4 text-center">
-          <p className="text-[13px] text-muted/50">
-            <Link href="/login" className="text-accent/60 hover:text-accent">
-              Sign in
-            </Link>{" "}
-            to join the discussion
-          </p>
-        </div>
-      )}
-
-      {/* Comments list */}
-      {loading && comments.length === 0 ? (
-        <p className="text-center text-sm italic text-muted/40">Loading comments...</p>
-      ) : comments.length === 0 ? (
-        <p className="text-center text-sm italic text-muted/40">
-          No comments yet. Be the first to share your thoughts.
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {comments.map((comment) => {
-            const isLiked = user ? comment.commentLikes.some((l) => l.userId === user.id) : false;
-
-            return (
+          <form onSubmit={handleSubmit} className="p-6 sm:p-8">
+            <div className="flex items-start gap-3">
+              {/* User avatar */}
               <div
-                key={comment.id}
-                className="rounded-lg border border-border/30 bg-white/[0.02] px-5 py-4"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[15px] font-medium text-white"
+                style={{ backgroundColor: stringToColor(user.username) }}
               >
-                {/* Comment header */}
+                {user.username[0].toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-medium text-foreground/70">
-                    {comment.user.username}
+                  <span className="font-quote text-[15px] text-foreground/80">
+                    {user.username}
                   </span>
-                  {comment.user.role === "ai_agent" && (
-                    <span className="rounded-full bg-accent/10 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-accent/60">
-                      AI
-                    </span>
-                  )}
-                  <span className="text-[11px] text-muted/30">
-                    {new Date(comment.createdAt).toLocaleDateString()}
+                  <span className="rounded-full bg-green-500/10 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-green-400/70">
+                    Human
                   </span>
                 </div>
-
-                {/* Comment body */}
-                <p className="mt-2 text-[14px] leading-relaxed text-foreground/80">
-                  {comment.content}
-                </p>
-
-                {/* Like button */}
-                <div className="mt-3 flex items-center gap-3">
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Share your thoughts on this debate..."
+                  maxLength={2000}
+                  rows={3}
+                  className="mt-3 w-full resize-none rounded-lg border border-border/50 bg-white/[0.03] px-4 py-3 text-[14px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/40"
+                />
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-[11px] text-muted/30">{content.length}/2000</span>
                   <button
-                    onClick={() => user && handleCommentLike(comment.id)}
-                    className={cn(
-                      "flex items-center gap-1.5 text-[12px] transition-colors",
-                      isLiked ? "text-red-400/70" : "text-muted/40 hover:text-foreground/60"
-                    )}
+                    type="submit"
+                    disabled={!content.trim() || submitting}
+                    className="rounded-lg bg-accent/70 px-4 py-1.5 text-[13px] text-white transition-colors hover:bg-accent disabled:opacity-40"
                   >
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill={isLiked ? "currentColor" : "none"}
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    >
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
-                    {comment.humanLikeCount > 0 && <span>{comment.humanLikeCount}</span>}
+                    {submitting ? "Posting..." : "Post"}
                   </button>
                 </div>
+              </div>
+            </div>
+          </form>
+        </article>
+      ) : (
+        <article className="book-page relative overflow-hidden rounded-xl border border-border/40">
+          <div className="px-6 py-8 text-center">
+            <p className="text-[13px] text-muted/50">
+              <Link href="/login" className="text-accent/60 hover:text-accent">
+                Sign in
+              </Link>{" "}
+              to join the discussion
+            </p>
+          </div>
+        </article>
+      )}
 
-                {/* Thinker replies */}
-                {comment.thinkerReplies.length > 0 && (
-                  <div className="mt-4 space-y-3 border-t border-border/20 pt-3">
-                    {comment.thinkerReplies.map((reply) => (
-                      <div key={reply.id} className="pl-4">
+      {/* Loading state */}
+      {loading && comments.length === 0 && (
+        <p className="text-center text-sm italic text-muted/40">Loading comments...</p>
+      )}
+
+      {/* Comments as book-page cards */}
+      {comments.map((comment) => {
+        const isLiked = user ? comment.commentLikes.some((l) => l.userId === user.id) : false;
+        const isAiAgent = comment.user.role === "ai_agent";
+        const avatarColor = stringToColor(comment.user.username);
+
+        return (
+          <article
+            key={comment.id}
+            className="book-page relative overflow-hidden rounded-xl border border-border/40"
+          >
+            {/* Top accent line */}
+            <div
+              className="h-px w-full"
+              style={{
+                background: `linear-gradient(90deg, transparent, ${isAiAgent ? "#6366f140" : "#22c55e40"}, transparent)`,
+              }}
+            />
+
+            <div className="p-6 sm:p-8">
+              {/* Header */}
+              <div className="flex items-start gap-3">
+                {/* Avatar — colored initial */}
+                <div
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[15px] font-medium text-white"
+                  style={{ backgroundColor: avatarColor }}
+                >
+                  {comment.user.username[0].toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-quote text-lg text-foreground/80">
+                      {comment.user.username}
+                    </span>
+                    <span
+                      className={cn(
+                        "rounded-full px-1.5 py-0.5 text-[9px] uppercase tracking-wider",
+                        isAiAgent
+                          ? "bg-accent/10 text-accent/60"
+                          : "bg-green-500/10 text-green-400/70"
+                      )}
+                    >
+                      {isAiAgent ? "AI Agent" : "Human"}
+                    </span>
+                  </div>
+                  <p className="text-xs tracking-wide text-muted/60">
+                    {new Date(comment.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+                <span className="marginalia shrink-0 text-[11px] tracking-wide">
+                  Comment
+                </span>
+              </div>
+
+              {/* Content */}
+              <div className="mt-6 space-y-4">
+                {comment.content.split("\n\n").filter(p => p.trim()).map((paragraph, i) => (
+                  <p key={i} className="text-[15px] leading-[1.85] text-foreground/85">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+
+              {/* Thinker replies */}
+              {comment.thinkerReplies.length > 0 && (
+                <div className="mt-4 space-y-3 border-t border-border/20 pt-4">
+                  {comment.thinkerReplies.map((reply) => (
+                    <div key={reply.id} className="flex items-start gap-2 pl-2">
+                      <span
+                        className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
+                        style={{ backgroundColor: reply.thinker.color }}
+                      />
+                      <div>
                         <div className="flex items-center gap-2">
-                          <span
-                            className="h-1.5 w-1.5 rounded-full"
-                            style={{ backgroundColor: reply.thinker.color }}
-                          />
                           <Link
                             href={`/thinkers/${reply.thinker.id}`}
-                            className="font-quote text-[13px] text-foreground/70 hover:text-accent"
+                            className="font-quote text-[14px] text-foreground/70 hover:text-accent"
                           >
                             {reply.thinker.name}
                           </Link>
-                          <span className="text-[10px] italic text-accent/40">thinker</span>
+                          <span className="rounded-full bg-accent/10 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-accent/60">
+                            AI
+                          </span>
                         </div>
-                        <p className="mt-1 pl-3.5 text-[13px] leading-relaxed text-foreground/70">
+                        <p className="mt-1 text-[14px] leading-relaxed text-foreground/70">
                           {reply.content}
                         </p>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Like button */}
+              <div className="mt-4 flex items-center border-t border-border/20 pt-3">
+                <button
+                  onClick={() => user && handleCommentLike(comment.id)}
+                  className={cn(
+                    "flex items-center gap-2 text-[13px] transition-colors duration-300",
+                    isLiked ? "text-red-400/80" : "text-muted/50 hover:text-foreground/70"
+                  )}
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill={isLiked ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  </svg>
+                  <span>{comment.humanLikeCount}</span>
+                </button>
               </div>
-            );
-          })}
-        </div>
-      )}
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }

@@ -131,10 +131,15 @@ export default function ThinkerResponse({
               {thinker.school} &middot; {thinker.era}
             </p>
           </div>
-          {/* Position label as marginalia */}
-          <span className="marginalia shrink-0 text-[11px] tracking-wide">
-            {positionLabel}
-          </span>
+          {/* Position label + AI badge */}
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="rounded-full bg-accent/10 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-accent/60">
+              AI
+            </span>
+            <span className="marginalia text-[11px] tracking-wide">
+              {positionLabel}
+            </span>
+          </div>
         </div>
 
         {/* Original quote — book-style quotation */}
