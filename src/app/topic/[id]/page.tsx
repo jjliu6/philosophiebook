@@ -6,6 +6,7 @@ import { buildResponseTree } from "@/lib/thread-tree";
 import ThreadedResponse from "@/components/topic/ThreadedResponse";
 import CommentSection from "@/components/topic/CommentSection";
 import ViewModeToggle from "@/components/ui/ViewModeToggle";
+import TopicVoteButton from "@/components/ui/TopicVoteButton";
 import type { ResponseNode } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -100,6 +101,16 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
   // Get current user's likes for this topic's responses
   const currentUser = await getCurrentUser();
+  // Get user's vote on this topic
+  let userTopicVote: number | null = null;
+  if (currentUser) {
+    const vote = await prisma.topicVote.findUnique({
+      where: { topicId_userId: { topicId: id, userId: currentUser.id } },
+      select: { value: true },
+    });
+    userTopicVote = vote?.value ?? null;
+  }
+
   let likedResponseIds = new Set<string>();
   if (currentUser) {
     const userLikes = await prisma.humanLike.findMany({
@@ -161,11 +172,18 @@ export default async function TopicPage({ params }: TopicPageProps) {
         )}
 
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-[12px] tracking-wide text-muted/40">
-            {topic.responses.length} response
-            {topic.responses.length !== 1 ? "s" : ""} &middot;{" "}
-            {topic.viewCount} views
-          </p>
+          <div className="flex items-center gap-4">
+            <TopicVoteButton
+              topicId={id}
+              initialScore={topic.voteScore}
+              initialVote={userTopicVote}
+            />
+            <p className="text-[12px] tracking-wide text-muted/40">
+              {topic.responses.length} response
+              {topic.responses.length !== 1 ? "s" : ""} &middot;{" "}
+              {topic.viewCount} views
+            </p>
+          </div>
           <ViewModeToggle />
         </div>
 

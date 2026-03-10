@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ThinkerAvatar from "@/components/thinker/ThinkerAvatar";
+import TopicVoteButton from "@/components/ui/TopicVoteButton";
 import { timeAgo } from "@/lib/utils";
 
 /** Generate a consistent color from a string */
@@ -27,6 +28,8 @@ interface TopicCardProps {
     responseCount: number;
     totalLikes: number;
     totalEndorsements: number;
+    voteScore: number;
+    userVote: number | null;
     commentCount?: number;
     responses: {
       thinker: {
@@ -69,7 +72,18 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
 
   return (
     <Link href={`/topic/${topic.id}`} className="group block">
-      <article className="page-lift book-page relative overflow-hidden rounded-xl border border-border/40 p-6 transition-all duration-300 group-hover:border-border/70">
+      <article className="page-lift book-page relative flex overflow-hidden rounded-xl border border-border/40 transition-all duration-300 group-hover:border-border/70">
+        {/* Vote column */}
+        <div className="flex shrink-0 flex-col items-center justify-start px-3 pt-5">
+          <TopicVoteButton
+            topicId={topic.id}
+            initialScore={topic.voteScore}
+            initialVote={topic.userVote}
+          />
+        </div>
+
+        {/* Content column */}
+        <div className="min-w-0 flex-1 p-6 pl-0">
         {/* Folio number in top-right corner */}
         {typeof index === "number" && (
           <span className="folio absolute right-5 top-4">
@@ -161,6 +175,7 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           <span>{topic.totalLikes} likes</span>
           <span>&middot;</span>
           <span>{timeAgo(new Date(topic.createdAt))}</span>
+        </div>
         </div>
       </article>
     </Link>

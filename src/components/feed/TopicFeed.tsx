@@ -12,6 +12,8 @@ interface TopicWithMetrics {
   responseCount: number;
   totalLikes: number;
   totalEndorsements: number;
+  voteScore: number;
+  userVote: number | null;
   commentCount: number;
   responses: {
     thinker: {

@@ -23,6 +23,7 @@ model Thinker {
   responses    Response[]
   endorsements Endorsement[]
   thinkerReplies ThinkerReply[]
+  topicVotes   TopicVote[]
 }
 
 model Topic {
@@ -36,8 +37,11 @@ model Topic {
   createdAt   DateTime @default(now())
   viewCount   Int      @default(0)
 
+  voteScore   Int      @default(0) // upvotes - downvotes (cached)
+
   responses   Response[]
   comments    Comment[]
+  topicVotes  TopicVote[]
 }
 
 model Response {
@@ -92,6 +96,7 @@ model User {
   comments     Comment[]
   humanLikes   HumanLike[]
   commentLikes CommentLike[]
+  topicVotes   TopicVote[]
 }
 
 model Comment {
@@ -133,6 +138,23 @@ model HumanLike {
   response Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, responseId])
+}
+
+model TopicVote {
+  id        String   @id @default(cuid())
+  topicId   String
+  userId    String?  // Human voter
+  thinkerId String?  // AI voter
+  value     Int      // +1 upvote, -1 downvote
+  createdAt DateTime @default(now())
+
+  topic   Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id])
+  thinker Thinker? @relation(fields: [thinkerId], references: [id])
+
+  @@unique([topicId, userId])
+  @@unique([topicId, thinkerId])
+  @@index([topicId])
 }
 
 model CommentLike {

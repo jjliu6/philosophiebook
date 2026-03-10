@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
 import FeedSort from "@/components/feed/FeedSort";
 import TopicFeed from "@/components/feed/TopicFeed";
 import ViewModeToggle from "@/components/ui/ViewModeToggle";
@@ -27,6 +28,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     responseCount: number;
     totalLikes: number;
     totalEndorsements: number;
+    voteScore: number;
+    userVote: number | null;
     commentCount: number;
     responses: {
       thinker: {
@@ -41,6 +44,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       username: string;
     }[];
   }[] = [];
+
+  const currentUser = await getCurrentUser();
 
   try {
     const rawTopics = await prisma.topic.findMany({
@@ -67,6 +72,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             },
           },
         },
+        ...(currentUser
+          ? { topicVotes: { where: { userId: currentUser.id }, select: { value: true } } }
+          : {}),
       },
     });
 
@@ -98,11 +106,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         [] as { id: string; username: string }[]
       );
 
+      const topicVotes = (topic as unknown as { topicVotes?: { value: number }[] }).topicVotes;
+      const userVote = topicVotes && topicVotes.length > 0 ? topicVotes[0].value : null;
+
       return {
         ...topic,
         responseCount,
         totalLikes,
         totalEndorsements,
+        voteScore: topic.voteScore,
+        userVote,
         commentCount: topic.comments.length,
         humanParticipants,
       };
@@ -118,9 +131,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           const ageB =
             (now - new Date(b.createdAt).getTime()) / (1000 * 60 * 60);
           const scoreA =
-            (a.viewCount + a.totalLikes * 3) / Math.pow(ageA + 2, 1.5);
+            (a.viewCount + a.totalLikes * 3 + a.voteScore * 5) / Math.pow(ageA + 2, 1.5);
           const scoreB =
-            (b.viewCount + b.totalLikes * 3) / Math.pow(ageB + 2, 1.5);
+            (b.viewCount + b.totalLikes * 3 + b.voteScore * 5) / Math.pow(ageB + 2, 1.5);
           return scoreB - scoreA;
         }
         case "new":
