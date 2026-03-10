@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { buildResponseTree } from "@/lib/thread-tree";
 import ThreadedResponse from "@/components/topic/ThreadedResponse";
 import CommentSection from "@/components/topic/CommentSection";
+import ViewModeToggle from "@/components/ui/ViewModeToggle";
 import type { ResponseNode } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -159,11 +160,14 @@ export default async function TopicPage({ params }: TopicPageProps) {
           </p>
         )}
 
-        <p className="mt-4 text-[12px] tracking-wide text-muted/40">
-          {topic.responses.length} response
-          {topic.responses.length !== 1 ? "s" : ""} &middot;{" "}
-          {topic.viewCount} views
-        </p>
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-[12px] tracking-wide text-muted/40">
+            {topic.responses.length} response
+            {topic.responses.length !== 1 ? "s" : ""} &middot;{" "}
+            {topic.viewCount} views
+          </p>
+          <ViewModeToggle />
+        </div>
 
         {/* Book-style fleuron divider */}
         <div className="fleuron mt-6">

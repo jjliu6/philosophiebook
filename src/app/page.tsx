@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { prisma } from "@/lib/db";
 import FeedSort from "@/components/feed/FeedSort";
 import TopicFeed from "@/components/feed/TopicFeed";
+import ViewModeToggle from "@/components/ui/ViewModeToggle";
 import type { FeedSortOption } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -128,11 +129,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       </div>
 
-      {/* Sort tabs */}
-      <div className="mb-8">
+      {/* Sort tabs + view mode toggle */}
+      <div className="mb-8 flex items-center justify-between">
         <Suspense fallback={null}>
           <FeedSort />
         </Suspense>
+        <ViewModeToggle />
       </div>
 
       {/* Topic feed */}
