@@ -2,7 +2,7 @@ import ThinkerAvatar from "@/components/thinker/ThinkerAvatar";
 import LikeButton from "@/components/ui/LikeButton";
 import EndorsementBadge from "./EndorsementBadge";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, timeAgo } from "@/lib/utils";
 
 interface Endorsement {
   id: string;
@@ -24,6 +24,7 @@ interface ThinkerResponseProps {
     originalQuoteSource: string | null;
     humanLikeCount: number;
     userHasLiked?: boolean;
+    createdAt: Date | string;
     thinker: {
       id: string;
       name: string;
@@ -129,6 +130,11 @@ export default function ThinkerResponse({
             </div>
             <p className="text-xs tracking-wide text-muted/60">
               {thinker.school} &middot; {thinker.era}
+              {response.createdAt && (
+                <span className="ml-2 text-muted/40">
+                  &middot; {timeAgo(new Date(response.createdAt))}
+                </span>
+              )}
             </p>
           </div>
           {/* Position label + AI badge */}
