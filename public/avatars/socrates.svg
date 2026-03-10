@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip-socrates">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle-clip-socrates)">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="100" fill="#4169E1" opacity="0.2"/>
+    <!-- Toga / shoulders -->
+    <path d="M25,200 Q35,160 60,148 Q80,140 100,138 Q120,140 140,148 Q165,160 175,200 Z" fill="#4169E1" opacity="0.45"/>
+    <!-- Toga drape line -->
+    <path d="M70,148 Q85,165 100,160 Q115,155 130,148" fill="none" stroke="#4169E1" stroke-width="2" opacity="0.6"/>
+    <path d="M60,155 Q80,175 100,168" fill="none" stroke="#4169E1" stroke-width="1.5" opacity="0.4"/>
+    <!-- Neck -->
+    <rect x="88" y="124" width="24" height="18" rx="6" fill="#D2A679"/>
+    <!-- Head shape - bald, rounded -->
+    <ellipse cx="100" cy="85" rx="40" ry="48" fill="#D2A679"/>
+    <!-- Bald head highlight -->
+    <ellipse cx="100" cy="60" rx="30" ry="20" fill="#DEBB8E" opacity="0.4"/>
+    <!-- Ears - slightly protruding -->
+    <ellipse cx="58" cy="88" rx="7" ry="11" fill="#C49565"/>
+    <ellipse cx="142" cy="88" rx="7" ry="11" fill="#C49565"/>
+    <!-- Eyebrows - thick, bushy, intense -->
+    <path d="M70,74 Q78,67 92,72" fill="none" stroke="#4169E1" stroke-width="3" stroke-linecap="round"/>
+    <path d="M108,72 Q122,67 130,74" fill="none" stroke="#4169E1" stroke-width="3" stroke-linecap="round"/>
+    <!-- Eyes - deep set, intense -->
+    <ellipse cx="82" cy="82" rx="8" ry="5" fill="white"/>
+    <circle cx="84" cy="82" r="3.5" fill="#1a3a7a"/>
+    <circle cx="85" cy="81" r="1.2" fill="white"/>
+    <ellipse cx="118" cy="82" rx="8" ry="5" fill="white"/>
+    <circle cx="116" cy="82" r="3.5" fill="#1a3a7a"/>
+    <circle cx="117" cy="81" r="1.2" fill="white"/>
+    <!-- Under-eye lines for age -->
+    <path d="M74,87 Q82,90 90,87" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.5"/>
+    <path d="M110,87 Q118,90 126,87" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.5"/>
+    <!-- Snub nose - famously flat/upturned -->
+    <path d="M100,86 L96,98 Q94,103 100,104 Q106,103 104,98 Z" fill="#C49565"/>
+    <circle cx="96" cy="102" r="2.5" fill="#B8895A" opacity="0.5"/>
+    <circle cx="104" cy="102" r="2.5" fill="#B8895A" opacity="0.5"/>
+    <!-- Mouth - wide, set in thought -->
+    <path d="M88,114 Q94,111 100,113 Q106,111 112,114" fill="none" stroke="#4169E1" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Thick full beard -->
+    <path d="M62,100 Q60,120 64,142 Q72,158 100,165 Q128,158 136,142 Q140,120 138,100" fill="#4169E1" opacity="0.35"/>
+    <!-- Beard texture lines -->
+    <path d="M70,108 Q72,130 76,148" fill="none" stroke="#4169E1" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+    <path d="M80,112 Q82,135 86,152" fill="none" stroke="#4169E1" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+    <path d="M92,116 Q94,140 96,155" fill="none" stroke="#4169E1" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+    <path d="M108,116 Q106,140 104,155" fill="none" stroke="#4169E1" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+    <path d="M120,112 Q118,135 114,152" fill="none" stroke="#4169E1" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+    <path d="M130,108 Q128,130 124,148" fill="none" stroke="#4169E1" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+    <!-- Mustache -->
+    <path d="M88,110 Q80,115 68,112" fill="none" stroke="#4169E1" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M112,110 Q120,115 132,112" fill="none" stroke="#4169E1" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <!-- Forehead wrinkles -->
+    <path d="M75,62 Q100,58 125,62" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.4"/>
+    <path d="M78,68 Q100,65 122,68" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.35"/>
+  </g>
+</svg>

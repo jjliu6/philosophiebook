@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip-plato">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle-clip-plato)">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="100" fill="#6A5ACD" opacity="0.2"/>
+    <!-- Classical Greek garment / shoulders -->
+    <path d="M25,200 Q35,158 58,146 Q78,138 100,136 Q122,138 142,146 Q165,158 175,200 Z" fill="#6A5ACD" opacity="0.45"/>
+    <!-- Garment drape lines -->
+    <path d="M65,150 Q82,168 100,162 Q118,156 135,150" fill="none" stroke="#6A5ACD" stroke-width="2" opacity="0.5"/>
+    <path d="M55,160 Q75,178 95,170" fill="none" stroke="#6A5ACD" stroke-width="1.5" opacity="0.35"/>
+    <!-- Neck -->
+    <rect x="88" y="122" width="24" height="18" rx="6" fill="#D2A679"/>
+    <!-- Head shape - broad forehead (Plato = "broad") -->
+    <ellipse cx="100" cy="82" rx="42" ry="48" fill="#D2A679"/>
+    <!-- Hair - wavy, receding slightly -->
+    <path d="M58,78 Q58,40 80,32 Q100,26 120,32 Q142,40 142,78" fill="#6A5ACD" opacity="0.4"/>
+    <path d="M62,78 Q62,44 82,36 Q100,30 118,36 Q138,44 138,78" fill="#6A5ACD" opacity="0.25"/>
+    <!-- Laurel wreath / headband -->
+    <path d="M60,68 Q100,58 140,68" fill="none" stroke="#6A5ACD" stroke-width="3" stroke-linecap="round"/>
+    <!-- Laurel leaves -->
+    <ellipse cx="68" cy="64" rx="5" ry="3" fill="#6A5ACD" opacity="0.5" transform="rotate(-20 68 64)"/>
+    <ellipse cx="80" cy="61" rx="5" ry="3" fill="#6A5ACD" opacity="0.5" transform="rotate(-10 80 61)"/>
+    <ellipse cx="92" cy="59" rx="5" ry="3" fill="#6A5ACD" opacity="0.5" transform="rotate(0 92 59)"/>
+    <ellipse cx="108" cy="59" rx="5" ry="3" fill="#6A5ACD" opacity="0.5" transform="rotate(0 108 59)"/>
+    <ellipse cx="120" cy="61" rx="5" ry="3" fill="#6A5ACD" opacity="0.5" transform="rotate(10 120 61)"/>
+    <ellipse cx="132" cy="64" rx="5" ry="3" fill="#6A5ACD" opacity="0.5" transform="rotate(20 132 64)"/>
+    <!-- Ears -->
+    <ellipse cx="57" cy="86" rx="6" ry="10" fill="#C49565"/>
+    <ellipse cx="143" cy="86" rx="6" ry="10" fill="#C49565"/>
+    <!-- Eyebrows - dignified, slightly arched -->
+    <path d="M70,76 Q80,71 92,74" fill="none" stroke="#6A5ACD" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M108,74 Q120,71 130,76" fill="none" stroke="#6A5ACD" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Eyes - wise, calm -->
+    <ellipse cx="82" cy="84" rx="8" ry="4.5" fill="white"/>
+    <circle cx="83" cy="84" r="3" fill="#2E1A6B"/>
+    <circle cx="84" cy="83" r="1" fill="white"/>
+    <ellipse cx="118" cy="84" rx="8" ry="4.5" fill="white"/>
+    <circle cx="117" cy="84" r="3" fill="#2E1A6B"/>
+    <circle cx="118" cy="83" r="1" fill="white"/>
+    <!-- Nose - straight, classical Greek profile hint -->
+    <path d="M100,86 L97,100 Q100,104 103,100 Z" fill="#C49565"/>
+    <!-- Mouth - dignified -->
+    <path d="M90,112 Q95,109 100,111 Q105,109 110,112" fill="none" stroke="#6A5ACD" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Full beard - well-kept, dignified -->
+    <path d="M64,100 Q62,118 66,136 Q74,152 100,158 Q126,152 134,136 Q138,118 136,100" fill="#6A5ACD" opacity="0.3"/>
+    <!-- Beard texture -->
+    <path d="M74,108 Q76,128 80,142" fill="none" stroke="#6A5ACD" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+    <path d="M86,112 Q88,132 92,148" fill="none" stroke="#6A5ACD" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+    <path d="M100,114 Q100,138 100,152" fill="none" stroke="#6A5ACD" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+    <path d="M114,112 Q112,132 108,148" fill="none" stroke="#6A5ACD" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+    <path d="M126,108 Q124,128 120,142" fill="none" stroke="#6A5ACD" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+    <!-- Mustache -->
+    <path d="M90,110 Q82,114 70,112" fill="none" stroke="#6A5ACD" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+    <path d="M110,110 Q118,114 130,112" fill="none" stroke="#6A5ACD" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+    <!-- Wrinkle lines on forehead -->
+    <path d="M74,70 Q100,67 126,70" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.3"/>
+  </g>
+</svg>

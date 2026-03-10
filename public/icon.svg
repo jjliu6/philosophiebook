@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <!-- PWA App Icon: Detailed speech bubble dialogue on dark background -->
+
+  <!-- Dark rounded background -->
+  <rect width="192" height="192" rx="36" ry="36" fill="#0f0f13"/>
+
+  <!-- Left speech bubble (behind, softer) -->
+  <rect x="26" y="54" width="72" height="54" rx="13" ry="13"
+        fill="none" stroke="#c8a850" stroke-width="4.5" opacity="0.45"/>
+  <path d="M48 108 L35 128 L60 108"
+        fill="none" stroke="#c8a850" stroke-width="4.5" stroke-linejoin="round" opacity="0.45"/>
+  <!-- Left bubble text lines -->
+  <line x1="40" y1="72" x2="78" y2="72"
+        stroke="#c8a850" stroke-width="2.5" opacity="0.22" stroke-linecap="round"/>
+  <line x1="40" y1="82" x2="70" y2="82"
+        stroke="#c8a850" stroke-width="2.5" opacity="0.22" stroke-linecap="round"/>
+  <line x1="40" y1="92" x2="58" y2="92"
+        stroke="#c8a850" stroke-width="2.5" opacity="0.22" stroke-linecap="round"/>
+
+  <!-- Right speech bubble (front, full opacity) -->
+  <rect x="80" y="34" width="86" height="62" rx="13" ry="13"
+        fill="none" stroke="#c8a850" stroke-width="4.5"/>
+  <path d="M138 96 L156 118 L126 96"
+        fill="none" stroke="#c8a850" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Right bubble text lines -->
+  <line x1="96" y1="54" x2="146" y2="54"
+        stroke="#c8a850" stroke-width="2.5" opacity="0.35" stroke-linecap="round"/>
+  <line x1="96" y1="66" x2="140" y2="66"
+        stroke="#c8a850" stroke-width="2.5" opacity="0.35" stroke-linecap="round"/>
+  <line x1="96" y1="78" x2="122" y2="78"
+        stroke="#c8a850" stroke-width="2.5" opacity="0.35" stroke-linecap="round"/>
+
+  <!-- Overlap accent: soft golden glow at the dialectic intersection -->
+  <circle cx="108" cy="70" r="3.5" fill="#c8a850" opacity="0.18"/>
+</svg>

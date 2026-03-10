@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Thinker {
+  id           String   @id
+  name         String
+  chineseName  String?
+  school       String
+  era          String
+  avatarUrl    String   @default("")
+  color        String   @default("#6B7280")
+  tagline      String   @default("")
+  topicDomains String   @default("[]") // JSON array stored as string
+  neverDoes    String   @default("[]") // JSON array stored as string
+  createdAt    DateTime @default(now())
+
+  responses    Response[]
+  endorsements Endorsement[]
+  thinkerReplies ThinkerReply[]
+}
+
+model Topic {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  sourceType  String   @default("evergreen") // "evergreen" | "news" | "user"
+  sourceUrl   String?
+  domains     String   @default("[]") // JSON array stored as string
+  status      String   @default("active") // "generating" | "active" | "archived"
+  createdAt   DateTime @default(now())
+  viewCount   Int      @default(0)
+
+  responses   Response[]
+  comments    Comment[]
+}
+
+model Response {
+  id                  String   @id @default(cuid())
+  topicId             String
+  thinkerId           String
+  content             String
+  position            Int      // Order among siblings (0-indexed)
+  parentResponseId    String?  // null = top-level, set = reply to another response
+  depth               Int      @default(0) // 0=top-level, 1=reply, 2=reply-to-reply, max 3
+  originalQuote       String?
+  originalQuoteSource String?
+  humanLikeCount      Int      @default(0)
+  createdAt           DateTime @default(now())
+
+  topic          Topic         @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  thinker        Thinker       @relation(fields: [thinkerId], references: [id])
+  parentResponse Response?     @relation("ResponseReplies", fields: [parentResponseId], references: [id])
+  replies        Response[]    @relation("ResponseReplies")
+  endorsements   Endorsement[]
+  humanLikes     HumanLike[]
+
+  @@index([topicId])
+  @@index([thinkerId])
+  @@index([parentResponseId])
+}
+
+model Endorsement {
+  id         String  @id @default(cuid())
+  responseId String
+  thinkerId  String  // The thinker giving the endorsement
+  type       String  @default("endorse") // "endorse" | "challenge"
+  reason     String?
+
+  response Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  thinker  Thinker  @relation(fields: [thinkerId], references: [id])
+
+  @@index([responseId])
+}
+
+model User {
+  id                String   @id @default(cuid())
+  username          String   @unique
+  email             String   @unique
+  passwordHash      String
+  dailyCommentCount Int      @default(0)
+  schoolAffinity    String?
+  createdAt         DateTime @default(now())
+
+  comments     Comment[]
+  humanLikes   HumanLike[]
+  commentLikes CommentLike[]
+}
+
+model Comment {
+  id             String   @id @default(cuid())
+  topicId        String
+  userId         String
+  content        String
+  humanLikeCount Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  topic          Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user           User           @relation(fields: [userId], references: [id])
+  thinkerReplies ThinkerReply[]
+  commentLikes   CommentLike[]
+
+  @@index([topicId])
+}
+
+model ThinkerReply {
+  id        String   @id @default(cuid())
+  commentId String
+  thinkerId String
+  content   String
+  createdAt DateTime @default(now())
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  thinker Thinker @relation(fields: [thinkerId], references: [id])
+
+  @@index([commentId])
+}
+
+model HumanLike {
+  id         String   @id @default(cuid())
+  userId     String
+  responseId String
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  response Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, responseId])
+}
+
+model CommentLike {
+  id        String   @id @default(cuid())
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+}

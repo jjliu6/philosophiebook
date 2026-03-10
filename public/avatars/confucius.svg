@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip-confucius">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle-clip-confucius)">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="100" fill="#8B4513" opacity="0.2"/>
+    <!-- Robe / shoulders -->
+    <path d="M30,200 Q40,155 65,145 Q80,140 100,138 Q120,140 135,145 Q160,155 170,200 Z" fill="#8B4513" opacity="0.5"/>
+    <!-- Robe collar -->
+    <path d="M75,145 L100,170 L125,145" fill="none" stroke="#8B4513" stroke-width="2.5"/>
+    <!-- Neck -->
+    <rect x="90" y="125" width="20" height="18" rx="5" fill="#D2A679"/>
+    <!-- Head shape -->
+    <ellipse cx="100" cy="90" rx="38" ry="45" fill="#D2A679"/>
+    <!-- Traditional hat (guan) - formal scholar cap -->
+    <rect x="72" y="42" width="56" height="22" rx="3" fill="#8B4513"/>
+    <rect x="82" y="30" width="36" height="16" rx="2" fill="#8B4513"/>
+    <!-- Hat decorative band -->
+    <rect x="72" y="58" width="56" height="4" fill="#6B3410"/>
+    <!-- Hat top piece -->
+    <rect x="90" y="22" width="20" height="12" rx="2" fill="#6B3410"/>
+    <!-- Eyebrows - aged, bushy -->
+    <path d="M72,78 Q80,72 92,76" fill="none" stroke="#5A3010" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M108,76 Q120,72 128,78" fill="none" stroke="#5A3010" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Eyes - wise, slightly downturned -->
+    <ellipse cx="82" cy="85" rx="7" ry="4" fill="white"/>
+    <circle cx="83" cy="85" r="3" fill="#3A2010"/>
+    <circle cx="84" cy="84" r="1" fill="white"/>
+    <ellipse cx="118" cy="85" rx="7" ry="4" fill="white"/>
+    <circle cx="117" cy="85" r="3" fill="#3A2010"/>
+    <circle cx="118" cy="84" r="1" fill="white"/>
+    <!-- Eyelids - aged appearance -->
+    <path d="M74,83 Q82,79 90,83" fill="none" stroke="#B8895A" stroke-width="1.2"/>
+    <path d="M110,83 Q118,79 126,83" fill="none" stroke="#B8895A" stroke-width="1.2"/>
+    <!-- Nose -->
+    <path d="M100,88 L97,102 Q100,106 103,102 Z" fill="#C49565"/>
+    <!-- Mouth - dignified -->
+    <path d="M90,112 Q95,110 100,112 Q105,110 110,112" fill="none" stroke="#8B4513" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Long beard -->
+    <path d="M80,118 Q78,140 72,165" fill="none" stroke="#8B4513" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <path d="M88,120 Q85,145 80,170" fill="none" stroke="#8B4513" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <path d="M95,122 Q93,150 90,175" fill="none" stroke="#8B4513" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+    <path d="M105,122 Q107,150 110,175" fill="none" stroke="#8B4513" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+    <path d="M112,120 Q115,145 120,170" fill="none" stroke="#8B4513" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <path d="M120,118 Q122,140 128,165" fill="none" stroke="#8B4513" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <!-- Mustache -->
+    <path d="M88,112 Q82,118 74,120" fill="none" stroke="#8B4513" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+    <path d="M112,112 Q118,118 126,120" fill="none" stroke="#8B4513" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+    <!-- Ears -->
+    <ellipse cx="61" cy="90" rx="6" ry="10" fill="#C49565"/>
+    <ellipse cx="139" cy="90" rx="6" ry="10" fill="#C49565"/>
+    <!-- Wrinkle lines for age -->
+    <path d="M75,100 Q78,98 80,100" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.5"/>
+    <path d="M120,100 Q122,98 125,100" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.5"/>
+  </g>
+</svg>

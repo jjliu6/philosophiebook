@@ -1,0 +1,190 @@
+import ThinkerAvatar from "@/components/thinker/ThinkerAvatar";
+import LikeButton from "@/components/ui/LikeButton";
+import EndorsementBadge from "./EndorsementBadge";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+
+interface Endorsement {
+  id: string;
+  type: string;
+  reason: string | null;
+  thinker: {
+    id: string;
+    name: string;
+    color: string;
+  };
+}
+
+interface ThinkerResponseProps {
+  response: {
+    id: string;
+    content: string;
+    position: number;
+    originalQuote: string | null;
+    originalQuoteSource: string | null;
+    humanLikeCount: number;
+    thinker: {
+      id: string;
+      name: string;
+      chineseName: string | null;
+      school: string;
+      era: string;
+      color: string;
+    };
+    endorsements: Endorsement[];
+  };
+  /** Roman numeral folio number (top-level only) */
+  folio?: string;
+  /** Whether this is a reply to another response */
+  isReply?: boolean;
+  /** Nesting depth (0 = top-level) */
+  replyDepth?: number;
+}
+
+const POSITION_LABELS = [
+  "Opening argument",
+  "Response",
+  "Further reflection",
+  "Final word",
+  "Addendum",
+];
+
+export default function ThinkerResponse({
+  response,
+  folio,
+  isReply = false,
+  replyDepth = 0,
+}: ThinkerResponseProps) {
+  const { thinker, endorsements } = response;
+
+  // Split content into paragraphs
+  const paragraphs = response.content
+    .split("\n\n")
+    .filter((p) => p.trim().length > 0);
+
+  const positionLabel = isReply
+    ? "Reply"
+    : POSITION_LABELS[response.position] ||
+      POSITION_LABELS[POSITION_LABELS.length - 1];
+
+  // Adaptive styling based on nesting depth
+  const showPageCorner = !isReply || replyDepth <= 1;
+  const showDropCap = !isReply;
+  const avatarSize = isReply ? "sm" : "md";
+  const padding = isReply ? "p-4 sm:p-5" : "p-6 sm:p-8";
+  const nameSize = isReply ? "text-[15px]" : "text-lg";
+
+  return (
+    <article
+      className={cn(
+        "book-page group relative overflow-hidden rounded-xl border border-border/40",
+        showPageCorner && "page-corner",
+        isReply && "border-border/25"
+      )}
+    >
+      {/* Top gradient accent using thinker color */}
+      <div
+        className="h-px w-full"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${thinker.color}${isReply ? "40" : "60"}, transparent)`,
+        }}
+      />
+
+      <div className={padding}>
+        {/* Folio number (top-level only) */}
+        {folio && !isReply && (
+          <div className="folio mb-4 text-right">{folio}</div>
+        )}
+
+        {/* Header: avatar, name, school, era */}
+        <div className="flex items-start gap-3">
+          <Link
+            href={`/thinkers/${thinker.id}`}
+            className="transition-opacity hover:opacity-80"
+          >
+            <ThinkerAvatar
+              name={thinker.name}
+              color={thinker.color}
+              thinkerId={thinker.id}
+              size={avatarSize}
+            />
+          </Link>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-baseline gap-2">
+              <Link
+                href={`/thinkers/${thinker.id}`}
+                className={cn(
+                  "font-quote text-foreground transition-colors hover:text-accent",
+                  nameSize
+                )}
+              >
+                {thinker.name}
+              </Link>
+              {thinker.chineseName && !isReply && (
+                <span className="text-sm text-muted/50">
+                  {thinker.chineseName}
+                </span>
+              )}
+            </div>
+            <p className="text-xs tracking-wide text-muted/60">
+              {thinker.school} &middot; {thinker.era}
+            </p>
+          </div>
+          {/* Position label as marginalia */}
+          <span className="marginalia shrink-0 text-[11px] tracking-wide">
+            {positionLabel}
+          </span>
+        </div>
+
+        {/* Original quote — book-style quotation */}
+        {response.originalQuote && (
+          <blockquote className={cn("book-quote", isReply ? "mt-4" : "mt-6")}>
+            <p className="font-quote text-[15px] italic leading-relaxed text-foreground/60">
+              {response.originalQuote}
+            </p>
+            {response.originalQuoteSource && (
+              <cite className="mt-2 block text-xs not-italic tracking-wide text-muted/50">
+                &mdash; {response.originalQuoteSource}
+              </cite>
+            )}
+          </blockquote>
+        )}
+
+        {/* Response content */}
+        <div className={cn("space-y-4", isReply ? "mt-4" : "mt-6")}>
+          {paragraphs.map((paragraph, i) => (
+            <p
+              key={i}
+              className={cn(
+                "text-[15px] leading-[1.85] text-foreground/85",
+                i === 0 && showDropCap && !response.originalQuote && "drop-cap"
+              )}
+            >
+              {paragraph}
+            </p>
+          ))}
+        </div>
+
+        {/* Endorsements */}
+        {endorsements.length > 0 && (
+          <div className="mt-4 space-y-1.5">
+            {endorsements.map((endorsement) => (
+              <EndorsementBadge
+                key={endorsement.id}
+                thinkerName={endorsement.thinker.name}
+                thinkerColor={endorsement.thinker.color}
+                type={endorsement.type as "endorse" | "challenge"}
+                reason={endorsement.reason}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Like button */}
+        <div className="mt-4 flex items-center border-t border-border/20 pt-3">
+          <LikeButton count={response.humanLikeCount} />
+        </div>
+      </div>
+    </article>
+  );
+}

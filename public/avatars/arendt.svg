@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip-arendt">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle-clip-arendt)">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="100" fill="#483D8B" opacity="0.2"/>
+    <!-- 1950s clothing / shoulders -->
+    <path d="M25,200 Q35,158 55,146 Q78,138 100,136 Q122,138 145,146 Q165,158 175,200 Z" fill="#483D8B" opacity="0.45"/>
+    <!-- Jacket collar / neckline -->
+    <path d="M70,148 Q78,140 88,142 L100,138 L112,142 Q122,140 130,148" fill="none" stroke="#483D8B" stroke-width="2.5" opacity="0.6"/>
+    <!-- Jacket lapels -->
+    <path d="M75,148 L88,160 L94,148" fill="none" stroke="#483D8B" stroke-width="1.5" opacity="0.4"/>
+    <path d="M125,148 L112,160 L106,148" fill="none" stroke="#483D8B" stroke-width="1.5" opacity="0.4"/>
+    <!-- Blouse underneath -->
+    <path d="M90,142 Q95,148 100,146 Q105,148 110,142" fill="none" stroke="#483D8B" stroke-width="1" opacity="0.3"/>
+    <!-- Neck -->
+    <rect x="90" y="120" width="20" height="20" rx="5" fill="#E0C098"/>
+    <!-- Head shape -->
+    <ellipse cx="100" cy="78" rx="38" ry="44" fill="#E0C098"/>
+    <!-- Short dark hair - 1950s style -->
+    <path d="M60,74 Q56,38 78,26 Q100,18 122,26 Q144,38 140,74" fill="#483D8B" opacity="0.45"/>
+    <!-- Hair parted and swept -->
+    <path d="M62,68 Q60,42 80,30 Q100,22 120,30 Q140,42 138,68" fill="#483D8B" opacity="0.4"/>
+    <!-- Hair waves/texture -->
+    <path d="M66,60 Q74,52 82,56 Q90,48 98,54" fill="none" stroke="#483D8B" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/>
+    <path d="M102,52 Q110,46 118,52 Q126,48 134,56" fill="none" stroke="#483D8B" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/>
+    <!-- Hair sides -->
+    <path d="M60,68 Q58,78 60,88 Q61,94 62,100" fill="none" stroke="#483D8B" stroke-width="4" stroke-linecap="round" opacity="0.35"/>
+    <path d="M140,68 Q142,78 140,88 Q139,94 138,100" fill="none" stroke="#483D8B" stroke-width="4" stroke-linecap="round" opacity="0.35"/>
+    <!-- Short hair ends at about ear level -->
+    <path d="M62,96 Q60,102 62,108" fill="none" stroke="#483D8B" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
+    <path d="M138,96 Q140,102 138,108" fill="none" stroke="#483D8B" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
+    <!-- Ears - partially showing through short hair -->
+    <ellipse cx="60" cy="84" rx="4" ry="8" fill="#CCA878"/>
+    <ellipse cx="140" cy="84" rx="4" ry="8" fill="#CCA878"/>
+    <!-- Eyebrows - defined, intellectual -->
+    <path d="M70,72 Q78,68 92,71" fill="none" stroke="#483D8B" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M108,71 Q122,68 130,72" fill="none" stroke="#483D8B" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- Eyes - thoughtful, penetrating gaze -->
+    <ellipse cx="82" cy="80" rx="7.5" ry="4.5" fill="white"/>
+    <circle cx="84" cy="80" r="3.2" fill="#1E1848"/>
+    <circle cx="85" cy="79" r="1.1" fill="white"/>
+    <ellipse cx="118" cy="80" rx="7.5" ry="4.5" fill="white"/>
+    <circle cx="116" cy="80" r="3.2" fill="#1E1848"/>
+    <circle cx="117" cy="79" r="1.1" fill="white"/>
+    <!-- Upper eyelid crease -->
+    <path d="M74,77 Q82,74 90,77" fill="none" stroke="#CCA878" stroke-width="0.8" opacity="0.4"/>
+    <path d="M110,77 Q118,74 126,77" fill="none" stroke="#CCA878" stroke-width="0.8" opacity="0.4"/>
+    <!-- Under-eye lines - thoughtful -->
+    <path d="M75,84 Q82,86 89,84" fill="none" stroke="#CCA878" stroke-width="0.6" opacity="0.3"/>
+    <path d="M111,84 Q118,86 125,84" fill="none" stroke="#CCA878" stroke-width="0.6" opacity="0.3"/>
+    <!-- Nose -->
+    <path d="M100,83 L97,96 Q100,100 103,96 Z" fill="#CCA878"/>
+    <!-- Nostrils -->
+    <circle cx="97" cy="97" r="1.5" fill="#B89868" opacity="0.3"/>
+    <circle cx="103" cy="97" r="1.5" fill="#B89868" opacity="0.3"/>
+    <!-- Mouth - set, serious, scholarly -->
+    <path d="M90,108 Q95,105 100,107 Q105,105 110,108" fill="none" stroke="#483D8B" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Lower lip hint -->
+    <path d="M92,109 Q100,112 108,109" fill="none" stroke="#483D8B" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+    <!-- Cigarette -->
+    <rect x="110" y="106" width="28" height="3" rx="1" fill="#CCA878" opacity="0.6" transform="rotate(12 110 107)"/>
+    <rect x="136" y="108" width="4" height="3" rx="1" fill="#483D8B" opacity="0.3" transform="rotate(12 136 109)"/>
+    <!-- Smoke wisp -->
+    <path d="M140,104 Q142,98 138,92 Q140,86 137,80" fill="none" stroke="#483D8B" stroke-width="0.8" stroke-linecap="round" opacity="0.2"/>
+    <!-- Nasolabial folds -->
+    <path d="M92,96 Q90,102 88,108" fill="none" stroke="#CCA878" stroke-width="0.6" opacity="0.25"/>
+    <path d="M108,96 Q110,102 112,108" fill="none" stroke="#CCA878" stroke-width="0.6" opacity="0.25"/>
+    <!-- Cheekbones -->
+    <path d="M68,90 Q72,88 76,90" fill="none" stroke="#CCA878" stroke-width="0.6" opacity="0.25"/>
+    <path d="M124,90 Q128,88 132,90" fill="none" stroke="#CCA878" stroke-width="0.6" opacity="0.25"/>
+    <!-- Chin -->
+    <path d="M94,118 Q100,122 106,118" fill="none" stroke="#CCA878" stroke-width="0.6" opacity="0.2"/>
+    <!-- Forehead line -->
+    <path d="M76,64 Q100,61 124,64" fill="none" stroke="#CCA878" stroke-width="0.7" opacity="0.25"/>
+  </g>
+</svg>

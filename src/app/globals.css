@@ -1,0 +1,302 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0f;
+  --foreground: #e8e6e3;
+  --card: #141419;
+  --card-hover: #1a1a22;
+  --border: #1f1f2e;
+  --muted: #6b6b7b;
+  --accent: #c8a850;
+  --accent-dim: #9a7d3a;
+  --font-serif: "Georgia", "Times New Roman", serif;
+  /* Book-like paper tones */
+  --paper: #16161d;
+  --paper-edge: #1c1c26;
+  --paper-warm: rgba(200, 168, 80, 0.015);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-paper: var(--paper);
+  --color-paper-edge: var(--paper-edge);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-serif);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Elegant scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2a2a3e;
+}
+
+/* Serif font class for quotes */
+.font-quote {
+  font-family: var(--font-serif);
+}
+
+/* Subtle text selection */
+::selection {
+  background: rgba(200, 168, 80, 0.25);
+  color: var(--foreground);
+}
+
+/* Smooth focus outlines */
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════
+   BOOK-LIKE UI — Paper, Type, Ornaments
+   ═══════════════════════════════════════ */
+
+/* Paper texture — subtle noise via CSS gradient layering */
+.book-page {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(200, 168, 80, 0.02), transparent 70%),
+    radial-gradient(ellipse at 80% 20%, rgba(200, 168, 80, 0.015), transparent 60%),
+    linear-gradient(180deg, var(--paper) 0%, var(--card) 100%);
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Decorative drop cap for first paragraph of responses */
+.drop-cap::first-letter {
+  font-family: var(--font-serif);
+  float: left;
+  font-size: 3.2em;
+  line-height: 0.8;
+  padding-right: 0.12em;
+  padding-top: 0.07em;
+  color: var(--accent);
+  font-weight: 400;
+}
+
+/* Book spine — vertical connector between response cards */
+.book-spine {
+  position: relative;
+}
+
+.book-spine::before {
+  content: "";
+  position: absolute;
+  left: 28px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--border) 8%,
+    var(--border) 92%,
+    transparent 100%
+  );
+  opacity: 0.4;
+}
+
+/* Chapter heading — decorative lines flanking title */
+.chapter-heading {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.chapter-heading::before,
+.chapter-heading::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent) 50%,
+    transparent
+  );
+  opacity: 0.15;
+}
+
+/* Page corner ornament — subtle decorative corner marks */
+.page-corner {
+  position: relative;
+}
+
+.page-corner::before,
+.page-corner::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.page-corner::before {
+  top: 12px;
+  left: 12px;
+  border-top: 1px solid var(--accent);
+  border-left: 1px solid var(--accent);
+}
+
+.page-corner::after {
+  bottom: 12px;
+  right: 12px;
+  border-bottom: 1px solid var(--accent);
+  border-right: 1px solid var(--accent);
+}
+
+/* Marginalia — side annotations styled like handwritten notes */
+.marginalia {
+  font-family: var(--font-serif);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  opacity: 0.35;
+}
+
+/* Page edge shadow — right edge shadow like a book page */
+.page-edge-right {
+  box-shadow:
+    4px 0 8px -2px rgba(0, 0, 0, 0.2),
+    1px 0 0 rgba(255, 255, 255, 0.02);
+}
+
+/* Folio number — page number styling */
+.folio {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  opacity: 0.35;
+}
+
+/* Section divider — book-style fleuron */
+.fleuron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem 0;
+}
+
+.fleuron::before,
+.fleuron::after {
+  content: "";
+  width: 3rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent),
+    transparent
+  );
+  opacity: 0.2;
+}
+
+/* Enhanced blockquote — book-style quotation */
+.book-quote {
+  position: relative;
+  padding-left: 1.75rem;
+  border-left: 2px solid rgba(200, 168, 80, 0.2);
+}
+
+.book-quote::before {
+  content: "\201C";
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  color: var(--accent);
+  opacity: 0.15;
+  position: absolute;
+  left: -0.1rem;
+  top: -0.6rem;
+  line-height: 1;
+}
+
+/* Page turn hover effect — subtle lift on response cards */
+.page-lift {
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.page-lift:hover {
+  transform: translateY(-2px) rotate(-0.3deg);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ═══════════════════════════════════════
+   THREADED REPLIES — Reddit-style nesting
+   ═══════════════════════════════════════ */
+
+/* Thread container */
+.thread-container {
+  position: relative;
+}
+
+/* Each thread node */
+.thread-node {
+  position: relative;
+}
+
+/* Vertical thread line alongside nested replies */
+.thread-line-container {
+  position: relative;
+}
+
+.thread-vertical-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 12px;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    var(--accent) 0%,
+    var(--border) 40%,
+    var(--border) 90%,
+    transparent 100%
+  );
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.thread-line-container:hover > .thread-vertical-line {
+  opacity: 0.4;
+  background: var(--accent);
+  transition: opacity 0.3s ease, background 0.3s ease;
+}
+
+/* "replying to" connector styling */
+.reply-connector {
+  padding-left: 4px;
+}
+
+.reply-connector svg {
+  flex-shrink: 0;
+}

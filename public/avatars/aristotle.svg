@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip-aristotle">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle-clip-aristotle)">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="100" fill="#556B2F" opacity="0.2"/>
+    <!-- Classical garments / shoulders -->
+    <path d="M25,200 Q35,158 58,146 Q78,138 100,136 Q122,138 142,146 Q165,158 175,200 Z" fill="#556B2F" opacity="0.45"/>
+    <!-- Garment drape -->
+    <path d="M65,150 Q82,166 100,160 Q118,154 135,150" fill="none" stroke="#556B2F" stroke-width="2" opacity="0.5"/>
+    <path d="M130,148 Q145,170 155,200" fill="none" stroke="#556B2F" stroke-width="1.5" opacity="0.35"/>
+    <!-- Neck -->
+    <rect x="88" y="122" width="24" height="18" rx="6" fill="#D2A679"/>
+    <!-- Head shape -->
+    <ellipse cx="100" cy="82" rx="40" ry="46" fill="#D2A679"/>
+    <!-- Hair - receding hairline, neat -->
+    <path d="M60,80 Q58,52 72,40 Q85,32 100,30 Q115,32 128,40 Q142,52 140,80" fill="#556B2F" opacity="0.35"/>
+    <!-- Receding hairline - exposed forehead -->
+    <path d="M68,72 Q76,44 100,38 Q124,44 132,72" fill="#D2A679"/>
+    <!-- Side hair remains -->
+    <path d="M58,75 Q56,55 68,48" fill="none" stroke="#556B2F" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+    <path d="M142,75 Q144,55 132,48" fill="none" stroke="#556B2F" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+    <!-- Ears -->
+    <ellipse cx="58" cy="86" rx="6" ry="10" fill="#C49565"/>
+    <ellipse cx="142" cy="86" rx="6" ry="10" fill="#C49565"/>
+    <!-- Eyebrows - keen, slightly furrowed (observant) -->
+    <path d="M70,76 Q80,72 92,75" fill="none" stroke="#556B2F" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M108,75 Q120,72 130,76" fill="none" stroke="#556B2F" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Eyes - keen, observant, slightly narrowed -->
+    <ellipse cx="82" cy="84" rx="7.5" ry="4.5" fill="white"/>
+    <circle cx="84" cy="84" r="3.2" fill="#2A3A15"/>
+    <circle cx="85" cy="83" r="1.1" fill="white"/>
+    <ellipse cx="118" cy="84" rx="7.5" ry="4.5" fill="white"/>
+    <circle cx="116" cy="84" r="3.2" fill="#2A3A15"/>
+    <circle cx="117" cy="83" r="1.1" fill="white"/>
+    <!-- Upper eyelids - slightly narrowed -->
+    <path d="M74,82 Q82,79 90,82" fill="none" stroke="#B8895A" stroke-width="1" opacity="0.5"/>
+    <path d="M110,82 Q118,79 126,82" fill="none" stroke="#B8895A" stroke-width="1" opacity="0.5"/>
+    <!-- Nose - straight, refined -->
+    <path d="M100,86 L97,100 Q100,104 103,100 Z" fill="#C49565"/>
+    <!-- Mouth -->
+    <path d="M90,112 Q95,110 100,112 Q105,110 110,112" fill="none" stroke="#556B2F" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Neat trimmed beard -->
+    <path d="M66,102 Q64,116 68,130 Q76,142 100,146 Q124,142 132,130 Q136,116 134,102" fill="#556B2F" opacity="0.3"/>
+    <!-- Beard texture - neat, trimmed -->
+    <path d="M76,108 Q78,122 82,134" fill="none" stroke="#556B2F" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+    <path d="M88,112 Q90,126 94,138" fill="none" stroke="#556B2F" stroke-width="1.3" stroke-linecap="round" opacity="0.35"/>
+    <path d="M100,114 Q100,130 100,140" fill="none" stroke="#556B2F" stroke-width="1.3" stroke-linecap="round" opacity="0.35"/>
+    <path d="M112,112 Q110,126 106,138" fill="none" stroke="#556B2F" stroke-width="1.3" stroke-linecap="round" opacity="0.35"/>
+    <path d="M124,108 Q122,122 118,134" fill="none" stroke="#556B2F" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+    <!-- Mustache - neat -->
+    <path d="M90,110 Q84,114 72,112" fill="none" stroke="#556B2F" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <path d="M110,110 Q116,114 128,112" fill="none" stroke="#556B2F" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <!-- Forehead lines - thoughtful -->
+    <path d="M76,62 Q100,59 124,62" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.35"/>
+    <path d="M78,67 Q100,64 122,67" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.3"/>
+  </g>
+</svg>
