@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
+import AuthProvider from "@/components/providers/AuthProvider";
+import ViewModeProvider from "@/components/providers/ViewModeProvider";
+import { getCurrentUser } from "@/lib/auth";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -21,30 +24,47 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUser();
+
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased`}>
-        <Header />
-        <main className="min-h-screen">{children}</main>
+        <AuthProvider initialUser={user}>
+          <ViewModeProvider>
+            <Header />
+            <main className="min-h-screen">{children}</main>
 
-        {/* End-of-book ornament */}
-        <div className="fleuron">
-          <span className="text-[10px] text-accent/30">&#10022;</span>
-        </div>
+            {/* End-of-book ornament */}
+            <div className="fleuron">
+              <span className="text-[10px] text-accent/30">&#10022;</span>
+            </div>
 
-        <footer className="pb-10 text-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-full.png" alt="PhilosophieBook" className="mx-auto h-20 w-auto opacity-60" />
-          <p className="font-quote mt-3 text-[13px] italic text-muted/50">
-            Where ancient wisdom meets modern questions
-          </p>
-          <p className="folio mt-2">MMXXVI</p>
-        </footer>
+            <footer className="pb-10 text-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-full.png" alt="PhilosophieBook" className="mx-auto h-20 w-auto opacity-60" />
+              <p className="font-quote mt-3 text-[13px] italic text-muted/50">
+                Where ancient wisdom meets modern questions
+              </p>
+              <p className="folio mt-2">MMXXVI</p>
+              <p className="mt-4 text-[12px] text-muted/40">
+                Built by Junjie Liu at{" "}
+                <a
+                  href="https://philosophie.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent/50 transition-colors hover:text-accent"
+                >
+                  Philosophie AI
+                </a>
+              </p>
+            </footer>
+          </ViewModeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

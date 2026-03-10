@@ -23,6 +23,7 @@ interface ThinkerResponseProps {
     originalQuote: string | null;
     originalQuoteSource: string | null;
     humanLikeCount: number;
+    userHasLiked?: boolean;
     thinker: {
       id: string;
       name: string;
@@ -182,7 +183,11 @@ export default function ThinkerResponse({
 
         {/* Like button */}
         <div className="mt-4 flex items-center border-t border-border/20 pt-3">
-          <LikeButton count={response.humanLikeCount} />
+          <LikeButton
+            responseId={response.id}
+            initialCount={response.humanLikeCount}
+            initialLiked={response.userHasLiked ?? false}
+          />
         </div>
       </div>
     </article>

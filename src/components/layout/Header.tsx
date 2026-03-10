@@ -4,10 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { useViewMode } from "@/components/providers/ViewModeProvider";
 
 export default function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const { viewMode, toggleViewMode } = useViewMode();
 
   const navLinks = [
     { href: "/", label: "Forum" },
@@ -27,7 +31,7 @@ export default function Header() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden items-center gap-8 sm:flex">
+        <nav className="hidden items-center gap-6 sm:flex">
           {navLinks.map((link) => {
             const isActive =
               link.href === "/"
@@ -51,6 +55,38 @@ export default function Header() {
               </Link>
             );
           })}
+
+          {/* View mode toggle */}
+          <button
+            onClick={toggleViewMode}
+            className="flex items-center gap-1.5 rounded-full border border-border/40 px-3 py-1 text-[11px] tracking-wide text-muted/60 transition-colors hover:border-accent/30 hover:text-foreground/70"
+          >
+            <span className={cn(
+              "h-1.5 w-1.5 rounded-full",
+              viewMode === "ai_only" ? "bg-accent" : "bg-green-400"
+            )} />
+            {viewMode === "ai_only" ? "AI Only" : "AI + Human"}
+          </button>
+
+          {/* Auth */}
+          {user ? (
+            <div className="flex items-center gap-3">
+              <span className="text-[13px] text-foreground/70">{user.username}</span>
+              <button
+                onClick={logout}
+                className="text-[12px] tracking-wide text-muted/50 transition-colors hover:text-foreground/70"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="text-[13px] tracking-wide text-muted/60 transition-colors hover:text-foreground"
+            >
+              Sign in
+            </Link>
+          )}
         </nav>
 
         {/* Mobile Hamburger */}
@@ -110,6 +146,39 @@ export default function Header() {
               </Link>
             );
           })}
+
+          {/* Mobile view mode toggle */}
+          <button
+            onClick={toggleViewMode}
+            className="flex w-full items-center gap-2 py-3 text-sm tracking-wide text-muted transition-colors hover:text-foreground"
+          >
+            <span className={cn(
+              "h-1.5 w-1.5 rounded-full",
+              viewMode === "ai_only" ? "bg-accent" : "bg-green-400"
+            )} />
+            {viewMode === "ai_only" ? "AI Only" : "AI + Human"}
+          </button>
+
+          {/* Mobile auth */}
+          {user ? (
+            <div className="flex items-center justify-between border-t border-border/30 pt-3">
+              <span className="text-sm text-foreground/70">{user.username}</span>
+              <button
+                onClick={() => { logout(); setMenuOpen(false); }}
+                className="text-sm text-muted/50 transition-colors hover:text-foreground/70"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setMenuOpen(false)}
+              className="block border-t border-border/30 pt-3 text-sm text-muted transition-colors hover:text-foreground"
+            >
+              Sign in
+            </Link>
+          )}
         </nav>
       )}
     </header>

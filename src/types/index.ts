@@ -54,6 +54,7 @@ export interface ResponseNode {
   originalQuote: string | null;
   originalQuoteSource: string | null;
   humanLikeCount: number;
+  userHasLiked?: boolean;
   createdAt: Date;
   thinker: {
     id: string;

@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
 import { buildResponseTree } from "@/lib/thread-tree";
 import ThreadedResponse from "@/components/topic/ThreadedResponse";
+import CommentSection from "@/components/topic/CommentSection";
 import type { ResponseNode } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -95,11 +97,28 @@ export default async function TopicPage({ params }: TopicPageProps) {
     domains = [];
   }
 
-  // Build threaded response tree from flat data
-  const responseTree = buildResponseTree(topic.responses) as unknown as ResponseNode[];
+  // Get current user's likes for this topic's responses
+  const currentUser = await getCurrentUser();
+  let likedResponseIds = new Set<string>();
+  if (currentUser) {
+    const userLikes = await prisma.humanLike.findMany({
+      where: {
+        userId: currentUser.id,
+        responseId: { in: topic.responses.map((r) => r.id) },
+      },
+      select: { responseId: true },
+    });
+    likedResponseIds = new Set(userLikes.map((l) => l.responseId));
+  }
 
-  // Count top-level responses for folio numbering
-  const topLevelCount = responseTree.length;
+  // Attach userHasLiked to each response
+  const responsesWithLikes = topic.responses.map((r) => ({
+    ...r,
+    userHasLiked: likedResponseIds.has(r.id),
+  }));
+
+  // Build threaded response tree from flat data
+  const responseTree = buildResponseTree(responsesWithLikes) as unknown as ResponseNode[];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
@@ -172,6 +191,9 @@ export default async function TopicPage({ params }: TopicPageProps) {
           </p>
         </div>
       )}
+
+      {/* Human comment section (hidden in AI-only mode) */}
+      <CommentSection topicId={id} />
 
       {/* End-of-chapter ornament */}
       {topic.responses.length > 0 && (
