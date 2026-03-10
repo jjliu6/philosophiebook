@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import { getThinker } from "@/personas";
 import ThinkerAvatar from "@/components/thinker/ThinkerAvatar";
 
+export const dynamic = "force-dynamic";
+
 interface ThinkerProfilePageProps {
   params: Promise<{ id: string }>;
 }

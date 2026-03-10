@@ -4,6 +4,8 @@ import FeedSort from "@/components/feed/FeedSort";
 import TopicFeed from "@/components/feed/TopicFeed";
 import type { FeedSortOption } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 interface HomePageProps {
   searchParams: Promise<{ sort?: string }>;
 }

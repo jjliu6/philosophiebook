@@ -5,6 +5,8 @@ import { buildResponseTree } from "@/lib/thread-tree";
 import ThreadedResponse from "@/components/topic/ThreadedResponse";
 import type { ResponseNode } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 interface TopicPageProps {
   params: Promise<{ id: string }>;
 }
