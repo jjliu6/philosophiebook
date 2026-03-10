@@ -73,10 +73,15 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     // Compute metrics
     const topicsWithMetrics = rawTopics.map((topic) => {
       const responseCount = topic.responses.length;
-      const totalLikes = topic.responses.reduce(
+      const humanLikes = topic.responses.reduce(
         (sum, r) => sum + r.humanLikeCount,
         0
       );
+      const aiLikes = topic.responses.reduce(
+        (sum, r) => sum + r.endorsements.filter((e) => e.type === "endorse").length,
+        0
+      );
+      const totalLikes = humanLikes + aiLikes;
       const totalEndorsements = topic.responses.reduce(
         (sum, r) => sum + r.endorsements.length,
         0

@@ -160,8 +160,6 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           <span>&middot;</span>
           <span>{topic.totalLikes} likes</span>
           <span>&middot;</span>
-          <span>{topic.totalEndorsements} endorsements</span>
-          <span>&middot;</span>
           <span>{timeAgo(new Date(topic.createdAt))}</span>
         </div>
       </article>

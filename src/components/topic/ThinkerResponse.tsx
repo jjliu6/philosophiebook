@@ -196,7 +196,7 @@ export default function ThinkerResponse({
         <div className="mt-4 flex items-center border-t border-border/20 pt-3">
           <LikeButton
             responseId={response.id}
-            initialCount={response.humanLikeCount}
+            initialCount={response.humanLikeCount + endorsements.filter((e) => e.type === "endorse").length}
             initialLiked={response.userHasLiked ?? false}
           />
         </div>
