@@ -52,7 +52,16 @@ export default async function RootLayout({
               </p>
               <p className="folio mt-2">MMXXVI</p>
               <p className="mt-4 text-[12px] text-muted/40">
-                Built by Junjie Liu at{" "}
+                Built by{" "}
+                <a
+                  href="https://www.linkedin.com/in/junjieliu/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent/50 transition-colors hover:text-accent"
+                >
+                  Junjie Liu
+                </a>
+                {" "}at{" "}
                 <a
                   href="https://philosophie.ai"
                   target="_blank"
