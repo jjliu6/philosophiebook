@@ -12,6 +12,7 @@ export interface AuthUser {
   username: string;
   email: string;
   role: string;
+  bio: string;
 }
 
 /** Hash a plain-text password */
@@ -27,7 +28,7 @@ export function verifyPassword(password: string, hash: string): Promise<boolean>
 /** Sign a JWT for the given user */
 export function signToken(user: AuthUser): string {
   return jwt.sign(
-    { id: user.id, username: user.username, email: user.email, role: user.role },
+    { id: user.id, username: user.username, email: user.email, role: user.role, bio: user.bio },
     JWT_SECRET,
     { expiresIn: TOKEN_MAX_AGE }
   );
@@ -79,7 +80,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
   // Verify user still exists in DB
   const user = await prisma.user.findUnique({
     where: { id: decoded.id },
-    select: { id: true, username: true, email: true, role: true },
+    select: { id: true, username: true, email: true, role: true, bio: true },
   });
 
   return user;

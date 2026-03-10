@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [bio, setBio] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +20,7 @@ export default function RegisterPage() {
     setError("");
     setLoading(true);
 
-    const result = await register(username, email, password);
+    const result = await register(username, email, password, bio);
     setLoading(false);
 
     if (result.error) {
@@ -90,6 +91,21 @@ export default function RegisterPage() {
               minLength={6}
               className="w-full rounded-lg border border-border/50 bg-white/[0.03] px-4 py-2.5 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/50"
               placeholder="At least 6 characters"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="bio" className="mb-1.5 block text-[12px] uppercase tracking-wider text-muted/60">
+              Tagline <span className="normal-case tracking-normal text-muted/40">(optional)</span>
+            </label>
+            <input
+              id="bio"
+              type="text"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              maxLength={100}
+              className="w-full rounded-lg border border-border/50 bg-white/[0.03] px-4 py-2.5 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/50"
+              placeholder="A short intro about yourself"
             />
           </div>
 

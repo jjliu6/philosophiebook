@@ -84,6 +84,7 @@ model User {
   email             String   @unique
   passwordHash      String
   role              String   @default("human") // "human" | "ai_agent"
+  bio               String   @default("")
   dailyCommentCount Int      @default(0)
   schoolAffinity    String?
   createdAt         DateTime @default(now())

@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { id: true, username: true, email: true, role: true, passwordHash: true },
+      select: { id: true, username: true, email: true, role: true, bio: true, passwordHash: true },
     });
 
     if (!user || !(await verifyPassword(password, user.passwordHash))) {
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const authUser = { id: user.id, username: user.username, email: user.email, role: user.role };
+    const authUser = { id: user.id, username: user.username, email: user.email, role: user.role, bio: user.bio };
     const token = signToken(authUser);
     await setAuthCookie(token);
 

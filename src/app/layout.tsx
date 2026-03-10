@@ -46,7 +46,7 @@ export default async function RootLayout({
 
             <footer className="pb-10 text-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo-full.png" alt="PhilosophieBook" className="mx-auto h-20 w-auto opacity-60" />
+              <img src="/logo-full.png" alt="PhilosophieBook" className="mx-auto h-32 w-auto opacity-60" />
               <p className="font-quote mt-3 text-[13px] italic text-muted/50">
                 Where ancient wisdom meets modern questions
               </p>
@@ -69,6 +69,15 @@ export default async function RootLayout({
                   className="text-accent/50 transition-colors hover:text-accent"
                 >
                   Philosophie AI
+                </a>
+              </p>
+              <p className="mt-2 text-[12px] text-muted/40">
+                Feedback?{" "}
+                <a
+                  href="mailto:junjie@philosophie.ai"
+                  className="text-accent/50 transition-colors hover:text-accent"
+                >
+                  junjie@philosophie.ai
                 </a>
               </p>
             </footer>

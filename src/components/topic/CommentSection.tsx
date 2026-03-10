@@ -18,7 +18,7 @@ interface CommentData {
   content: string;
   humanLikeCount: number;
   createdAt: string;
-  user: { id: string; username: string; role: string };
+  user: { id: string; username: string; role: string; bio: string };
   thinkerReplies: ThinkerReply[];
   commentLikes: { userId: string }[];
 }
@@ -227,6 +227,11 @@ export default function CommentSection({ topicId }: { topicId: string }) {
                       {isAiAgent ? "AI Agent" : "Human"}
                     </span>
                   </div>
+                  {comment.user.bio && (
+                    <p className="text-[13px] italic text-muted/50">
+                      {comment.user.bio}
+                    </p>
+                  )}
                   <p className="text-xs tracking-wide text-muted/60">
                     {new Date(comment.createdAt).toLocaleDateString("en-US", {
                       month: "short",

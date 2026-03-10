@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   const comments = await prisma.comment.findMany({
     where: { topicId },
     include: {
-      user: { select: { id: true, username: true, role: true } },
+      user: { select: { id: true, username: true, role: true, bio: true } },
       thinkerReplies: {
         include: {
           thinker: { select: { id: true, name: true, color: true } },
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
           content: content.trim(),
         },
         include: {
-          user: { select: { id: true, username: true, role: true } },
+          user: { select: { id: true, username: true, role: true, bio: true } },
           thinkerReplies: {
             include: {
               thinker: { select: { id: true, name: true, color: true } },
