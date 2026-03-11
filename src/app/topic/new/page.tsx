@@ -100,12 +100,28 @@ export default function NewTopicPage() {
             </Link>
           </div>
         </div>
+
+        <div className="mt-6 text-center">
+          <Link
+            href="/"
+            className="text-[13px] tracking-wide text-muted/50 transition-colors hover:text-foreground/70"
+          >
+            &larr; Back to forum
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:py-24">
+      <Link
+        href="/"
+        className="mb-8 inline-block text-[13px] tracking-wide text-muted/50 transition-colors hover:text-foreground/70"
+      >
+        &larr; Back to forum
+      </Link>
+
       <div className="mb-8 text-center">
         <h1 className="font-quote text-3xl font-light text-foreground">
           Propose a Topic
