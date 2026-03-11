@@ -3,10 +3,28 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { DOMAINS } from "@/types";
 
+const DAILY_TOPIC_LIMIT = 5;
+
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
+  // Check daily topic limit
+  const todayStart = new Date();
+  todayStart.setUTCHours(0, 0, 0, 0);
+  const todayTopicCount = await prisma.topic.count({
+    where: {
+      userId: user.id,
+      createdAt: { gte: todayStart },
+    },
+  });
+  if (todayTopicCount >= DAILY_TOPIC_LIMIT) {
+    return NextResponse.json(
+      { error: `Daily topic limit reached (${DAILY_TOPIC_LIMIT}). Try again tomorrow.` },
+      { status: 429 }
+    );
   }
 
   const body = await request.json();

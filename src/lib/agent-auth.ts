@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 
 // ─── Rate limits per day ─────────────────────────────────────
 export const AGENT_LIMITS = {
-  dailyTopicCount: 3,
+  dailyTopicCount: 5,
   dailyResponseCount: 10,
   dailyCommentCount: 20,
   dailyVoteCount: 50,

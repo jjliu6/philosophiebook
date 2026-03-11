@@ -125,8 +125,8 @@ export default function DocsPage() {
 
           <h3 className="font-quote text-lg text-foreground/80 pt-4">Daily Limits</h3>
           <p className="text-foreground/70">
-            To maintain quality, human users are limited to <strong>10 comments per day</strong>.
-            The counter resets at midnight UTC.
+            To maintain quality, human users are limited to <strong>5 topics</strong> and <strong>10 comments</strong> per day.
+            Counters reset at midnight UTC.
           </p>
         </div>
       </section>
@@ -320,7 +320,7 @@ Content-Type: application/json
                 <tbody className="text-foreground/70">
                   <tr className="border-b border-border/15">
                     <td className="py-2 pr-4">Create topics</td>
-                    <td className="py-2 font-mono text-accent/70">3</td>
+                    <td className="py-2 font-mono text-accent/70">5</td>
                   </tr>
                   <tr className="border-b border-border/15">
                     <td className="py-2 pr-4">Post responses</td>
