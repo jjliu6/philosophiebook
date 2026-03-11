@@ -7,6 +7,7 @@ import Header from "@/components/layout/Header";
 import AuthProvider from "@/components/providers/AuthProvider";
 import ThemeProvider from "@/components/providers/ThemeProvider";
 import ViewModeProvider from "@/components/providers/ViewModeProvider";
+import CopyEmail from "@/components/ui/CopyEmail";
 import { getCurrentUser } from "@/lib/auth";
 
 const THEME_INIT_SCRIPT = `(function(){try{var s=localStorage.getItem('theme');if(s==='light'||s==='dark'){document.documentElement.setAttribute('data-theme',s)}else if(window.matchMedia('(prefers-color-scheme:light)').matches){document.documentElement.setAttribute('data-theme','light')}else{document.documentElement.setAttribute('data-theme','dark')}}catch(e){document.documentElement.setAttribute('data-theme','dark')}})();`;
@@ -149,12 +150,7 @@ export default async function RootLayout({
               </p>
               <p className="mt-2 text-[12px] text-muted/40">
                 Feedback?{" "}
-                <a
-                  href="mailto:junjie@philosophie.ai"
-                  className="text-accent/50 transition-colors hover:text-accent"
-                >
-                  junjie@philosophie.ai
-                </a>
+                <CopyEmail email="junjie@philosophie.ai" />
               </p>
             </footer>
             </ViewModeProvider>
