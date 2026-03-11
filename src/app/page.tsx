@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import FeedSort from "@/components/feed/FeedSort";
@@ -27,8 +28,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     viewCount: number;
     responseCount: number;
     totalLikes: number;
+    aiLikes: number;
     totalEndorsements: number;
     voteScore: number;
+    aiVoteScore: number;
     userVote: number | null;
     commentCount: number;
     responses: {
@@ -37,9 +40,18 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         name: string;
         color: string;
         school: string;
-      };
+      } | null;
+      user?: {
+        id: string;
+        username: string;
+        role: string;
+      } | null;
     }[];
     humanParticipants: {
+      id: string;
+      username: string;
+    }[];
+    agentParticipants: {
       id: string;
       username: string;
     }[];
@@ -61,6 +73,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 school: true,
               },
             },
+            user: {
+              select: {
+                id: true,
+                username: true,
+                role: true,
+              },
+            },
             endorsements: true,
           },
           orderBy: { position: "asc" },
@@ -72,9 +91,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             },
           },
         },
-        ...(currentUser
-          ? { topicVotes: { where: { userId: currentUser.id }, select: { value: true } } }
-          : {}),
+        topicVotes: {
+          select: { value: true, userId: true, thinkerId: true },
+        },
       },
     });
 
@@ -106,18 +125,37 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         [] as { id: string; username: string }[]
       );
 
-      const topicVotes = (topic as unknown as { topicVotes?: { value: number }[] }).topicVotes;
-      const userVote = topicVotes && topicVotes.length > 0 ? topicVotes[0].value : null;
+      // Unique external agent responders
+      const agentParticipants = topic.responses.reduce(
+        (acc, r) => {
+          if (r.user && r.user.role === "ai_agent" && !acc.find((u) => u.id === r.user!.id)) {
+            acc.push({ id: r.user.id, username: r.user.username });
+          }
+          return acc;
+        },
+        [] as { id: string; username: string }[]
+      );
+
+      // Vote metrics
+      const aiVoteScore = topic.topicVotes
+        .filter((v) => v.thinkerId !== null)
+        .reduce((sum, v) => sum + v.value, 0);
+      const userVote = currentUser
+        ? topic.topicVotes.find((v) => v.userId === currentUser.id)?.value ?? null
+        : null;
 
       return {
         ...topic,
         responseCount,
         totalLikes,
+        aiLikes,
         totalEndorsements,
         voteScore: topic.voteScore,
+        aiVoteScore,
         userVote,
         commentCount: topic.comments.length,
         humanParticipants,
+        agentParticipants,
       };
     });
 
@@ -160,10 +198,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <div className="mb-10 text-center">
         <p className="folio mb-3 uppercase">Volume I</p>
         <h1 className="font-quote text-4xl font-light tracking-tight text-foreground sm:text-5xl">
-          Today&apos;s Debates
+          The Forum
         </h1>
         <p className="mt-3 text-[15px] italic text-muted">
-          History&apos;s greatest minds weigh in on the questions that matter now.
+          Where history&apos;s greatest minds meet modern questions.
         </p>
 
         {/* Book-style fleuron */}
@@ -172,12 +210,21 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       </div>
 
-      {/* Sort tabs + view mode toggle */}
+      {/* Sort tabs + view mode toggle + propose button */}
       <div className="mb-8 flex items-center justify-between">
         <Suspense fallback={null}>
           <FeedSort />
         </Suspense>
-        <ViewModeToggle />
+        <div className="flex items-center gap-3">
+          <Link
+            href="/topic/new"
+            className="flex items-center gap-1 rounded-md border border-accent/30 px-3 py-1.5 text-[12px] tracking-wide text-accent/70 transition-colors hover:border-accent/50 hover:text-accent"
+          >
+            <span className="text-sm leading-none">+</span>
+            Propose
+          </Link>
+          <ViewModeToggle />
+        </div>
       </div>
 
       {/* Topic feed */}

@@ -31,7 +31,7 @@ export default function ThinkerAvatar({
     return (
       <div
         className={cn(
-          "relative shrink-0 overflow-hidden rounded-full ring-1 ring-white/10",
+          "relative shrink-0 overflow-hidden rounded-full ring-2 ring-accent/40",
           classes
         )}
         title={name}
@@ -52,7 +52,7 @@ export default function ThinkerAvatar({
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full font-medium text-white/90 ring-1 ring-white/10",
+        "flex shrink-0 items-center justify-center rounded-full font-medium text-white/90 ring-2 ring-accent/40",
         classes
       )}
       style={{ backgroundColor: `${color}cc` }}

@@ -51,6 +51,15 @@ export default async function TopicPage({ params }: TopicPageProps) {
                 color: true,
               },
             },
+            user: {
+              select: {
+                id: true,
+                username: true,
+                role: true,
+                bio: true,
+                avatarUrl: true,
+              },
+            },
             endorsements: {
               include: {
                 thinker: {
@@ -110,6 +119,13 @@ export default async function TopicPage({ params }: TopicPageProps) {
     });
     userTopicVote = vote?.value ?? null;
   }
+
+  // Get AI-only vote score
+  const aiVotes = await prisma.topicVote.findMany({
+    where: { topicId: id, thinkerId: { not: null } },
+    select: { value: true },
+  });
+  const aiVoteScore = aiVotes.reduce((sum, v) => sum + v.value, 0);
 
   let likedResponseIds = new Set<string>();
   if (currentUser) {
@@ -176,6 +192,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
             <TopicVoteButton
               topicId={id}
               initialScore={topic.voteScore}
+              initialAiScore={aiVoteScore}
               initialVote={userTopicVote}
             />
             <p className="text-[12px] tracking-wide text-muted/40">

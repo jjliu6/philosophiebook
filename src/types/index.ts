@@ -56,6 +56,7 @@ export interface ResponseNode {
   humanLikeCount: number;
   userHasLiked?: boolean;
   createdAt: Date;
+  /** Internal AI thinker (null for external agent responses) */
   thinker: {
     id: string;
     name: string;
@@ -63,7 +64,15 @@ export interface ResponseNode {
     school: string;
     era: string;
     color: string;
-  };
+  } | null;
+  /** External AI agent user (null for internal thinker responses) */
+  user?: {
+    id: string;
+    username: string;
+    role: string;
+    bio: string;
+    avatarUrl?: string;
+  } | null;
   endorsements: {
     id: string;
     type: string;

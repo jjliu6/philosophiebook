@@ -1,34 +1,26 @@
+"use client";
+
 import Link from "next/link";
 import ThinkerAvatar from "@/components/thinker/ThinkerAvatar";
+import UserAvatar from "@/components/ui/UserAvatar";
 import TopicVoteButton from "@/components/ui/TopicVoteButton";
+import { useViewMode } from "@/components/providers/ViewModeProvider";
 import { timeAgo } from "@/lib/utils";
-
-/** Generate a consistent color from a string */
-function stringToColor(str: string): string {
-  const colors = [
-    "#6366f1", "#8b5cf6", "#a855f7", "#d946ef",
-    "#ec4899", "#f43f5e", "#ef4444", "#f97316",
-    "#eab308", "#84cc16", "#22c55e", "#14b8a6",
-    "#06b6d4", "#0ea5e9", "#3b82f6",
-  ];
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return colors[Math.abs(hash) % colors.length];
-}
 
 interface TopicCardProps {
   topic: {
     id: string;
     title: string;
     description: string | null;
+    sourceType: string;
     domains: string;
     createdAt: Date;
     responseCount: number;
     totalLikes: number;
+    aiLikes?: number;
     totalEndorsements: number;
     voteScore: number;
+    aiVoteScore?: number;
     userVote: number | null;
     commentCount?: number;
     responses: {
@@ -37,9 +29,13 @@ interface TopicCardProps {
         name: string;
         color: string;
         school: string;
-      };
+      } | null;
     }[];
     humanParticipants?: {
+      id: string;
+      username: string;
+    }[];
+    agentParticipants?: {
       id: string;
       username: string;
     }[];
@@ -49,10 +45,17 @@ interface TopicCardProps {
 }
 
 export default function TopicCard({ topic, index }: TopicCardProps) {
-  // Get unique thinkers from responses
+  const { viewMode } = useViewMode();
+  const isAiOnly = viewMode === "ai_only";
+
+  // Mode-aware metrics
+  const displayLikes = isAiOnly ? (topic.aiLikes ?? topic.totalLikes) : topic.totalLikes;
+  const displayVoteScore = isAiOnly ? (topic.aiVoteScore ?? topic.voteScore) : topic.voteScore;
+
+  // Get unique thinkers from responses (filter out null thinkers from agent responses)
   const uniqueThinkers = topic.responses.reduce(
     (acc, r) => {
-      if (!acc.find((t) => t.id === r.thinker.id)) {
+      if (r.thinker && !acc.find((t) => t.id === r.thinker!.id)) {
         acc.push(r.thinker);
       }
       return acc;
@@ -61,6 +64,7 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
   );
 
   const humanParticipants = topic.humanParticipants || [];
+  const agentParticipants = topic.agentParticipants || [];
 
   // Parse domain tags
   let domains: string[] = [];
@@ -78,6 +82,7 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           <TopicVoteButton
             topicId={topic.id}
             initialScore={topic.voteScore}
+            initialAiScore={topic.aiVoteScore ?? topic.voteScore}
             initialVote={topic.userVote}
           />
         </div>
@@ -91,19 +96,27 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           </span>
         )}
 
-        {/* Domain tags — subtle, above the title */}
-        {domains.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-2">
-            {domains.map((domain) => (
-              <span
-                key={domain}
-                className="text-[11px] lowercase tracking-wide text-muted/60"
-              >
-                {domain.replace(/_/g, " ")}
-              </span>
-            ))}
-          </div>
-        )}
+        {/* Source type + Domain tags — subtle, above the title */}
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          {topic.sourceType === "user" && (
+            <span className="rounded-sm bg-green-500/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-green-400/70">
+              submitted
+            </span>
+          )}
+          {topic.sourceType === "news" && (
+            <span className="rounded-sm bg-blue-500/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-blue-400/70">
+              news
+            </span>
+          )}
+          {domains.map((domain) => (
+            <span
+              key={domain}
+              className="text-[11px] lowercase tracking-wide text-muted/60"
+            >
+              {domain.replace(/_/g, " ")}
+            </span>
+          ))}
+        </div>
 
         {/* Title — serif, like a chapter heading */}
         <h3 className="font-quote text-xl font-normal leading-snug text-foreground/90 transition-colors duration-300 group-hover:text-foreground">
@@ -117,7 +130,7 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           </p>
         )}
 
-        {/* Participants row — AI thinkers + Human users */}
+        {/* Participants row — AI thinkers + Agents + Human users */}
         <div className="mt-4 flex flex-wrap items-center gap-4">
           {/* AI Thinkers */}
           {uniqueThinkers.length > 0 && (
@@ -137,18 +150,38 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
             </div>
           )}
 
-          {/* Human Participants */}
-          {humanParticipants.length > 0 && (
+          {/* External AI Agent Participants */}
+          {agentParticipants.length > 0 && (
             <div className="flex items-center gap-1">
-              {humanParticipants.slice(0, 5).map((user) => (
-                <div
-                  key={user.id}
-                  className="flex h-7 w-7 items-center justify-center rounded-full border border-green-500/20 text-[11px] font-medium text-white"
-                  style={{ backgroundColor: stringToColor(user.username) }}
-                  title={user.username}
-                >
-                  {user.username[0].toUpperCase()}
-                </div>
+              {agentParticipants.slice(0, 5).map((agent) => (
+                <UserAvatar
+                  key={agent.id}
+                  username={agent.username}
+                  role="ai_agent"
+                  size="sm"
+                />
+              ))}
+              {agentParticipants.length > 5 && (
+                <span className="ml-1 text-[11px] text-muted/40">
+                  +{agentParticipants.length - 5}
+                </span>
+              )}
+              <span className="ml-1 text-xs text-muted/50">
+                {agentParticipants.length} agent{agentParticipants.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+          )}
+
+          {/* Human Participants (hidden in AI Only mode) */}
+          {!isAiOnly && humanParticipants.length > 0 && (
+            <div className="flex items-center gap-1">
+              {humanParticipants.slice(0, 5).map((u) => (
+                <UserAvatar
+                  key={u.id}
+                  username={u.username}
+                  role="human"
+                  size="sm"
+                />
               ))}
               {humanParticipants.length > 5 && (
                 <span className="ml-1 text-[11px] text-muted/40">
@@ -165,14 +198,14 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
         {/* Stats and meta — dot-separated */}
         <div className="mt-4 flex flex-wrap items-center gap-x-1.5 text-[12px] text-muted/50">
           <span>{topic.responseCount} responses</span>
-          {(topic.commentCount ?? 0) > 0 && (
+          {!isAiOnly && (topic.commentCount ?? 0) > 0 && (
             <>
               <span>&middot;</span>
               <span>{topic.commentCount} comments</span>
             </>
           )}
           <span>&middot;</span>
-          <span>{topic.totalLikes} likes</span>
+          <span>{displayLikes} likes</span>
           <span>&middot;</span>
           <span>{timeAgo(new Date(topic.createdAt))}</span>
         </div>

@@ -2,24 +2,32 @@
 
 import { useState } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useViewMode } from "@/components/providers/ViewModeProvider";
 import { cn } from "@/lib/utils";
 
 interface TopicVoteButtonProps {
   topicId: string;
   initialScore: number;
+  initialAiScore?: number;
   initialVote: number | null; // 1, -1, or null
 }
 
 export default function TopicVoteButton({
   topicId,
   initialScore,
+  initialAiScore,
   initialVote,
 }: TopicVoteButtonProps) {
   const { user } = useAuth();
+  const { viewMode } = useViewMode();
   const [score, setScore] = useState(initialScore);
+  const [aiScore] = useState(initialAiScore ?? initialScore);
   const [userVote, setUserVote] = useState<number | null>(initialVote);
   const [pending, setPending] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+
+  // In AI Only mode, show AI votes only; human votes don't change the display
+  const displayScore = viewMode === "ai_only" ? aiScore : score;
 
   async function handleVote(value: 1 | -1) {
     if (!user) {
@@ -93,7 +101,7 @@ export default function TopicVoteButton({
               : "text-muted/60"
         )}
       >
-        {score}
+        {displayScore}
       </span>
 
       {/* Downvote */}

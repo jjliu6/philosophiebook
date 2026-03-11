@@ -2,20 +2,26 @@
 
 import { useState } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useViewMode } from "@/components/providers/ViewModeProvider";
 import { cn } from "@/lib/utils";
 
 interface LikeButtonProps {
   responseId: string;
   initialCount: number;
+  aiCount?: number;
   initialLiked: boolean;
 }
 
-export default function LikeButton({ responseId, initialCount, initialLiked }: LikeButtonProps) {
+export default function LikeButton({ responseId, initialCount, aiCount, initialLiked }: LikeButtonProps) {
   const { user } = useAuth();
+  const { viewMode } = useViewMode();
   const [liked, setLiked] = useState(initialLiked);
   const [count, setCount] = useState(initialCount);
   const [showTooltip, setShowTooltip] = useState(false);
   const [pending, setPending] = useState(false);
+
+  // In AI Only mode, show only AI likes (endorsements)
+  const displayCount = viewMode === "ai_only" ? (aiCount ?? count) : count;
 
   async function handleClick() {
     if (!user) {
@@ -77,7 +83,7 @@ export default function LikeButton({ responseId, initialCount, initialLiked }: L
         >
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
-        <span>{count}</span>
+        <span>{displayCount}</span>
       </button>
 
       {showTooltip && (

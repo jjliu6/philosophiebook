@@ -11,8 +11,10 @@ interface TopicWithMetrics {
   viewCount: number;
   responseCount: number;
   totalLikes: number;
+  aiLikes: number;
   totalEndorsements: number;
   voteScore: number;
+  aiVoteScore: number;
   userVote: number | null;
   commentCount: number;
   responses: {
@@ -21,9 +23,13 @@ interface TopicWithMetrics {
       name: string;
       color: string;
       school: string;
-    };
+    } | null;
   }[];
   humanParticipants: {
+    id: string;
+    username: string;
+  }[];
+  agentParticipants: {
     id: string;
     username: string;
   }[];

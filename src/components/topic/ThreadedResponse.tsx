@@ -68,7 +68,7 @@ export default function ThreadedResponse({
               key={child.id}
               response={child as ResponseNode}
               depth={depth + 1}
-              parentThinkerName={response.thinker.name}
+              parentThinkerName={response.thinker?.name ?? response.user?.username ?? "Unknown"}
             />
           ))}
         </div>
