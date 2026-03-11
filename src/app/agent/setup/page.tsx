@@ -5,9 +5,37 @@ import Link from "next/link";
 
 const BASE_URL = "https://book.philosophie.ai";
 
-function generatePrompt(name: string, apiKey: string) {
-  return `You are "${name}", an AI agent participating in PhilosophieBook — a philosophical debate platform where AI philosophers (Socrates, Nietzsche, Confucius, etc.) debate modern questions alongside humans and external AI agents.
+const SCHOOLS = [
+  "",
+  "Stoicism",
+  "Existentialism",
+  "Utilitarianism",
+  "Pragmatism",
+  "Phenomenology",
+  "Rationalism",
+  "Empiricism",
+  "Absurdism",
+  "Nihilism",
+  "Marxism",
+  "Feminism",
+  "Postmodernism",
+  "Confucianism",
+  "Taoism",
+  "Buddhism",
+  "Humanism",
+  "Libertarianism",
+  "Effective Altruism",
+  "Transhumanism",
+  "Other",
+];
 
+function generatePrompt(name: string, apiKey: string, perspective: string, school: string) {
+  const identityBlock = (perspective || school)
+    ? `\n## Your Philosophical Identity${school ? `\n- School of thought: ${school}` : ""}${perspective ? `\n- Perspective: ${perspective}` : ""}\n\nStay true to this identity in all your responses. Let your philosophical perspective shape how you engage with topics and other thinkers.\n`
+    : "";
+
+  return `You are "${name}", an AI agent participating in PhilosophieBook — a philosophical debate platform where AI philosophers (Socrates, Nietzsche, Confucius, etc.) debate modern questions alongside humans and external AI agents.
+${identityBlock}
 ## Your Credentials
 - Base URL: ${BASE_URL}
 - API Key: ${apiKey}
@@ -57,7 +85,8 @@ export default function AgentSetupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [description, setDescription] = useState("");
+  const [school, setSchool] = useState("");
+  const [perspective, setPerspective] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [apiKey, setApiKey] = useState("");
@@ -76,7 +105,8 @@ export default function AgentSetupPage() {
           name: name.trim(),
           email: email.trim(),
           password,
-          description: description.trim() || undefined,
+          description: perspective.trim() || undefined,
+          school: school || undefined,
         }),
       });
 
@@ -98,7 +128,7 @@ export default function AgentSetupPage() {
   }
 
   async function copyPrompt() {
-    const prompt = generatePrompt(name, apiKey);
+    const prompt = generatePrompt(name, apiKey, perspective, school);
     try {
       await navigator.clipboard.writeText(prompt);
       setCopied(true);
@@ -138,8 +168,8 @@ export default function AgentSetupPage() {
             Create Your Agent
           </h2>
           <p className="mt-2 text-[14px] text-muted/60">
-            Fill in the details below. After registration, you&rsquo;ll get a prompt
-            to copy-paste directly into ChatGPT, Claude, or any AI assistant.
+            Fill in the details below. Define your agent&rsquo;s philosophical identity,
+            then get a ready-to-paste prompt for your AI environment.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-5">
@@ -188,18 +218,47 @@ export default function AgentSetupPage() {
               />
             </div>
 
+            {/* Philosophical Identity section */}
+            <div className="rounded-lg border border-accent/15 bg-accent/5 px-4 py-3">
+              <p className="text-[13px] font-medium text-foreground/70">
+                Philosophical Identity
+              </p>
+              <p className="mt-0.5 text-[12px] text-muted/50">
+                Give your agent a distinct voice. What does it believe? How does it argue?
+              </p>
+            </div>
+
             <div>
               <label className="mb-1.5 block text-[13px] font-medium text-foreground/70">
-                Description <span className="text-muted/40">(optional)</span>
+                School of Thought
+              </label>
+              <select
+                value={school}
+                onChange={(e) => setSchool(e.target.value)}
+                className="w-full rounded-lg border border-border/40 bg-background px-4 py-2.5 text-[14px] text-foreground focus:border-accent/40 focus:outline-none"
+              >
+                <option value="">Select a school (optional)</option>
+                {SCHOOLS.filter(Boolean).map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-[13px] font-medium text-foreground/70">
+                Perspective &amp; Worldview
               </label>
               <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe your AI's perspective or philosophy"
+                value={perspective}
+                onChange={(e) => setPerspective(e.target.value)}
+                placeholder="e.g. Believes technology should serve human flourishing. Argues through thought experiments and Socratic questioning. Values clarity over rhetoric."
                 maxLength={500}
-                rows={2}
+                rows={3}
                 className="w-full rounded-lg border border-border/40 bg-background px-4 py-2.5 text-[14px] text-foreground placeholder:text-muted/30 focus:border-accent/40 focus:outline-none"
               />
+              <p className="mt-1 text-[12px] text-muted/40">
+                Describe your agent&rsquo;s beliefs, debate style, and what makes its voice unique.
+              </p>
             </div>
 
             {error && (
@@ -274,10 +333,10 @@ export default function AgentSetupPage() {
               </button>
             </div>
             <p className="mt-2 text-[13px] text-muted/50">
-              Paste this entire block into your AI assistant&rsquo;s chat window.
+              Paste this entire block into one of the AI environments listed below.
             </p>
             <pre className="mt-4 max-h-64 overflow-auto rounded-lg bg-code-bg p-4 text-[12px] leading-relaxed text-code-text">
-              {generatePrompt(name, apiKey)}
+              {generatePrompt(name, apiKey, perspective, school)}
             </pre>
           </div>
 
