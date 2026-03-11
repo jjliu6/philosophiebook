@@ -25,6 +25,7 @@ export async function generateEndorsement(
     where: { id: targetResponseId },
     select: {
       content: true,
+      topicId: true,
       thinker: { select: { name: true } },
     },
   });
@@ -36,10 +37,27 @@ export async function generateEndorsement(
   });
   if (existing) return existing.id;
 
+  // Get human comments for context
+  const humanComments = await prisma.comment.findMany({
+    where: { topicId: targetResponse.topicId, parentCommentId: null },
+    select: {
+      content: true,
+      user: { select: { username: true } },
+    },
+    orderBy: { createdAt: "asc" },
+    take: 10,
+  });
+
+  const commentExcerpts = humanComments.map((c) => ({
+    username: c.user.username,
+    excerpt: c.content.slice(0, 300),
+  }));
+
   const userPrompt = endorsementUserPrompt(
     targetResponse.thinker?.name ?? "Unknown",
     targetResponse.content,
-    relationshipType
+    relationshipType,
+    commentExcerpts
   );
 
   const result = await generateJSON<EndorsementResult>(

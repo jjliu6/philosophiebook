@@ -37,11 +37,28 @@ export async function generateTopicResponse(
     excerpt: r.content.slice(0, 600),
   }));
 
+  // Get human comments for context
+  const humanComments = await prisma.comment.findMany({
+    where: { topicId, parentCommentId: null },
+    select: {
+      content: true,
+      user: { select: { username: true } },
+    },
+    orderBy: { createdAt: "asc" },
+    take: 10,
+  });
+
+  const commentExcerpts = humanComments.map((c) => ({
+    username: c.user.username,
+    excerpt: c.content.slice(0, 300),
+  }));
+
   const userPrompt = responseUserPrompt(
     topic.title,
     topic.description,
     excerpts,
-    position
+    position,
+    commentExcerpts
   );
 
   const content = await generateText(

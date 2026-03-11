@@ -77,7 +77,8 @@ export function responseUserPrompt(
   topicTitle: string,
   topicDescription: string | null,
   existingResponses: { thinkerName: string; excerpt: string }[],
-  position: number
+  position: number,
+  humanComments?: { username: string; excerpt: string }[]
 ): string {
   const positionLabel =
     position === 0
@@ -97,6 +98,13 @@ export function responseUserPrompt(
     prompt += `\n\nPrevious responses in this debate:`;
     for (const r of existingResponses) {
       prompt += `\n\n--- ${r.thinkerName} ---\n${r.excerpt}`;
+    }
+  }
+
+  if (humanComments && humanComments.length > 0) {
+    prompt += `\n\nComments from human participants:`;
+    for (const c of humanComments) {
+      prompt += `\n\n--- ${c.username} (human) ---\n${c.excerpt}`;
     }
   }
 
@@ -120,7 +128,8 @@ export function replyUserPrompt(
   topicTitle: string,
   targetThinkerName: string,
   targetContent: string,
-  relationshipDynamic: string | null
+  relationshipDynamic: string | null,
+  humanComments?: { username: string; excerpt: string }[]
 ): string {
   let prompt = `TOPIC: ${topicTitle}\n\nYou are replying to ${targetThinkerName}'s argument:\n\n"${targetContent}"`;
 
@@ -128,7 +137,14 @@ export function replyUserPrompt(
     prompt += `\n\nYour relationship with ${targetThinkerName}: ${relationshipDynamic}`;
   }
 
-  prompt += `\n\nWrite a focused reply (150-250 words). Engage directly with their argument — agree, challenge, or build upon it. Be specific about which points you're addressing. Write flowing prose, no markdown headers or bullet points.`;
+  if (humanComments && humanComments.length > 0) {
+    prompt += `\n\nComments from human participants in this discussion:`;
+    for (const c of humanComments) {
+      prompt += `\n- ${c.username}: ${c.excerpt}`;
+    }
+  }
+
+  prompt += `\n\nWrite a focused reply (150-250 words). Engage directly with their argument — agree, challenge, or build upon it. Be specific about which points you're addressing. You may also acknowledge relevant human comments if they add to the discussion. Write flowing prose, no markdown headers or bullet points.`;
 
   return prompt;
 }
@@ -139,14 +155,26 @@ export function replyUserPrompt(
 export function endorsementUserPrompt(
   targetThinkerName: string,
   targetContent: string,
-  relationshipType: string
+  relationshipType: string,
+  humanComments?: { username: string; excerpt: string }[]
 ): string {
   const action =
     relationshipType === "ally" || relationshipType === "dialogue"
       ? "endorse"
       : "challenge";
 
-  return `${targetThinkerName} wrote:\n"${targetContent.slice(0, 500)}"\n\nYou are giving a brief ${action} of this response.\nRespond ONLY with valid JSON:\n{ "type": "${action}", "reason": "1-2 sentence explanation of why you ${action} this argument" }`;
+  let prompt = `${targetThinkerName} wrote:\n"${targetContent.slice(0, 500)}"`;
+
+  if (humanComments && humanComments.length > 0) {
+    prompt += `\n\nHuman participants have commented:`;
+    for (const c of humanComments) {
+      prompt += `\n- ${c.username}: ${c.excerpt.slice(0, 150)}`;
+    }
+  }
+
+  prompt += `\n\nYou are giving a brief ${action} of this response.\nRespond ONLY with valid JSON:\n{ "type": "${action}", "reason": "1-2 sentence explanation of why you ${action} this argument" }`;
+
+  return prompt;
 }
 
 /**

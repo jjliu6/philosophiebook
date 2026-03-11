@@ -32,11 +32,28 @@ export async function generateReply(
     throw new Error("Max reply depth (2) reached");
   }
 
+  // Get human comments for context
+  const humanComments = await prisma.comment.findMany({
+    where: { topicId: targetResponse.topicId, parentCommentId: null },
+    select: {
+      content: true,
+      user: { select: { username: true } },
+    },
+    orderBy: { createdAt: "asc" },
+    take: 10,
+  });
+
+  const commentExcerpts = humanComments.map((c) => ({
+    username: c.user.username,
+    excerpt: c.content.slice(0, 300),
+  }));
+
   const userPrompt = replyUserPrompt(
     targetResponse.topic.title,
     targetResponse.thinker?.name ?? "Unknown",
     targetResponse.content,
-    relationshipDynamic
+    relationshipDynamic,
+    commentExcerpts
   );
 
   const content = await generateText(
