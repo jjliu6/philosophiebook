@@ -158,8 +158,8 @@ export default function Header() {
             </Link>
           )}
 
-          <div className="flex items-center justify-center border-t border-border/30 pt-3">
-            <ThemeToggle />
+          <div className="border-t border-border/30 pt-2">
+            <ThemeToggle showLabel />
           </div>
         </nav>
       )}
