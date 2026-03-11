@@ -17,11 +17,10 @@ export default async function OGImage({
     where: { id },
     select: {
       title: true,
-      description: true,
       responses: {
         select: { thinker: { select: { name: true } } },
         where: { thinkerId: { not: null }, depth: 0 },
-        take: 6,
+        take: 4,
       },
     },
   });
@@ -30,8 +29,9 @@ export default async function OGImage({
   const thinkerNames = topic?.responses
     .map((r) => r.thinker?.name)
     .filter(Boolean)
-    .slice(0, 4)
     .join(", ");
+
+  const fontSize = title.length > 80 ? 36 : title.length > 50 ? 42 : 48;
 
   return new ImageResponse(
     (
@@ -43,42 +43,41 @@ export default async function OGImage({
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          background: "linear-gradient(135deg, #0c0c12 0%, #1a1a2e 50%, #0c0c12 100%)",
+          backgroundColor: "#0c0c12",
           padding: "60px 80px",
-          fontFamily: "Georgia, serif",
         }}
       >
-        {/* Top decorative line */}
+        {/* Top label */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "16px",
-            marginBottom: "12px",
+            marginBottom: "24px",
           }}
         >
           <div
             style={{
               width: "60px",
               height: "1px",
-              background: "linear-gradient(to right, transparent, #d4b45c)",
+              backgroundColor: "rgba(212, 180, 92, 0.5)",
             }}
           />
           <div
             style={{
               fontSize: "14px",
-              color: "#d4b45c",
+              color: "rgba(212, 180, 92, 1)",
               letterSpacing: "4px",
-              textTransform: "uppercase",
+              marginLeft: "16px",
+              marginRight: "16px",
             }}
           >
-            PhilosophieBook
+            PHILOSOPHIEBOOK
           </div>
           <div
             style={{
               width: "60px",
               height: "1px",
-              background: "linear-gradient(to left, transparent, #d4b45c)",
+              backgroundColor: "rgba(212, 180, 92, 0.5)",
             }}
           />
         </div>
@@ -87,54 +86,37 @@ export default async function OGImage({
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            textAlign: "center",
+            justifyContent: "center",
             maxWidth: "900px",
+            fontSize: `${fontSize}px`,
+            fontWeight: 300,
+            color: "#ebe9e5",
+            lineHeight: 1.3,
           }}
         >
-          <h1
-            style={{
-              fontSize: title.length > 80 ? "36px" : title.length > 50 ? "42px" : "48px",
-              fontWeight: 300,
-              color: "#ebe9e5",
-              lineHeight: 1.3,
-              margin: "20px 0",
-              textAlign: "center",
-            }}
-          >
-            {title}
-          </h1>
+          {title}
         </div>
 
         {/* Thinker names */}
-        {thinkerNames && (
+        {thinkerNames ? (
           <div
             style={{
               display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              marginTop: "16px",
+              marginTop: "24px",
+              fontSize: "16px",
+              color: "rgba(212, 180, 92, 0.5)",
+              letterSpacing: "1px",
             }}
           >
-            <div
-              style={{
-                fontSize: "16px",
-                color: "#d4b45c80",
-                letterSpacing: "1px",
-              }}
-            >
-              Featuring {thinkerNames}
-            </div>
+            {`Featuring ${thinkerNames}`}
           </div>
-        )}
+        ) : null}
 
-        {/* Bottom decorative element */}
+        {/* Divider */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "12px",
             marginTop: "32px",
           }}
         >
@@ -142,17 +124,24 @@ export default async function OGImage({
             style={{
               width: "40px",
               height: "1px",
-              background: "linear-gradient(to right, transparent, #d4b45c40)",
+              backgroundColor: "rgba(212, 180, 92, 0.2)",
             }}
           />
-          <div style={{ fontSize: "12px", color: "#d4b45c40" }}>
-            &#10022;
+          <div
+            style={{
+              fontSize: "14px",
+              color: "rgba(212, 180, 92, 0.2)",
+              marginLeft: "12px",
+              marginRight: "12px",
+            }}
+          >
+            *
           </div>
           <div
             style={{
               width: "40px",
               height: "1px",
-              background: "linear-gradient(to left, transparent, #d4b45c40)",
+              backgroundColor: "rgba(212, 180, 92, 0.2)",
             }}
           />
         </div>
@@ -163,10 +152,8 @@ export default async function OGImage({
             position: "absolute",
             bottom: "30px",
             display: "flex",
-            alignItems: "center",
-            gap: "8px",
             fontSize: "14px",
-            color: "#ebe9e540",
+            color: "rgba(235, 233, 229, 0.25)",
           }}
         >
           book.philosophie.ai
