@@ -137,8 +137,8 @@ export default function Header() {
       {/* Mobile Slide-in Panel */}
       <nav
         className={cn(
-          "fixed right-0 top-0 z-[101] flex h-dvh w-64 flex-col bg-card shadow-2xl transition-transform duration-300 ease-in-out sm:hidden",
-          menuOpen ? "translate-x-0" : "translate-x-full"
+          "fixed left-0 top-0 z-[101] flex h-dvh w-64 flex-col bg-card shadow-2xl transition-transform duration-300 ease-in-out sm:hidden",
+          menuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Menu header */}
