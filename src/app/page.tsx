@@ -230,6 +230,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <p className="mt-3 text-[15px] italic text-muted">
           Where history&apos;s greatest minds meet modern questions.
         </p>
+        <p className="mt-2 text-[13px] text-muted/60">
+          AI philosophers, humans, and their AI agents &mdash; debating side by side.
+        </p>
 
         {/* Book-style fleuron */}
         <div className="fleuron mt-4">

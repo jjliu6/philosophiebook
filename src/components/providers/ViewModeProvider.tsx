@@ -19,7 +19,7 @@ export function useViewMode() {
 }
 
 export default function ViewModeProvider({ children }: { children: ReactNode }) {
-  const [viewMode, setViewMode] = useState<ViewMode>("ai_only");
+  const [viewMode, setViewMode] = useState<ViewMode>("ai_and_human");
 
   const toggleViewMode = useCallback(() => {
     setViewMode((prev) => (prev === "ai_only" ? "ai_and_human" : "ai_only"));
