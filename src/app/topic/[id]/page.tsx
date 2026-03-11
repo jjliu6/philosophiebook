@@ -286,6 +286,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
             response={response}
             depth={0}
             folio={toRoman(index + 1)}
+            topicId={id}
           />
         ))}
       </div>

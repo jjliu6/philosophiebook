@@ -1,6 +1,7 @@
 import ThinkerAvatar from "@/components/thinker/ThinkerAvatar";
 import UserAvatar from "@/components/ui/UserAvatar";
 import LikeButton from "@/components/ui/LikeButton";
+import ReplyButton from "./ReplyButton";
 import EndorsementBadge from "./EndorsementBadge";
 import Link from "next/link";
 import { cn, timeAgo } from "@/lib/utils";
@@ -51,6 +52,8 @@ interface ThinkerResponseProps {
   isReply?: boolean;
   /** Nesting depth (0 = top-level) */
   replyDepth?: number;
+  /** Topic ID for reply functionality */
+  topicId?: string;
 }
 
 const POSITION_LABELS = [
@@ -66,14 +69,17 @@ export default function ThinkerResponse({
   folio,
   isReply = false,
   replyDepth = 0,
+  topicId,
 }: ThinkerResponseProps) {
   const { thinker, endorsements } = response;
   const agentUser = response.user?.role === "ai_agent" ? response.user : null;
+  const humanUser = response.user?.role === "human" ? response.user : null;
 
-  // Determine if this is an external agent response
+  // Determine response author type
   const isAgent = !thinker && !!agentUser;
-  const displayName = thinker?.name ?? agentUser?.username ?? "Unknown";
-  const displayColor = thinker?.color ?? "#6B7280";
+  const isHuman = !thinker && !!humanUser;
+  const displayName = thinker?.name ?? agentUser?.username ?? humanUser?.username ?? "Unknown";
+  const displayColor = thinker?.color ?? (isHuman ? "var(--color-human)" : "#6B7280");
 
   // Split content into paragraphs
   const paragraphs = response.content
@@ -132,8 +138,8 @@ export default function ThinkerResponse({
           ) : (
             <UserAvatar
               username={displayName}
-              avatarUrl={agentUser?.avatarUrl}
-              role="ai_agent"
+              avatarUrl={humanUser?.avatarUrl ?? agentUser?.avatarUrl}
+              role={isHuman ? "human" : "ai_agent"}
               size={avatarSize}
             />
           )}
@@ -171,6 +177,10 @@ export default function ThinkerResponse({
                 <>
                   {thinker.school} &middot; {thinker.era}
                 </>
+              ) : humanUser ? (
+                <>
+                  {humanUser.bio || "Forum participant"}
+                </>
               ) : agentUser ? (
                 <>
                   {agentUser.bio || "External Agent"}
@@ -185,7 +195,11 @@ export default function ThinkerResponse({
           </div>
           {/* Position label + type badge */}
           <div className="flex shrink-0 items-center gap-2">
-            {isAgent ? (
+            {isHuman ? (
+              <span className="rounded-full bg-human-dim px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-human/80">
+                Human
+              </span>
+            ) : isAgent ? (
               <span className="rounded-full bg-agent-dim px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-agent/80">
                 Agent
               </span>
@@ -244,14 +258,21 @@ export default function ThinkerResponse({
           </div>
         )}
 
-        {/* Like button */}
-        <div className="mt-4 flex items-center border-t border-border/20 pt-3">
+        {/* Like + Reply buttons */}
+        <div className="mt-4 flex items-center gap-4 border-t border-border/20 pt-3">
           <LikeButton
             responseId={response.id}
             initialCount={response.humanLikeCount + endorsements.filter((e) => e.type === "endorse").length}
             aiCount={endorsements.filter((e) => e.type === "endorse").length}
             initialLiked={response.userHasLiked ?? false}
           />
+          {topicId && (
+            <ReplyButton
+              responseId={response.id}
+              topicId={topicId}
+              depth={replyDepth}
+            />
+          )}
         </div>
       </div>
     </article>

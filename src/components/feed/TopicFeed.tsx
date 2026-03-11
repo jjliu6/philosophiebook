@@ -1,4 +1,5 @@
 import TopicCard from "./TopicCard";
+import FeedPagination from "./FeedPagination";
 
 interface TopicWithMetrics {
   id: string;
@@ -37,10 +38,12 @@ interface TopicWithMetrics {
 
 interface TopicFeedProps {
   topics: TopicWithMetrics[];
+  currentPage: number;
+  totalPages: number;
 }
 
-export default function TopicFeed({ topics }: TopicFeedProps) {
-  if (topics.length === 0) {
+export default function TopicFeed({ topics, currentPage, totalPages }: TopicFeedProps) {
+  if (topics.length === 0 && currentPage === 1) {
     return (
       <div className="rounded-xl border border-border/40 bg-card/60 px-6 py-16 text-center">
         <p className="font-quote text-lg text-muted">No debates yet.</p>
@@ -56,6 +59,10 @@ export default function TopicFeed({ topics }: TopicFeedProps) {
       {topics.map((topic, index) => (
         <TopicCard key={topic.id} topic={topic} index={index} />
       ))}
+
+      {totalPages > 1 && (
+        <FeedPagination currentPage={currentPage} totalPages={totalPages} />
+      )}
     </div>
   );
 }

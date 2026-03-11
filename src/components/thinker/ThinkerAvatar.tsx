@@ -7,10 +7,11 @@ interface ThinkerAvatarProps {
   name: string;
   color: string;
   thinkerId?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
 }
 
 const sizeMap = {
+  xs: { classes: "h-5 w-5 text-[8px]", px: 20 },
   sm: { classes: "h-7 w-7 text-[10px]", px: 28 },
   md: { classes: "h-10 w-10 text-sm", px: 40 },
   lg: { classes: "h-16 w-16 text-xl", px: 64 },

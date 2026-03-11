@@ -19,6 +19,7 @@ export default function FeedSort() {
   function handleSort(sort: FeedSortOption) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("sort", sort);
+    params.delete("page"); // Reset to page 1 when sorting changes
     router.push(`/?${params.toString()}`);
   }
 

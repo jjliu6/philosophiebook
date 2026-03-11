@@ -9,13 +9,16 @@ import type { FeedSortOption } from "@/types";
 
 export const dynamic = "force-dynamic";
 
+const TOPICS_PER_PAGE = 15;
+
 interface HomePageProps {
-  searchParams: Promise<{ sort?: string }>;
+  searchParams: Promise<{ sort?: string; page?: string }>;
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
   const sort = (params.sort as FeedSortOption) || "hot";
+  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
 
   let topics: {
     id: string;
@@ -56,6 +59,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       username: string;
     }[];
   }[] = [];
+  let totalCount = 0;
 
   const currentUser = await getCurrentUser();
 
@@ -188,9 +192,18 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     });
 
     topics = topicsWithMetrics;
+    totalCount = topicsWithMetrics.length;
   } catch (error) {
     console.error("Failed to fetch topics:", error);
   }
+
+  // Paginate after sorting
+  const totalPages = Math.max(1, Math.ceil(totalCount / TOPICS_PER_PAGE));
+  const safePage = Math.min(page, totalPages);
+  const paginatedTopics = topics.slice(
+    (safePage - 1) * TOPICS_PER_PAGE,
+    safePage * TOPICS_PER_PAGE
+  );
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
@@ -228,7 +241,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </div>
 
       {/* Topic feed */}
-      <TopicFeed topics={topics} />
+      <TopicFeed
+        topics={paginatedTopics}
+        currentPage={safePage}
+        totalPages={totalPages}
+      />
     </div>
   );
 }

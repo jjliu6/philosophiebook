@@ -391,12 +391,27 @@ body {
   position: relative;
 }
 
-.thread-vertical-line {
+/* Clickable collapse button — wider hit area around the thin line */
+.thread-collapse-button {
   position: absolute;
-  left: 0;
+  left: -6px;
   top: 0;
   bottom: 12px;
-  width: 1px;
+  width: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+}
+
+.thread-collapse-button .thread-vertical-line {
+  position: relative;
+  width: 2px;
+  height: 100%;
+  border-radius: 1px;
   background: linear-gradient(
     180deg,
     var(--accent) 0%,
@@ -405,13 +420,26 @@ body {
     transparent 100%
   );
   opacity: 0.2;
-  pointer-events: none;
+  transition: opacity 0.2s ease, background 0.2s ease, width 0.15s ease;
 }
 
-.thread-line-container:hover > .thread-vertical-line {
-  opacity: 0.4;
+.thread-collapse-button:hover .thread-vertical-line {
+  opacity: 0.6;
   background: var(--accent);
-  transition: opacity 0.3s ease, background 0.3s ease;
+  width: 3px;
+}
+
+/* Collapsed summary row */
+.thread-collapsed-summary {
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.thread-collapsed-summary:hover {
+  opacity: 1;
+  background: var(--card);
 }
 
 /* "replying to" connector styling */
