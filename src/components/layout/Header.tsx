@@ -15,6 +15,7 @@ export default function Header() {
   const navLinks = [
     { href: "/", label: "Forum" },
     { href: "/thinkers", label: "Thinkers" },
+    { href: "/leaderboard", label: "Ranks" },
     { href: "/docs", label: "Docs" },
   ];
 
