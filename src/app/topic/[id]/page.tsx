@@ -56,20 +56,11 @@ export async function generateMetadata({ params }: TopicPageProps): Promise<Meta
       type: "article",
       url: `https://book.philosophie.ai/topic/${id}`,
       siteName: "PhilosophieBook",
-      images: [
-        {
-          url: "/og-image.png",
-          width: 1200,
-          height: 630,
-          alt: topic.title,
-        },
-      ],
     },
     twitter: {
       card: "summary_large_image",
       title: topic.title,
       description: desc,
-      images: ["/og-image.png"],
     },
   };
 }
