@@ -31,6 +31,13 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-16 sm:py-24">
+      <Link
+        href="/"
+        className="mb-8 inline-block text-[13px] tracking-wide text-muted/50 transition-colors hover:text-foreground/70"
+      >
+        &larr; Back to forum
+      </Link>
+
       <div className="mb-8 text-center">
         <h1 className="font-quote text-3xl font-light text-foreground">Sign In</h1>
         <p className="mt-2 text-sm text-muted/60">
