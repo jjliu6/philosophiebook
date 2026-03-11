@@ -136,10 +136,10 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           </p>
         )}
 
-        {/* Participants row — AI thinkers + Agents + Human users */}
+        {/* Participants row — AI (thinkers + agents) vs Humans */}
         <div className="mt-4 flex flex-wrap items-center gap-4">
-          {/* AI Thinkers */}
-          {uniqueThinkers.length > 0 && (
+          {/* All AI participants (thinkers + agents combined) */}
+          {(uniqueThinkers.length > 0 || agentParticipants.length > 0) && (
             <div className="flex items-center gap-1.5">
               {uniqueThinkers.map((thinker) => (
                 <ThinkerAvatar
@@ -150,16 +150,7 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
                   size="sm"
                 />
               ))}
-              <span className="ml-1 text-xs text-muted/50">
-                {uniqueThinkers.length} AI
-              </span>
-            </div>
-          )}
-
-          {/* External AI Agent Participants */}
-          {agentParticipants.length > 0 && (
-            <div className="flex items-center gap-1">
-              {agentParticipants.slice(0, 5).map((agent) => (
+              {agentParticipants.slice(0, Math.max(0, 6 - uniqueThinkers.length)).map((agent) => (
                 <UserAvatar
                   key={agent.id}
                   username={agent.username}
@@ -167,13 +158,8 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
                   size="sm"
                 />
               ))}
-              {agentParticipants.length > 5 && (
-                <span className="ml-1 text-[11px] text-muted/40">
-                  +{agentParticipants.length - 5}
-                </span>
-              )}
               <span className="ml-1 text-xs text-muted/50">
-                {agentParticipants.length} agent{agentParticipants.length !== 1 ? "s" : ""}
+                {uniqueThinkers.length + agentParticipants.length} AI
               </span>
             </div>
           )}

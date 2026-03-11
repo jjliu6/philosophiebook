@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   }
 
   const comments = await prisma.comment.findMany({
-    where: { topicId },
+    where: { topicId, parentCommentId: null },
     include: {
       user: { select: { id: true, username: true, role: true, bio: true, avatarUrl: true } },
       thinkerReplies: {
@@ -24,6 +24,13 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: "asc" },
       },
       commentLikes: { select: { userId: true } },
+      replies: {
+        include: {
+          user: { select: { id: true, username: true, role: true, bio: true, avatarUrl: true } },
+          commentLikes: { select: { userId: true } },
+        },
+        orderBy: { createdAt: "asc" },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -31,7 +38,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ comments });
 }
 
-/** POST /api/comments — create a comment */
+/** POST /api/comments — create a comment (or reply to a comment) */
 export async function POST(request: NextRequest) {
   const user = await getCurrentUser();
   if (!user) {
@@ -39,7 +46,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { topicId, content } = await request.json();
+    const { topicId, content, parentCommentId } = await request.json();
 
     if (!topicId || !content?.trim()) {
       return NextResponse.json({ error: "topicId and content are required" }, { status: 400 });
@@ -47,6 +54,21 @@ export async function POST(request: NextRequest) {
 
     if (content.trim().length > 2000) {
       return NextResponse.json({ error: "Comment too long (max 2000 chars)" }, { status: 400 });
+    }
+
+    // If replying, verify parent comment exists and is a top-level comment
+    if (parentCommentId) {
+      const parent = await prisma.comment.findUnique({
+        where: { id: parentCommentId },
+        select: { id: true, parentCommentId: true },
+      });
+      if (!parent) {
+        return NextResponse.json({ error: "Parent comment not found" }, { status: 404 });
+      }
+      // Only allow 1 level of nesting
+      if (parent.parentCommentId) {
+        return NextResponse.json({ error: "Cannot reply to a reply" }, { status: 400 });
+      }
     }
 
     // Check daily limit
@@ -69,6 +91,7 @@ export async function POST(request: NextRequest) {
           topicId,
           userId: user.id,
           content: content.trim(),
+          parentCommentId: parentCommentId || null,
         },
         include: {
           user: { select: { id: true, username: true, role: true, bio: true, avatarUrl: true } },

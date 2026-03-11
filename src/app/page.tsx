@@ -241,7 +241,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </div>
 
       {/* Sort tabs + view mode toggle + propose button */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <Suspense fallback={null}>
           <FeedSort />
         </Suspense>

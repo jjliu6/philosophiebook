@@ -110,19 +110,23 @@ model User {
 }
 
 model Comment {
-  id             String   @id @default(cuid())
-  topicId        String
-  userId         String
-  content        String
-  humanLikeCount Int      @default(0)
-  createdAt      DateTime @default(now())
+  id              String   @id @default(cuid())
+  topicId         String
+  userId          String
+  content         String
+  parentCommentId String?  // null = top-level comment, set = reply to another comment
+  humanLikeCount  Int      @default(0)
+  createdAt       DateTime @default(now())
 
   topic          Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
   user           User           @relation(fields: [userId], references: [id])
+  parentComment  Comment?       @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies        Comment[]      @relation("CommentReplies")
   thinkerReplies ThinkerReply[]
   commentLikes   CommentLike[]
 
   @@index([topicId])
+  @@index([parentCommentId])
 }
 
 model ThinkerReply {

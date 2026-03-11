@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/providers/AuthProvider";
 import ThemeToggle from "@/components/ui/ThemeToggle";
@@ -11,6 +11,21 @@ export default function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+
+  // Close menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
 
   const navLinks = [
     { href: "/", label: "Forum" },
@@ -22,11 +37,11 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-2.5 sm:px-6">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
+        {/* Logo — always show site name */}
+        <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-full.png" alt="PhilosophieBook" className="h-9 w-auto rounded-sm" />
-          <span className="hidden font-quote text-[15px] font-light tracking-[0.08em] text-foreground/80 sm:block">
+          <span className="font-quote text-[13px] font-light tracking-[0.05em] text-foreground/80 sm:text-[15px] sm:tracking-[0.08em]">
             PhilosophieBook
           </span>
         </Link>
@@ -82,7 +97,7 @@ export default function Header() {
 
         {/* Mobile Hamburger */}
         <button
-          className="flex flex-col gap-1.5 sm:hidden"
+          className="relative z-[60] flex flex-col gap-1.5 p-1 sm:hidden"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
@@ -110,9 +125,39 @@ export default function Header() {
       {/* Subtle bottom separator */}
       <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <nav className="border-t border-border/50 px-4 pb-4 pt-2 sm:hidden">
+      {/* Mobile Overlay backdrop */}
+      <div
+        className={cn(
+          "fixed inset-0 z-[100] bg-black/30 transition-opacity duration-300 sm:hidden",
+          menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        )}
+        onClick={() => setMenuOpen(false)}
+      />
+
+      {/* Mobile Slide-in Panel */}
+      <nav
+        className={cn(
+          "fixed right-0 top-0 z-[101] flex h-dvh w-64 flex-col bg-card shadow-2xl transition-transform duration-300 ease-in-out sm:hidden",
+          menuOpen ? "translate-x-0" : "translate-x-full"
+        )}
+      >
+        {/* Menu header */}
+        <div className="flex items-center justify-between border-b border-border/40 px-5 py-4">
+          <span className="font-quote text-[14px] tracking-wide text-foreground/70">Menu</span>
+          <button
+            onClick={() => setMenuOpen(false)}
+            className="p-1 text-muted/50 transition-colors hover:text-foreground"
+            aria-label="Close menu"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Nav links */}
+        <div className="flex-1 overflow-y-auto px-3 py-3">
           {navLinks.map((link) => {
             const isActive =
               link.href === "/"
@@ -124,27 +169,29 @@ export default function Header() {
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
                 className={cn(
-                  "block py-3 text-sm tracking-wide transition-colors duration-300",
+                  "flex items-center gap-3 rounded-lg px-3 py-3.5 text-[14px] tracking-wide transition-colors duration-200",
                   isActive
-                    ? "text-foreground"
-                    : "text-muted hover:text-foreground"
+                    ? "bg-accent/10 text-foreground"
+                    : "text-muted/70 hover:bg-card/50 hover:text-foreground"
                 )}
               >
-                {link.label}
                 {isActive && (
-                  <span className="ml-2 inline-block h-1 w-1 rounded-full bg-accent align-middle" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
                 )}
+                {link.label}
               </Link>
             );
           })}
+        </div>
 
-          {/* Mobile auth */}
+        {/* Bottom section: auth + theme */}
+        <div className="border-t border-border/40 px-5 py-4">
           {user ? (
-            <div className="flex items-center justify-between border-t border-border/30 pt-3">
-              <span className="text-sm text-foreground/70">{user.username}</span>
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-[13px] text-foreground/70">{user.username}</span>
               <button
                 onClick={() => { logout(); setMenuOpen(false); }}
-                className="text-sm text-muted/50 transition-colors hover:text-foreground/70"
+                className="text-[12px] text-muted/50 transition-colors hover:text-foreground/70"
               >
                 Sign out
               </button>
@@ -153,17 +200,14 @@ export default function Header() {
             <Link
               href="/login"
               onClick={() => setMenuOpen(false)}
-              className="block border-t border-border/30 pt-3 text-sm text-muted transition-colors hover:text-foreground"
+              className="mb-3 block text-[13px] text-accent/70 transition-colors hover:text-accent"
             >
               Sign in
             </Link>
           )}
-
-          <div className="border-t border-border/30 pt-2">
-            <ThemeToggle showLabel />
-          </div>
-        </nav>
-      )}
+          <ThemeToggle showLabel />
+        </div>
+      </nav>
     </header>
   );
 }
