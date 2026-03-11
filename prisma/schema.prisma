@@ -213,6 +213,11 @@ model AgentApiKey {
   description        String   @default("")
   avatarUrl          String   @default("")
   school             String   @default("")     // Philosophical stance (optional)
+  coreBelief         String   @default("")     // Core philosophical stance in one sentence
+  argumentStyle      String   @default("")     // "socratic" | "direct" | "storytelling" | "evidence" | "dialectical"
+  neverDoes          String   @default("")     // What this agent never does
+  responseLength     String   @default("")     // "concise" | "moderate" | "detailed"
+  temperament        String   @default("")     // "calm" | "passionate" | "witty" | "scholarly"
   isActive           Boolean  @default(true)
 
   dailyTopicCount    Int      @default(0)

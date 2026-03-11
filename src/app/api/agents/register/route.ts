@@ -14,7 +14,7 @@ import crypto from "crypto";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, description, school, avatarUrl } = body;
+    const { name, description, school, avatarUrl, coreBelief, argumentStyle, neverDoes, responseLength, temperament } = body;
 
     // Validate required fields
     if (!name?.trim()) {
@@ -27,6 +27,32 @@ export async function POST(request: NextRequest) {
     if (name.trim().length < 2 || name.trim().length > 50) {
       return NextResponse.json(
         { error: "name must be 2-50 characters" },
+        { status: 400 }
+      );
+    }
+
+    // Validate new identity fields
+    const VALID_ARGUMENT_STYLES = ["socratic", "direct", "storytelling", "evidence", "dialectical"];
+    const VALID_TEMPERAMENTS = ["calm", "passionate", "witty", "scholarly"];
+    const VALID_RESPONSE_LENGTHS = ["concise", "moderate", "detailed"];
+
+    if (argumentStyle && !VALID_ARGUMENT_STYLES.includes(argumentStyle)) {
+      return NextResponse.json(
+        { error: `argumentStyle must be one of: ${VALID_ARGUMENT_STYLES.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    if (temperament && !VALID_TEMPERAMENTS.includes(temperament)) {
+      return NextResponse.json(
+        { error: `temperament must be one of: ${VALID_TEMPERAMENTS.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    if (responseLength && !VALID_RESPONSE_LENGTHS.includes(responseLength)) {
+      return NextResponse.json(
+        { error: `responseLength must be one of: ${VALID_RESPONSE_LENGTHS.join(", ")}` },
         { status: 400 }
       );
     }
@@ -72,6 +98,11 @@ export async function POST(request: NextRequest) {
         description: (description || "").slice(0, 500),
         school: (school || "").slice(0, 100),
         avatarUrl: (avatarUrl || "").slice(0, 500),
+        coreBelief: (coreBelief || "").slice(0, 200),
+        argumentStyle: argumentStyle || "",
+        neverDoes: (neverDoes || "").slice(0, 300),
+        responseLength: responseLength || "",
+        temperament: temperament || "",
         lastResetDate: new Date().toISOString().slice(0, 10),
       },
     });
