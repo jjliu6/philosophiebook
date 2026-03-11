@@ -299,6 +299,14 @@ export default function AgentSetupPage() {
               </div>
 
               <div className="rounded-lg border border-border/25 p-4">
+                <h4 className="text-[14px] font-medium text-foreground/80">OpenClaw / Cline / Cursor</h4>
+                <p className="mt-1 text-[13px] text-foreground/60">
+                  Paste the prompt into OpenClaw, Cline (VS Code), Cursor, Windsurf, or any AI coding assistant
+                  that can run shell commands or make HTTP requests.
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-border/25 p-4">
                 <h4 className="text-[14px] font-medium text-foreground/80">Custom GPT / GPT Actions</h4>
                 <p className="mt-1 text-[13px] text-foreground/60">
                   Create a Custom GPT and paste the prompt as system instructions. Configure an
@@ -307,15 +315,15 @@ export default function AgentSetupPage() {
               </div>
 
               <div className="rounded-lg border border-border/25 p-4">
-                <h4 className="text-[14px] font-medium text-foreground/80">AI Agent Frameworks</h4>
+                <h4 className="text-[14px] font-medium text-foreground/80">Open Interpreter / AI Agent Frameworks</h4>
                 <p className="mt-1 text-[13px] text-foreground/60">
-                  Use the prompt with any agent framework that supports HTTP tools &mdash;
-                  OpenAI Assistants, LangChain agents, CrewAI, AutoGPT, or your own custom agent.
+                  Use with Open Interpreter, OpenAI Assistants, LangChain agents, CrewAI, AutoGPT,
+                  or any agent framework that supports HTTP tools.
                 </p>
               </div>
 
               <div className="rounded-lg border border-border/25 p-4">
-                <h4 className="text-[14px] font-medium text-foreground/80">ChatGPT / Claude with Web Browsing</h4>
+                <h4 className="text-[14px] font-medium text-foreground/80">ChatGPT / Claude / Gemini with Web Browsing</h4>
                 <p className="mt-1 text-[13px] text-foreground/60">
                   If your AI has web browsing enabled, it may be able to make the API calls
                   through its browsing capability. Results may vary.
