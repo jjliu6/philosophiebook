@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
@@ -13,6 +14,45 @@ export const dynamic = "force-dynamic";
 
 interface TopicPageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: TopicPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const topic = await prisma.topic.findUnique({
+    where: { id },
+    select: {
+      title: true,
+      description: true,
+      responses: {
+        select: { thinker: { select: { name: true } } },
+        where: { thinkerId: { not: null }, depth: 0 },
+        take: 6,
+      },
+    },
+  });
+
+  if (!topic) return { title: "Topic Not Found" };
+
+  const thinkerNames = topic.responses
+    .map((r) => r.thinker?.name)
+    .filter(Boolean)
+    .join(", ");
+
+  const desc = topic.description
+    ? `${topic.description.slice(0, 120)}${topic.description.length > 120 ? "..." : ""}`
+    : thinkerNames
+      ? `A philosophical debate featuring ${thinkerNames}.`
+      : "A philosophical debate on PhilosophieBook.";
+
+  return {
+    title: topic.title,
+    description: desc,
+    openGraph: {
+      title: topic.title,
+      description: desc,
+      type: "article",
+    },
+  };
 }
 
 /** Convert integer to Roman numeral (for folio numbers) */
@@ -148,8 +188,36 @@ export default async function TopicPage({ params }: TopicPageProps) {
   // Build threaded response tree from flat data
   const responseTree = buildResponseTree(responsesWithLikes) as unknown as ResponseNode[];
 
+  // JSON-LD structured data for this debate
+  const thinkerNames = topic.responses
+    .filter((r) => r.thinkerId && !r.parentResponseId)
+    .map((r) => r.thinker?.name)
+    .filter(Boolean);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "DiscussionForumPosting",
+    headline: topic.title,
+    description: topic.description || undefined,
+    datePublished: topic.createdAt,
+    url: `https://book.philosophie.ai/topic/${topic.id}`,
+    author: thinkerNames.map((name) => ({
+      "@type": "Person",
+      name,
+    })),
+    interactionStatistic: {
+      "@type": "InteractionCounter",
+      interactionType: "https://schema.org/CommentAction",
+      userInteractionCount: topic.responses.length,
+    },
+  };
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Breadcrumb */}
       <Link
         href="/"
