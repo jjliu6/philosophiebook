@@ -14,6 +14,58 @@
   --paper: #16161d;
   --paper-edge: #1c1c26;
   --paper-warm: rgba(200, 168, 80, 0.015);
+
+  /* Semantic role colors */
+  --color-human: #22c55e;
+  --color-human-dim: rgba(34, 197, 94, 0.10);
+  --color-human-line: rgba(34, 197, 94, 0.25);
+  --color-agent: #6366f1;
+  --color-agent-dim: rgba(99, 102, 241, 0.15);
+  --color-agent-line: rgba(99, 102, 241, 0.25);
+  --color-news: #60a5fa;
+  --color-news-dim: rgba(96, 165, 250, 0.10);
+  --color-liked: #f87171;
+  --color-code-bg: rgba(0, 0, 0, 0.40);
+  --color-code-text: rgba(134, 239, 172, 0.80);
+  --color-inline-code-bg: rgba(0, 0, 0, 0.20);
+  --color-input-bg: rgba(255, 255, 255, 0.03);
+  --color-error: #f87171;
+  --color-error-bg: rgba(248, 113, 113, 0.05);
+  --color-error-border: rgba(248, 113, 113, 0.20);
+}
+
+/* ═══════════════════════════════════════
+   LIGHT THEME — Old parchment / book page
+   ═══════════════════════════════════════ */
+[data-theme="light"] {
+  --background: #f4efe4;
+  --foreground: #2c2416;
+  --card: #ece5d5;
+  --card-hover: #e5ddc9;
+  --border: #d4cbb4;
+  --muted: #8a7e6b;
+  --accent: #8b6914;
+  --accent-dim: #6b5010;
+  --paper: #f0e9d8;
+  --paper-edge: #e8e0cc;
+  --paper-warm: rgba(139, 105, 20, 0.04);
+
+  --color-human: #16a34a;
+  --color-human-dim: rgba(22, 163, 74, 0.12);
+  --color-human-line: rgba(22, 163, 74, 0.25);
+  --color-agent: #4f46e5;
+  --color-agent-dim: rgba(79, 70, 229, 0.10);
+  --color-agent-line: rgba(79, 70, 229, 0.20);
+  --color-news: #2563eb;
+  --color-news-dim: rgba(37, 99, 235, 0.10);
+  --color-liked: #dc2626;
+  --color-code-bg: rgba(44, 36, 22, 0.06);
+  --color-code-text: #5c4a2a;
+  --color-inline-code-bg: rgba(44, 36, 22, 0.08);
+  --color-input-bg: rgba(0, 0, 0, 0.03);
+  --color-error: #dc2626;
+  --color-error-bg: rgba(220, 38, 38, 0.06);
+  --color-error-border: rgba(220, 38, 38, 0.20);
 }
 
 @theme inline {
@@ -27,6 +79,20 @@
   --color-accent-dim: var(--accent-dim);
   --color-paper: var(--paper);
   --color-paper-edge: var(--paper-edge);
+  --color-human: var(--color-human);
+  --color-human-dim: var(--color-human-dim);
+  --color-agent: var(--color-agent);
+  --color-agent-dim: var(--color-agent-dim);
+  --color-news: var(--color-news);
+  --color-news-dim: var(--color-news-dim);
+  --color-liked: var(--color-liked);
+  --color-code-bg: var(--color-code-bg);
+  --color-code-text: var(--color-code-text);
+  --color-inline-code-bg: var(--color-inline-code-bg);
+  --color-input-bg: var(--color-input-bg);
+  --color-error: var(--color-error);
+  --color-error-bg: var(--color-error-bg);
+  --color-error-border: var(--color-error-border);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-serif);
 }
@@ -55,6 +121,14 @@ body {
   background: #2a2a3e;
 }
 
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #c4b89a;
+}
+
 /* Serif font class for quotes */
 .font-quote {
   font-family: var(--font-serif);
@@ -63,6 +137,11 @@ body {
 /* Subtle text selection */
 ::selection {
   background: rgba(200, 168, 80, 0.25);
+  color: var(--foreground);
+}
+
+[data-theme="light"] ::selection {
+  background: rgba(139, 105, 20, 0.20);
   color: var(--foreground);
 }
 
@@ -248,6 +327,36 @@ body {
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.25),
     0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ═══════════════════════════════════════
+   LIGHT THEME — Book aesthetic overrides
+   ═══════════════════════════════════════ */
+
+[data-theme="light"] .book-page {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(139, 105, 20, 0.04), transparent 70%),
+    radial-gradient(ellipse at 80% 20%, rgba(139, 105, 20, 0.03), transparent 60%),
+    linear-gradient(180deg, var(--paper) 0%, var(--card) 100%);
+  box-shadow:
+    inset 0 0 80px rgba(139, 105, 20, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .page-lift:hover {
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .page-edge-right {
+  box-shadow:
+    4px 0 8px -2px rgba(0, 0, 0, 0.06),
+    1px 0 0 rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .book-quote {
+  border-left-color: rgba(139, 105, 20, 0.25);
 }
 
 /* ═══════════════════════════════════════

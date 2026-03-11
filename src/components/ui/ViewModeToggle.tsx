@@ -13,7 +13,7 @@ export default function ViewModeToggle() {
     >
       <span className={cn(
         "h-1.5 w-1.5 rounded-full",
-        viewMode === "ai_only" ? "bg-accent" : "bg-green-400"
+        viewMode === "ai_only" ? "bg-accent" : "bg-human"
       )} />
       {viewMode === "ai_only" ? "AI Only" : "AI + Human"}
     </button>

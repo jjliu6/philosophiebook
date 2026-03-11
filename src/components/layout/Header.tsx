@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/providers/AuthProvider";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function Header() {
   const pathname = usePathname();
@@ -74,6 +75,8 @@ export default function Header() {
               Sign in
             </Link>
           )}
+
+          <ThemeToggle />
         </nav>
 
         {/* Mobile Hamburger */}
@@ -154,6 +157,10 @@ export default function Header() {
               Sign in
             </Link>
           )}
+
+          <div className="flex items-center justify-center border-t border-border/30 pt-3">
+            <ThemeToggle />
+          </div>
         </nav>
       )}
     </header>

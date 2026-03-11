@@ -48,7 +48,7 @@ export default function LoginPage() {
       <div className="book-page page-corner rounded-xl border border-border/40 p-6 sm:p-8">
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
-            <div className="rounded-lg border border-red-400/20 bg-red-400/5 px-4 py-3 text-sm text-red-400">
+            <div className="rounded-lg border border-error-border bg-error-bg px-4 py-3 text-sm text-error">
               {error}
             </div>
           )}
@@ -63,7 +63,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-lg border border-border/50 bg-white/[0.03] px-4 py-2.5 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/50"
+              className="w-full rounded-lg border border-border/50 bg-input-bg px-4 py-2.5 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/50"
               placeholder="you@example.com"
             />
           </div>
@@ -78,7 +78,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-lg border border-border/50 bg-white/[0.03] px-4 py-2.5 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/50"
+              className="w-full rounded-lg border border-border/50 bg-input-bg px-4 py-2.5 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/50"
               placeholder="Enter your password"
             />
           </div>

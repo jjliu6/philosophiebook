@@ -45,8 +45,8 @@ export default function UserAvatar({
 
   // Ring color: green for humans, purple for AI agents
   const ringClass = role === "ai_agent"
-    ? "ring-purple-400/50"
-    : "ring-green-500/40";
+    ? "ring-agent/50"
+    : "ring-human/40";
 
   // If we have a valid avatar URL, show the image
   if (avatarUrl && !imgError) {

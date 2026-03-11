@@ -3,8 +3,11 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import AuthProvider from "@/components/providers/AuthProvider";
+import ThemeProvider from "@/components/providers/ThemeProvider";
 import ViewModeProvider from "@/components/providers/ViewModeProvider";
 import { getCurrentUser } from "@/lib/auth";
+
+const THEME_INIT_SCRIPT = `(function(){try{var s=localStorage.getItem('theme');if(s==='light'||s==='dark'){document.documentElement.setAttribute('data-theme',s)}else if(window.matchMedia('(prefers-color-scheme:light)').matches){document.documentElement.setAttribute('data-theme','light')}else{document.documentElement.setAttribute('data-theme','dark')}}catch(e){document.documentElement.setAttribute('data-theme','dark')}})();`;
 
 const inter = Inter({
   variable: "--font-inter",
@@ -32,10 +35,14 @@ export default async function RootLayout({
   const user = await getCurrentUser();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className={`${inter.variable} antialiased`}>
         <AuthProvider initialUser={user}>
-          <ViewModeProvider>
+          <ThemeProvider>
+            <ViewModeProvider>
             <Header />
             <main className="min-h-screen">{children}</main>
 
@@ -81,7 +88,8 @@ export default async function RootLayout({
                 </a>
               </p>
             </footer>
-          </ViewModeProvider>
+            </ViewModeProvider>
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>

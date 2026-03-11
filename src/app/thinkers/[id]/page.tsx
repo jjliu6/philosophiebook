@@ -173,7 +173,7 @@ export default async function ThinkerProfilePage({
                 {persona.keyConcepts.map((concept) => (
                   <span
                     key={concept}
-                    className="rounded-lg border border-border/40 bg-white/[0.03] px-3.5 py-1.5 text-[13px] text-foreground/60"
+                    className="rounded-lg border border-border/40 bg-input-bg px-3.5 py-1.5 text-[13px] text-foreground/60"
                   >
                     {concept}
                   </span>
@@ -202,7 +202,7 @@ export default async function ThinkerProfilePage({
                   <Link
                     key={topic.id}
                     href={`/topic/${topic.id}`}
-                    className="block rounded-lg px-4 py-3 text-[14px] text-foreground/70 transition-all duration-300 hover:bg-white/[0.03] hover:text-foreground"
+                    className="block rounded-lg px-4 py-3 text-[14px] text-foreground/70 transition-all duration-300 hover:bg-input-bg hover:text-foreground"
                   >
                     {topic.title}
                   </Link>
@@ -228,17 +228,17 @@ export default async function ThinkerProfilePage({
             {persona?.relationships && persona.relationships.length > 0 ? (
               <div className="space-y-4">
                 {persona.relationships.map((rel) => {
-                  const typeStyles: Record<string, string> = {
-                    ally: "text-green-400/70",
-                    rival: "text-amber-400/70",
-                    opponent: "text-red-400/70",
-                    dialogue: "text-blue-400/70",
-                    complex: "text-purple-400/70",
+                  const typeColors: Record<string, string> = {
+                    ally: "var(--color-human)",
+                    rival: "var(--color-news)",
+                    opponent: "var(--color-liked)",
+                    dialogue: "var(--color-agent)",
+                    complex: "var(--color-agent)",
                   };
                   return (
                     <div
                       key={rel.targetThinkerId}
-                      className="rounded-lg border border-border/30 bg-white/[0.02] px-5 py-4"
+                      className="rounded-lg border border-border/30 bg-input-bg px-5 py-4"
                     >
                       <div className="flex items-center gap-3">
                         <Link
@@ -249,7 +249,8 @@ export default async function ThinkerProfilePage({
                             rel.targetThinkerId.slice(1)}
                         </Link>
                         <span
-                          className={`text-[11px] italic tracking-wide ${typeStyles[rel.type] || "text-muted/50"}`}
+                          className="text-[11px] italic tracking-wide"
+                          style={{ color: typeColors[rel.type] || undefined }}
                         >
                           {rel.type}
                         </span>

@@ -186,7 +186,7 @@ export default function ThinkerResponse({
           {/* Position label + type badge */}
           <div className="flex shrink-0 items-center gap-2">
             {isAgent ? (
-              <span className="rounded-full bg-purple-500/15 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-purple-400/80">
+              <span className="rounded-full bg-agent-dim px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-agent/80">
                 Agent
               </span>
             ) : (

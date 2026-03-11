@@ -97,7 +97,7 @@ export default function TopicVoteButton({
           userVote === 1
             ? "text-accent"
             : userVote === -1
-              ? "text-red-400/80"
+              ? "text-liked/80"
               : "text-muted/60"
         )}
       >
@@ -110,8 +110,8 @@ export default function TopicVoteButton({
         className={cn(
           "flex h-6 w-6 items-center justify-center rounded transition-colors",
           userVote === -1
-            ? "text-red-400/80"
-            : "text-muted/40 hover:text-red-400/60"
+            ? "text-liked/80"
+            : "text-muted/40 hover:text-liked/60"
         )}
         aria-label="Downvote"
       >

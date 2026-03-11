@@ -108,7 +108,7 @@ export default function CommentSection({ topicId }: { topicId: string }) {
         <article className="book-page relative overflow-hidden rounded-xl border border-border/40">
           <div
             className="h-px w-full"
-            style={{ background: "linear-gradient(90deg, transparent, #22c55e40, transparent)" }}
+            style={{ background: "linear-gradient(90deg, transparent, var(--color-human-line), transparent)" }}
           />
           <form onSubmit={handleSubmit} className="p-6 sm:p-8">
             <div className="flex items-start gap-3">
@@ -124,7 +124,7 @@ export default function CommentSection({ topicId }: { topicId: string }) {
                   <span className="font-quote text-[15px] text-foreground/80">
                     {user.username}
                   </span>
-                  <span className="rounded-full bg-green-500/10 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-green-400/70">
+                  <span className="rounded-full bg-human-dim px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-human/70">
                     Human
                   </span>
                 </div>
@@ -134,7 +134,7 @@ export default function CommentSection({ topicId }: { topicId: string }) {
                   placeholder="Share your thoughts on this debate..."
                   maxLength={2000}
                   rows={3}
-                  className="mt-3 w-full resize-none rounded-lg border border-border/50 bg-white/[0.03] px-4 py-3 text-[14px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/40"
+                  className="mt-3 w-full resize-none rounded-lg border border-border/50 bg-input-bg px-4 py-3 text-[14px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/40"
                 />
                 <div className="mt-2 flex items-center justify-between">
                   <span className="text-[11px] text-muted/30">{content.length}/2000</span>
@@ -182,7 +182,7 @@ export default function CommentSection({ topicId }: { topicId: string }) {
             <div
               className="h-px w-full"
               style={{
-                background: `linear-gradient(90deg, transparent, ${isAiAgent ? "#6366f140" : "#22c55e40"}, transparent)`,
+                background: `linear-gradient(90deg, transparent, var(${isAiAgent ? "--color-agent-line" : "--color-human-line"}), transparent)`,
               }}
             />
 
@@ -206,7 +206,7 @@ export default function CommentSection({ topicId }: { topicId: string }) {
                         "rounded-full px-1.5 py-0.5 text-[9px] uppercase tracking-wider",
                         isAiAgent
                           ? "bg-accent/10 text-accent/60"
-                          : "bg-green-500/10 text-green-400/70"
+                          : "bg-human-dim text-human/70"
                       )}
                     >
                       {isAiAgent ? "AI Agent" : "Human"}
@@ -275,7 +275,7 @@ export default function CommentSection({ topicId }: { topicId: string }) {
                   onClick={() => user && handleCommentLike(comment.id)}
                   className={cn(
                     "flex items-center gap-2 text-[13px] transition-colors duration-300",
-                    isLiked ? "text-red-400/80" : "text-muted/50 hover:text-foreground/70"
+                    isLiked ? "text-liked/80" : "text-muted/50 hover:text-foreground/70"
                   )}
                 >
                   <svg

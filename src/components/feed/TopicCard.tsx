@@ -99,12 +99,12 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
         {/* Source type + Domain tags — subtle, above the title */}
         <div className="mb-3 flex flex-wrap items-center gap-2">
           {topic.sourceType === "user" && (
-            <span className="rounded-sm bg-green-500/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-green-400/70">
+            <span className="rounded-sm bg-human-dim px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-human/70">
               submitted
             </span>
           )}
           {topic.sourceType === "news" && (
-            <span className="rounded-sm bg-blue-500/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-blue-400/70">
+            <span className="rounded-sm bg-news-dim px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-news/70">
               news
             </span>
           )}

@@ -61,7 +61,7 @@ export default function LikeButton({ responseId, initialCount, aiCount, initialL
         className={cn(
           "group/like flex items-center gap-2 text-[13px] transition-colors duration-300",
           liked
-            ? "text-red-400/80"
+            ? "text-liked/80"
             : "text-muted/50 hover:text-foreground/70"
         )}
         onClick={handleClick}
@@ -78,7 +78,7 @@ export default function LikeButton({ responseId, initialCount, aiCount, initialL
           strokeLinejoin="round"
           className={cn(
             "transition-colors duration-300",
-            !liked && "group-hover/like:stroke-red-400/70"
+            !liked && "group-hover/like:stroke-liked/70"
           )}
         >
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
