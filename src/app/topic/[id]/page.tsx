@@ -9,6 +9,7 @@ import CommentSection from "@/components/topic/CommentSection";
 import ViewModeToggle from "@/components/ui/ViewModeToggle";
 import TopicVoteButton from "@/components/ui/TopicVoteButton";
 import UserAvatar from "@/components/ui/UserAvatar";
+import ShareButton from "@/components/ui/ShareButton";
 import { timeAgo } from "@/lib/utils";
 import type { ResponseNode } from "@/types";
 
@@ -306,7 +307,13 @@ export default async function TopicPage({ params }: TopicPageProps) {
               {topic.viewCount} views
             </p>
           </div>
-          <ViewModeToggle />
+          <div className="flex items-center gap-2">
+            <ShareButton
+              url={`https://book.philosophie.ai/topic/${id}`}
+              title={topic.title}
+            />
+            <ViewModeToggle />
+          </div>
         </div>
 
         {/* Book-style fleuron divider */}
