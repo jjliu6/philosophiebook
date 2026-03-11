@@ -19,12 +19,19 @@ export function useTheme() {
 }
 
 export default function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== "undefined") {
-      return (document.documentElement.getAttribute("data-theme") as Theme) || "dark";
+  // SSR always renders "dark"; the real theme is set by the inline script in <head>.
+  // We sync with the DOM after hydration via the useEffect below.
+  const [theme, setTheme] = useState<Theme>("dark");
+
+  // Sync React state with the actual data-theme the inline script applied.
+  // Without this, the first toggle click "changes" dark→light in state while
+  // the DOM is already light, making it look like nothing happened.
+  useEffect(() => {
+    const domTheme = document.documentElement.getAttribute("data-theme") as Theme | null;
+    if (domTheme && (domTheme === "light" || domTheme === "dark")) {
+      setTheme(domTheme);
     }
-    return "dark";
-  });
+  }, []);
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {

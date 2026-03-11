@@ -18,6 +18,12 @@ interface TopicWithMetrics {
   aiVoteScore: number;
   userVote: number | null;
   commentCount: number;
+  user: {
+    id: string;
+    username: string;
+    role: string;
+    avatarUrl: string | null;
+  } | null;
   responses: {
     thinker: {
       id: string;

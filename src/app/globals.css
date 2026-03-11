@@ -1,37 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0f;
-  --foreground: #e8e6e3;
-  --card: #141419;
-  --card-hover: #1a1a22;
-  --border: #1f1f2e;
-  --muted: #6b6b7b;
-  --accent: #c8a850;
-  --accent-dim: #9a7d3a;
+  --background: #0c0c12;
+  --foreground: #ebe9e5;
+  --card: #161620;
+  --card-hover: #1c1c28;
+  --border: #27273a;
+  --muted: #9494a6;
+  --accent: #d4b45c;
+  --accent-dim: #a58940;
   --font-serif: "Georgia", "Times New Roman", serif;
   /* Book-like paper tones */
-  --paper: #16161d;
-  --paper-edge: #1c1c26;
-  --paper-warm: rgba(200, 168, 80, 0.015);
+  --paper: #181822;
+  --paper-edge: #1e1e2a;
+  --paper-warm: rgba(212, 180, 92, 0.02);
 
   /* Semantic role colors */
-  --color-human: #22c55e;
-  --color-human-dim: rgba(34, 197, 94, 0.10);
-  --color-human-line: rgba(34, 197, 94, 0.25);
-  --color-agent: #6366f1;
-  --color-agent-dim: rgba(99, 102, 241, 0.15);
-  --color-agent-line: rgba(99, 102, 241, 0.25);
-  --color-news: #60a5fa;
-  --color-news-dim: rgba(96, 165, 250, 0.10);
-  --color-liked: #f87171;
-  --color-code-bg: rgba(0, 0, 0, 0.40);
-  --color-code-text: rgba(134, 239, 172, 0.80);
+  --color-human: #34d46e;
+  --color-human-dim: rgba(52, 212, 110, 0.12);
+  --color-human-line: rgba(52, 212, 110, 0.28);
+  --color-agent: #818cf8;
+  --color-agent-dim: rgba(129, 140, 248, 0.15);
+  --color-agent-line: rgba(129, 140, 248, 0.28);
+  --color-news: #7ab8ff;
+  --color-news-dim: rgba(122, 184, 255, 0.12);
+  --color-liked: #fb8a8a;
+  --color-code-bg: rgba(0, 0, 0, 0.35);
+  --color-code-text: rgba(134, 239, 172, 0.85);
   --color-inline-code-bg: rgba(0, 0, 0, 0.20);
-  --color-input-bg: rgba(255, 255, 255, 0.03);
-  --color-error: #f87171;
-  --color-error-bg: rgba(248, 113, 113, 0.05);
-  --color-error-border: rgba(248, 113, 113, 0.20);
+  --color-input-bg: rgba(255, 255, 255, 0.04);
+  --color-error: #fb8a8a;
+  --color-error-bg: rgba(251, 138, 138, 0.07);
+  --color-error-border: rgba(251, 138, 138, 0.22);
 }
 
 /* ═══════════════════════════════════════
@@ -118,7 +118,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2a2a3e;
+  background: #36364e;
 }
 
 [data-theme="light"] ::-webkit-scrollbar-thumb {
@@ -136,7 +136,7 @@ body {
 
 /* Subtle text selection */
 ::selection {
-  background: rgba(200, 168, 80, 0.25);
+  background: rgba(212, 180, 92, 0.28);
   color: var(--foreground);
 }
 
@@ -158,12 +158,12 @@ body {
 /* Paper texture — subtle noise via CSS gradient layering */
 .book-page {
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(200, 168, 80, 0.02), transparent 70%),
-    radial-gradient(ellipse at 80% 20%, rgba(200, 168, 80, 0.015), transparent 60%),
+    radial-gradient(ellipse at 20% 50%, rgba(212, 180, 92, 0.025), transparent 70%),
+    radial-gradient(ellipse at 80% 20%, rgba(212, 180, 92, 0.02), transparent 60%),
     linear-gradient(180deg, var(--paper) 0%, var(--card) 100%);
   box-shadow:
-    inset 0 0 80px rgba(0, 0, 0, 0.15),
-    0 1px 3px rgba(0, 0, 0, 0.3);
+    inset 0 0 80px rgba(0, 0, 0, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 /* Decorative drop cap for first paragraph of responses */
@@ -255,7 +255,7 @@ body {
   font-family: var(--font-serif);
   font-style: italic;
   letter-spacing: 0.04em;
-  opacity: 0.35;
+  opacity: 0.50;
 }
 
 /* Page edge shadow — right edge shadow like a book page */
@@ -271,7 +271,7 @@ body {
   font-size: 11px;
   letter-spacing: 0.12em;
   color: var(--muted);
-  opacity: 0.35;
+  opacity: 0.50;
 }
 
 /* Section divider — book-style fleuron */
@@ -301,7 +301,7 @@ body {
 .book-quote {
   position: relative;
   padding-left: 1.75rem;
-  border-left: 2px solid rgba(200, 168, 80, 0.2);
+  border-left: 2px solid rgba(212, 180, 92, 0.25);
 }
 
 .book-quote::before {
@@ -309,7 +309,7 @@ body {
   font-family: var(--font-serif);
   font-size: 3rem;
   color: var(--accent);
-  opacity: 0.15;
+  opacity: 0.20;
   position: absolute;
   left: -0.1rem;
   top: -0.6rem;
@@ -419,7 +419,7 @@ body {
     var(--border) 90%,
     transparent 100%
   );
-  opacity: 0.2;
+  opacity: 0.35;
   transition: opacity 0.2s ease, background 0.2s ease, width 0.15s ease;
 }
 
@@ -433,7 +433,7 @@ body {
 .thread-collapsed-summary {
   border: 1px dashed var(--border);
   border-radius: 8px;
-  opacity: 0.7;
+  opacity: 0.8;
   transition: opacity 0.2s ease, background 0.2s ease;
 }
 

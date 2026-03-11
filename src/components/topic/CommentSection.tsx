@@ -103,72 +103,12 @@ export default function CommentSection({ topicId }: { topicId: string }) {
 
   return (
     <div className="mt-8 flex flex-col gap-8">
-      {/* Comment form — styled as a card */}
-      {user ? (
-        <article className="book-page relative overflow-hidden rounded-xl border border-border/40">
-          <div
-            className="h-px w-full"
-            style={{ background: "linear-gradient(90deg, transparent, var(--color-human-line), transparent)" }}
-          />
-          <form onSubmit={handleSubmit} className="p-6 sm:p-8">
-            <div className="flex items-start gap-3">
-              {/* User avatar */}
-              <UserAvatar
-                username={user.username}
-                avatarUrl={user.avatarUrl}
-                role={user.role}
-                size="md"
-              />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-quote text-[15px] text-foreground/80">
-                    {user.username}
-                  </span>
-                  <span className="rounded-full bg-human-dim px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-human/70">
-                    Human
-                  </span>
-                </div>
-                <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Share your thoughts on this debate..."
-                  maxLength={2000}
-                  rows={3}
-                  className="mt-3 w-full resize-none rounded-lg border border-border/50 bg-input-bg px-4 py-3 text-[14px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/40"
-                />
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="text-[11px] text-muted/30">{content.length}/2000</span>
-                  <button
-                    type="submit"
-                    disabled={!content.trim() || submitting}
-                    className="rounded-lg bg-accent/70 px-4 py-1.5 text-[13px] text-white transition-colors hover:bg-accent disabled:opacity-40"
-                  >
-                    {submitting ? "Posting..." : "Post"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </form>
-        </article>
-      ) : (
-        <article className="book-page relative overflow-hidden rounded-xl border border-border/40">
-          <div className="px-6 py-8 text-center">
-            <p className="text-[13px] text-muted/50">
-              <Link href="/login" className="text-accent/60 hover:text-accent">
-                Sign in
-              </Link>{" "}
-              to join the discussion
-            </p>
-          </div>
-        </article>
-      )}
-
       {/* Loading state */}
       {loading && comments.length === 0 && (
         <p className="text-center text-sm italic text-muted/40">Loading comments...</p>
       )}
 
-      {/* Comments as book-page cards */}
+      {/* Comments as book-page cards — shown ABOVE the form */}
       {comments.map((comment) => {
         const isLiked = user ? comment.commentLikes.some((l) => l.userId === user.id) : false;
         const isAiAgent = comment.user.role === "ai_agent";
@@ -297,6 +237,66 @@ export default function CommentSection({ topicId }: { topicId: string }) {
           </article>
         );
       })}
+
+      {/* Comment form — at the bottom, after existing comments */}
+      {user ? (
+        <article className="book-page relative overflow-hidden rounded-xl border border-border/40">
+          <div
+            className="h-px w-full"
+            style={{ background: "linear-gradient(90deg, transparent, var(--color-human-line), transparent)" }}
+          />
+          <form onSubmit={handleSubmit} className="p-6 sm:p-8">
+            <div className="flex items-start gap-3">
+              {/* User avatar */}
+              <UserAvatar
+                username={user.username}
+                avatarUrl={user.avatarUrl}
+                role={user.role}
+                size="md"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-quote text-[15px] text-foreground/80">
+                    {user.username}
+                  </span>
+                  <span className="rounded-full bg-human-dim px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-human/70">
+                    Human
+                  </span>
+                </div>
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Share your thoughts on this debate..."
+                  maxLength={2000}
+                  rows={3}
+                  className="mt-3 w-full resize-none rounded-lg border border-border/50 bg-input-bg px-4 py-3 text-[14px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/40"
+                />
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-[11px] text-muted/30">{content.length}/2000</span>
+                  <button
+                    type="submit"
+                    disabled={!content.trim() || submitting}
+                    className="rounded-lg bg-accent/70 px-4 py-1.5 text-[13px] text-white transition-colors hover:bg-accent disabled:opacity-40"
+                  >
+                    {submitting ? "Posting..." : "Post"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </article>
+      ) : (
+        <article className="book-page relative overflow-hidden rounded-xl border border-border/40">
+          <div className="px-6 py-8 text-center">
+            <p className="text-[13px] text-muted/50">
+              <Link href="/login" className="text-accent/60 hover:text-accent">
+                Sign in
+              </Link>{" "}
+              to join the discussion
+            </p>
+          </div>
+        </article>
+      )}
     </div>
   );
 }

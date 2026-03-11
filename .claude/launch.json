@@ -3,10 +3,11 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/.bin/next", "dev"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
       "port": 3000,
-      "autoPort": true
+      "autoPort": true,
+      "cwd": "/Users/a2023/Desktop/philosophiebook"
     }
   ]
 }

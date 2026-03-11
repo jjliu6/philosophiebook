@@ -23,6 +23,12 @@ interface TopicCardProps {
     aiVoteScore?: number;
     userVote: number | null;
     commentCount?: number;
+    user?: {
+      id: string;
+      username: string;
+      role: string;
+      avatarUrl: string | null;
+    } | null;
     responses: {
       thinker: {
         id: string;
@@ -197,6 +203,27 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
 
         {/* Stats and meta — dot-separated */}
         <div className="mt-4 flex flex-wrap items-center gap-x-1.5 text-[12px] text-muted/50">
+          {topic.user ? (
+            <>
+              <span className="flex items-center gap-1">
+                <UserAvatar
+                  username={topic.user.username}
+                  avatarUrl={topic.user.avatarUrl ?? undefined}
+                  role={topic.user.role}
+                  size="xs"
+                />
+                <span className="text-foreground/60">{topic.user.username}</span>
+              </span>
+              <span>&middot;</span>
+            </>
+          ) : (
+            <>
+              <span className="rounded-full bg-accent/10 px-1 py-px text-[9px] uppercase tracking-wider text-accent/50">
+                System
+              </span>
+              <span>&middot;</span>
+            </>
+          )}
           <span>{topic.responseCount} responses</span>
           {!isAiOnly && (topic.commentCount ?? 0) > 0 && (
             <>

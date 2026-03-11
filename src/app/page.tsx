@@ -37,6 +37,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     aiVoteScore: number;
     userVote: number | null;
     commentCount: number;
+    user: {
+      id: string;
+      username: string;
+      role: string;
+      avatarUrl: string | null;
+    } | null;
     responses: {
       thinker: {
         id: string;
@@ -67,6 +73,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     const rawTopics = await prisma.topic.findMany({
       where: sort === "timeless" ? { sourceType: "evergreen" } : undefined,
       include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            role: true,
+            avatarUrl: true,
+          },
+        },
         responses: {
           include: {
             thinker: {

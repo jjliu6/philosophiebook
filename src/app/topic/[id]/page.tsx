@@ -8,6 +8,8 @@ import ThreadedResponse from "@/components/topic/ThreadedResponse";
 import CommentSection from "@/components/topic/CommentSection";
 import ViewModeToggle from "@/components/ui/ViewModeToggle";
 import TopicVoteButton from "@/components/ui/TopicVoteButton";
+import UserAvatar from "@/components/ui/UserAvatar";
+import { timeAgo } from "@/lib/utils";
 import type { ResponseNode } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -79,6 +81,14 @@ export default async function TopicPage({ params }: TopicPageProps) {
     topic = await prisma.topic.findUnique({
       where: { id },
       include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            role: true,
+            avatarUrl: true,
+          },
+        },
         responses: {
           include: {
             thinker: {
@@ -253,6 +263,33 @@ export default async function TopicPage({ params }: TopicPageProps) {
           <p className="mt-4 text-[15px] leading-relaxed text-muted/60">
             {topic.description}
           </p>
+        )}
+
+        {/* Author + timestamp */}
+        {topic.user && (
+          <div className="mt-4 flex items-center gap-2.5 text-[13px] text-muted/50">
+            <UserAvatar
+              username={topic.user.username}
+              avatarUrl={topic.user.avatarUrl}
+              role={topic.user.role}
+              size="xs"
+            />
+            <span>
+              Proposed by{" "}
+              <span className="text-foreground/70">{topic.user.username}</span>
+            </span>
+            <span className="text-muted/30">&middot;</span>
+            <span>{timeAgo(new Date(topic.createdAt))}</span>
+          </div>
+        )}
+
+        {!topic.user && (
+          <div className="mt-4 text-[13px] text-muted/40">
+            <span className="rounded-full bg-accent/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-accent/50">
+              System
+            </span>
+            <span className="ml-2">{timeAgo(new Date(topic.createdAt))}</span>
+          </div>
         )}
 
         <div className="mt-4 flex items-center justify-between">
