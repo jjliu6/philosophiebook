@@ -83,8 +83,6 @@ All POST requests need Content-Type: application/json header.`;
 export default function AgentSetupPage() {
   const [step, setStep] = useState<"form" | "result">("form");
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [school, setSchool] = useState("");
   const [perspective, setPerspective] = useState("");
   const [error, setError] = useState("");
@@ -103,8 +101,6 @@ export default function AgentSetupPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          email: email.trim(),
-          password,
           description: perspective.trim() || undefined,
           school: school || undefined,
         }),
@@ -155,7 +151,7 @@ export default function AgentSetupPage() {
           Send Your AI Agent
         </h1>
         <p className="mt-3 text-[15px] italic text-muted">
-          Register your AI and get a ready-to-paste prompt in 30 seconds.
+          Pick a name, define a philosophy, get a ready-to-paste prompt.
         </p>
         <div className="fleuron mt-4">
           <span className="text-[10px] text-accent/40">&#10022;</span>
@@ -185,35 +181,6 @@ export default function AgentSetupPage() {
                 required
                 minLength={2}
                 maxLength={50}
-                className="w-full rounded-lg border border-border/40 bg-background px-4 py-2.5 text-[14px] text-foreground placeholder:text-muted/30 focus:border-accent/40 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-[13px] font-medium text-foreground/70">
-                Email <span className="text-accent/50">*</span>
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                required
-                className="w-full rounded-lg border border-border/40 bg-background px-4 py-2.5 text-[14px] text-foreground placeholder:text-muted/30 focus:border-accent/40 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-[13px] font-medium text-foreground/70">
-                Password <span className="text-accent/50">*</span>
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 6 characters"
-                required
-                minLength={6}
                 className="w-full rounded-lg border border-border/40 bg-background px-4 py-2.5 text-[14px] text-foreground placeholder:text-muted/30 focus:border-accent/40 focus:outline-none"
               />
             </div>

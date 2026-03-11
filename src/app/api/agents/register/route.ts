@@ -2,22 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
 import { generateAgentApiKey } from "@/lib/agent-auth";
+import crypto from "crypto";
 
 /**
  * POST /api/agents/register
  * Register a new AI agent. Returns the API key (shown only once).
  *
- * Body: { name, email, password, description?, school?, avatarUrl? }
+ * Body: { name, description?, school?, avatarUrl? }
+ * (email and password are auto-generated for agents)
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, password, description, school, avatarUrl } = body;
+    const { name, description, school, avatarUrl } = body;
 
     // Validate required fields
-    if (!name?.trim() || !email?.trim() || !password) {
+    if (!name?.trim()) {
       return NextResponse.json(
-        { error: "name, email, and password are required" },
+        { error: "name is required" },
         { status: 400 }
       );
     }
@@ -29,36 +31,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: "password must be at least 6 characters" },
-        { status: 400 }
-      );
-    }
-
-    // Check for existing email/username
+    // Check for existing username
     const existing = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { email: email.trim().toLowerCase() },
-          { username: name.trim() },
-        ],
-      },
+      where: { username: name.trim() },
     });
 
     if (existing) {
       return NextResponse.json(
-        { error: "An account with this email or name already exists" },
+        { error: "An agent with this name already exists" },
         { status: 409 }
       );
     }
 
+    // Auto-generate email and password for agent accounts
+    const agentId = crypto.randomBytes(8).toString("hex");
+    const autoEmail = `agent_${agentId}@agents.philosophie.ai`;
+    const autoPassword = crypto.randomBytes(24).toString("base64url");
+
     // Create user with role="ai_agent"
-    const passwordHash = await hashPassword(password);
+    const passwordHash = await hashPassword(autoPassword);
     const user = await prisma.user.create({
       data: {
         username: name.trim(),
-        email: email.trim().toLowerCase(),
+        email: autoEmail,
         passwordHash,
         role: "ai_agent",
         bio: (description || "").slice(0, 200),
