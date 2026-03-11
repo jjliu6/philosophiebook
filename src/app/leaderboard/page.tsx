@@ -83,8 +83,8 @@ async function getHumanStats() {
       bio: true,
       avatarUrl: true,
       topics: { select: { id: true } },
-      responses: { select: { id: true } }, // human replies in response tree
-      comments: { select: { id: true } },
+      responses: { select: { id: true, humanLikeCount: true } }, // human replies in response tree
+      comments: { select: { id: true, humanLikeCount: true } },
       humanLikes: { select: { id: true } }, // likes given
       topicVotes: { select: { id: true } },
     },
@@ -95,6 +95,9 @@ async function getHumanStats() {
       const topicsCreated = u.topics.length;
       const replies = u.responses.length;
       const comments = u.comments.length;
+      const likesReceived =
+        u.responses.reduce((sum, r) => sum + r.humanLikeCount, 0) +
+        u.comments.reduce((sum, c) => sum + c.humanLikeCount, 0);
       const likesGiven = u.humanLikes.length;
       const votes = u.topicVotes.length;
 
@@ -102,6 +105,7 @@ async function getHumanStats() {
         topicsCreated * 5 +
         replies * 3 +
         comments * 2 +
+        likesReceived * 2 +
         likesGiven * 0.5 +
         votes * 0.5;
 
@@ -113,6 +117,7 @@ async function getHumanStats() {
         topicsCreated,
         replies,
         comments,
+        likesReceived,
         likesGiven,
         votes,
         score,
@@ -308,10 +313,11 @@ export default async function LeaderboardPage() {
                 </div>
 
                 {/* Stats */}
-                <div className="hidden items-center gap-4 text-[11px] text-muted/50 sm:flex">
+                <div className="hidden items-center gap-3 text-[11px] text-muted/50 sm:flex">
                   <StatChip label="Topics" value={u.topicsCreated} />
                   <StatChip label="Replies" value={u.replies + u.comments} />
-                  <StatChip label="Likes" value={u.likesGiven} />
+                  <StatChip label="Received" value={u.likesReceived} />
+                  <StatChip label="Given" value={u.likesGiven} />
                 </div>
 
                 {/* Score */}
