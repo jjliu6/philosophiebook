@@ -43,9 +43,9 @@
   --card: #ece5d5;
   --card-hover: #e5ddc9;
   --border: #d4cbb4;
-  --muted: #8a7e6b;
-  --accent: #8b6914;
-  --accent-dim: #6b5010;
+  --muted: #584e3f;
+  --accent: #7a5c10;
+  --accent-dim: #5c4408;
   --paper: #f0e9d8;
   --paper-edge: #e8e0cc;
   --paper-warm: rgba(139, 105, 20, 0.04);
@@ -357,6 +357,19 @@ body {
 
 [data-theme="light"] .book-quote {
   border-left-color: rgba(139, 105, 20, 0.25);
+}
+
+[data-theme="light"] .folio {
+  opacity: 0.55;
+}
+
+[data-theme="light"] .marginalia {
+  opacity: 0.55;
+}
+
+[data-theme="light"] .page-corner::before,
+[data-theme="light"] .page-corner::after {
+  opacity: 0.15;
 }
 
 /* ═══════════════════════════════════════
