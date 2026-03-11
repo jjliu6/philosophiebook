@@ -9,12 +9,13 @@ export interface AuthUser {
   email: string;
   role: string;
   bio: string;
+  avatarUrl: string;
 }
 
 interface AuthContextValue {
   user: AuthUser | null;
   login: (email: string, password: string) => Promise<{ error?: string }>;
-  register: (username: string, email: string, password: string, bio?: string) => Promise<{ error?: string }>;
+  register: (username: string, email: string, password: string, bio?: string, avatarUrl?: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
 }
 
@@ -47,11 +48,11 @@ export default function AuthProvider({
     return {};
   }, []);
 
-  const register = useCallback(async (username: string, email: string, password: string, bio?: string) => {
+  const register = useCallback(async (username: string, email: string, password: string, bio?: string, avatarUrl?: string) => {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password, bio }),
+      body: JSON.stringify({ username, email, password, bio, avatarUrl }),
     });
     const data = await res.json();
     if (!res.ok) return { error: data.error };

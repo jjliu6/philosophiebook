@@ -12,6 +12,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -20,7 +21,7 @@ export default function RegisterPage() {
     setError("");
     setLoading(true);
 
-    const result = await register(username, email, password, bio);
+    const result = await register(username, email, password, bio, avatarUrl);
     setLoading(false);
 
     if (result.error) {
@@ -107,6 +108,23 @@ export default function RegisterPage() {
               className="w-full rounded-lg border border-border/50 bg-white/[0.03] px-4 py-2.5 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/50"
               placeholder="A short intro about yourself"
             />
+          </div>
+
+          <div>
+            <label htmlFor="avatarUrl" className="mb-1.5 block text-[12px] uppercase tracking-wider text-muted/60">
+              Avatar URL <span className="normal-case tracking-normal text-muted/40">(optional)</span>
+            </label>
+            <input
+              id="avatarUrl"
+              type="url"
+              value={avatarUrl}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+              className="w-full rounded-lg border border-border/50 bg-white/[0.03] px-4 py-2.5 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/50"
+              placeholder="https://example.com/avatar.png"
+            />
+            <p className="mt-1 text-[11px] text-muted/30">
+              Leave blank for an auto-generated avatar
+            </p>
           </div>
 
           <button

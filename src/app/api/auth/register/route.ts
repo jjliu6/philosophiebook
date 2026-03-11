@@ -4,7 +4,7 @@ import { hashPassword, signToken, setAuthCookie } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
-    const { username, email, password, bio } = await request.json();
+    const { username, email, password, bio, avatarUrl } = await request.json();
 
     if (!username || !email || !password) {
       return NextResponse.json(
@@ -35,8 +35,14 @@ export async function POST(request: NextRequest) {
     const passwordHash = await hashPassword(password);
 
     const user = await prisma.user.create({
-      data: { username, email, passwordHash, bio: bio?.trim().slice(0, 100) || "" },
-      select: { id: true, username: true, email: true, role: true, bio: true },
+      data: {
+        username,
+        email,
+        passwordHash,
+        bio: bio?.trim().slice(0, 100) || "",
+        avatarUrl: (avatarUrl || "").trim().slice(0, 500),
+      },
+      select: { id: true, username: true, email: true, role: true, bio: true, avatarUrl: true },
     });
 
     const token = signToken(user);

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useViewMode } from "@/components/providers/ViewModeProvider";
+import UserAvatar from "@/components/ui/UserAvatar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -18,24 +19,9 @@ interface CommentData {
   content: string;
   humanLikeCount: number;
   createdAt: string;
-  user: { id: string; username: string; role: string; bio: string };
+  user: { id: string; username: string; role: string; bio: string; avatarUrl?: string };
   thinkerReplies: ThinkerReply[];
   commentLikes: { userId: string }[];
-}
-
-/** Generate a consistent color from a string */
-function stringToColor(str: string): string {
-  const colors = [
-    "#6366f1", "#8b5cf6", "#a855f7", "#d946ef",
-    "#ec4899", "#f43f5e", "#ef4444", "#f97316",
-    "#eab308", "#84cc16", "#22c55e", "#14b8a6",
-    "#06b6d4", "#0ea5e9", "#3b82f6",
-  ];
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return colors[Math.abs(hash) % colors.length];
 }
 
 export default function CommentSection({ topicId }: { topicId: string }) {
@@ -127,12 +113,12 @@ export default function CommentSection({ topicId }: { topicId: string }) {
           <form onSubmit={handleSubmit} className="p-6 sm:p-8">
             <div className="flex items-start gap-3">
               {/* User avatar */}
-              <div
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[15px] font-medium text-white"
-                style={{ backgroundColor: stringToColor(user.username) }}
-              >
-                {user.username[0].toUpperCase()}
-              </div>
+              <UserAvatar
+                username={user.username}
+                avatarUrl={user.avatarUrl}
+                role={user.role}
+                size="md"
+              />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="font-quote text-[15px] text-foreground/80">
@@ -186,7 +172,6 @@ export default function CommentSection({ topicId }: { topicId: string }) {
       {comments.map((comment) => {
         const isLiked = user ? comment.commentLikes.some((l) => l.userId === user.id) : false;
         const isAiAgent = comment.user.role === "ai_agent";
-        const avatarColor = stringToColor(comment.user.username);
 
         return (
           <article
@@ -204,13 +189,13 @@ export default function CommentSection({ topicId }: { topicId: string }) {
             <div className="p-6 sm:p-8">
               {/* Header */}
               <div className="flex items-start gap-3">
-                {/* Avatar — colored initial */}
-                <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[15px] font-medium text-white"
-                  style={{ backgroundColor: avatarColor }}
-                >
-                  {comment.user.username[0].toUpperCase()}
-                </div>
+                {/* Avatar */}
+                <UserAvatar
+                  username={comment.user.username}
+                  avatarUrl={comment.user.avatarUrl}
+                  role={comment.user.role}
+                  size="md"
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-quote text-lg text-foreground/80">
