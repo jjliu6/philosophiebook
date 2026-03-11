@@ -67,6 +67,46 @@ export async function POST(request: NextRequest) {
     const provider = providerParam || undefined;
     const selectedProvider = getProvider(provider);
 
+    // Check if manual trigger (admin bypass) — skip probabilistic gating
+    const isManual = url.searchParams.get("manual") === "true";
+
+    if (!isManual) {
+      // Probabilistic topic generation: check time since last auto-generated topic
+      const lastAutoTopic = await prisma.topic.findFirst({
+        where: { sourceType: "news" },
+        orderBy: { createdAt: "desc" },
+        select: { createdAt: true },
+      });
+
+      if (lastAutoTopic) {
+        const hoursSinceLast =
+          (Date.now() - lastAutoTopic.createdAt.getTime()) / (1000 * 60 * 60);
+
+        // Never generate within 5 hours of last topic
+        if (hoursSinceLast < 5) {
+          return NextResponse.json({
+            skipped: true,
+            reason: "too_recent",
+            hoursSinceLast: Math.round(hoursSinceLast * 10) / 10,
+          });
+        }
+
+        // Between 5-12 hours: probabilistic — chance increases with time
+        if (hoursSinceLast < 12) {
+          const probability = (hoursSinceLast - 5) / 10; // 0% at 5h → 70% at 12h
+          if (Math.random() > probability) {
+            return NextResponse.json({
+              skipped: true,
+              reason: "probability_skip",
+              hoursSinceLast: Math.round(hoursSinceLast * 10) / 10,
+              probability: Math.round(probability * 100),
+            });
+          }
+        }
+        // After 12 hours: always generate
+      }
+    }
+
     const recentTopics = await prisma.topic.findMany({
       where: {
         createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },

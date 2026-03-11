@@ -1,9 +1,15 @@
 import { prisma } from "@/lib/db";
 import { ALL_THINKERS, THINKER_MAP } from "@/personas";
 
+/** Random integer between min and max (inclusive) */
+function randomBetween(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 /**
  * Schedule initial topic responses for a new topic.
  * Matches thinkers by domain overlap and creates AgentTasks.
+ * Timing is randomized to feel natural.
  * Returns the number of tasks created.
  */
 export async function scheduleTopicResponses(topicId: string): Promise<number> {
@@ -40,15 +46,22 @@ export async function scheduleTopicResponses(topicId: string): Promise<number> {
     }
   }
 
+  // Randomized staggering: first response 5-30 min after topic,
+  // then 80-160 min gaps between subsequent responses
   const now = new Date();
-  const tasks = selected.map((s, i) => ({
-    type: "topic_response" as const,
-    thinkerId: s.thinkerId,
-    topicId,
-    metadata: JSON.stringify({ position: i }),
-    priority: 100 - i, // first responders have higher priority
-    scheduledFor: new Date(now.getTime() + i * 2 * 60 * 60 * 1000), // stagger by 2h
-  }));
+  let cumulativeMs = randomBetween(5, 30) * 60 * 1000;
+  const tasks = selected.map((s, i) => {
+    const task = {
+      type: "topic_response" as const,
+      thinkerId: s.thinkerId,
+      topicId,
+      metadata: JSON.stringify({ position: i }),
+      priority: 100 - i,
+      scheduledFor: new Date(now.getTime() + cumulativeMs),
+    };
+    cumulativeMs += randomBetween(80, 160) * 60 * 1000; // 1h20m–2h40m gap
+    return task;
+  });
 
   await prisma.agentTask.createMany({ data: tasks });
 
@@ -58,6 +71,7 @@ export async function scheduleTopicResponses(topicId: string): Promise<number> {
 /**
  * Schedule follow-up tasks (replies + endorsements) after initial responses.
  * Called when all opening responses for a topic are completed.
+ * Timing is randomized to feel natural.
  */
 export async function scheduleFollowUps(topicId: string): Promise<number> {
   // Get existing responses with their thinkers (only internal thinker responses)
@@ -87,6 +101,8 @@ export async function scheduleFollowUps(topicId: string): Promise<number> {
     scheduledFor: Date;
   }[] = [];
 
+  let replyCumulativeMs = randomBetween(30, 90) * 60 * 1000; // first reply: 30-90 min
+  let endorseCumulativeMs = randomBetween(15, 60) * 60 * 1000; // first endorsement: 15-60 min
   let taskIndex = 0;
 
   // For each response, check if other thinkers have rival/opponent relationships
@@ -111,7 +127,7 @@ export async function scheduleFollowUps(topicId: string): Promise<number> {
         relationship.type === "rival" ||
         relationship.type === "opponent"
       ) {
-        // Schedule a reply
+        // Schedule a reply with randomized timing (90-180 min gaps)
         tasks.push({
           type: "reply",
           thinkerId: otherResponse.thinkerId,
@@ -123,13 +139,12 @@ export async function scheduleFollowUps(topicId: string): Promise<number> {
             relationshipDynamic: relationship.dynamic,
           }),
           priority: 50 - taskIndex,
-          scheduledFor: new Date(
-            now.getTime() + (taskIndex + 1) * 2 * 60 * 60 * 1000
-          ),
+          scheduledFor: new Date(now.getTime() + replyCumulativeMs),
         });
+        replyCumulativeMs += randomBetween(90, 180) * 60 * 1000; // 1.5h–3h gap
         taskIndex++;
       } else if (relationship.type === "ally") {
-        // Schedule an endorsement
+        // Schedule an endorsement with randomized timing (30-90 min gaps)
         tasks.push({
           type: "endorsement",
           thinkerId: otherResponse.thinkerId,
@@ -139,10 +154,9 @@ export async function scheduleFollowUps(topicId: string): Promise<number> {
             relationshipType: relationship.type,
           }),
           priority: 30 - taskIndex,
-          scheduledFor: new Date(
-            now.getTime() + (taskIndex + 1) * 60 * 60 * 1000
-          ),
+          scheduledFor: new Date(now.getTime() + endorseCumulativeMs),
         });
+        endorseCumulativeMs += randomBetween(30, 90) * 60 * 1000; // 0.5h–1.5h gap
         taskIndex++;
       }
     }
@@ -151,7 +165,7 @@ export async function scheduleFollowUps(topicId: string): Promise<number> {
   // Limit to reasonable number of follow-ups
   const limitedTasks = tasks.slice(0, 8);
 
-  // Schedule topic votes for participating thinkers
+  // Schedule topic votes with randomized timing per thinker (20-120 min)
   const voteThinkerIds = responses.map((r) => r.thinkerId);
   for (const thinkerId of voteThinkerIds) {
     limitedTasks.push({
@@ -161,7 +175,9 @@ export async function scheduleFollowUps(topicId: string): Promise<number> {
       targetResponseId: "",
       metadata: "{}",
       priority: 10,
-      scheduledFor: new Date(now.getTime() + 60 * 60 * 1000),
+      scheduledFor: new Date(
+        now.getTime() + randomBetween(20, 120) * 60 * 1000
+      ),
     });
   }
 
