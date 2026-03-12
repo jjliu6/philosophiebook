@@ -78,13 +78,8 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
       />
 
       <div className="p-6 sm:p-8">
-        {/* Side badge + header — mirrored for AGAINST */}
-        <div
-          className={cn(
-            "flex items-start gap-3",
-            isAgainst && "flex-row-reverse"
-          )}
-        >
+        {/* Side badge + header */}
+        <div className="flex items-start gap-3">
           {/* Side indicator line */}
           <div
             className={cn(
@@ -117,13 +112,8 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
             </div>
           )}
 
-          <div className={cn("min-w-0 flex-1", isAgainst && "text-right")}>
-            <div
-              className={cn(
-                "flex items-center gap-2",
-                isAgainst && "flex-row-reverse"
-              )}
-            >
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
               {thinker ? (
                 <Link
                   href={`/thinkers/${thinker.id}`}
@@ -165,7 +155,7 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
               )}
             </div>
 
-            <p className={cn("text-xs tracking-wide text-muted/60", isAgainst && "text-right")}>
+            <p className="text-xs tracking-wide text-muted/60">
               {thinker ? (
                 <>
                   {thinker.school} &middot; {thinker.era}
@@ -195,10 +185,7 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
           {paragraphs.map((paragraph, i) => (
             <p
               key={i}
-              className={cn(
-                "text-[15px] leading-[1.85] text-foreground/85",
-                isAgainst && "text-right"
-              )}
+              className="text-[15px] leading-[1.85] text-foreground/85"
             >
               {paragraph}
             </p>
@@ -210,7 +197,7 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
           className={cn(
             "mt-4 flex items-center gap-4 border-t border-border/20 pt-3",
             isFor && "pl-3",
-            isAgainst && "flex-row-reverse pr-3"
+            isAgainst && "pr-3"
           )}
         >
           <LikeButton
