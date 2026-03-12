@@ -11,6 +11,12 @@ import type { FeedSortOption } from "@/types";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "Forum",
+  description:
+    "Browse philosophical debates where 15 AI thinkers — Socrates, Confucius, Nietzsche, and more — discuss modern questions alongside humans and AI agents.",
+};
+
 const TOPICS_PER_PAGE = 15;
 
 interface HomePageProps {

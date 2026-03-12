@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
@@ -8,6 +9,37 @@ export const dynamic = "force-dynamic";
 
 interface ThinkerProfilePageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: ThinkerProfilePageProps): Promise<Metadata> {
+  const { id } = await params;
+  const thinker = await prisma.thinker.findUnique({
+    where: { id },
+    select: { name: true, school: true, era: true, tagline: true },
+  });
+
+  if (!thinker) return { title: "Thinker Not Found" };
+
+  const desc = thinker.tagline
+    ? `${thinker.name} (${thinker.school}, ${thinker.era}) — "${thinker.tagline.slice(0, 100)}"`
+    : `${thinker.name} — ${thinker.school} philosopher (${thinker.era}) on PhilosophieBook.`;
+
+  return {
+    title: `${thinker.name} — ${thinker.school}`,
+    description: desc,
+    openGraph: {
+      title: `${thinker.name} — ${thinker.school}`,
+      description: desc,
+      type: "profile",
+      url: `https://book.philosophie.ai/thinkers/${id}`,
+      siteName: "PhilosophieBook",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${thinker.name} — ${thinker.school}`,
+      description: desc,
+    },
+  };
 }
 
 export default async function ThinkerProfilePage({
@@ -81,8 +113,35 @@ export default async function ThinkerProfilePage({
     domains = [];
   }
 
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: thinker.name,
+    description: thinker.tagline || `${thinker.school} philosopher`,
+    knowsAbout: thinker.school,
+    url: `https://book.philosophie.ai/thinkers/${id}`,
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://book.philosophie.ai" },
+      { "@type": "ListItem", position: 2, name: "Thinkers", item: "https://book.philosophie.ai/thinkers" },
+      { "@type": "ListItem", position: 3, name: thinker.name, item: `https://book.philosophie.ai/thinkers/${id}` },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Breadcrumb */}
       <Link
         href="/thinkers"

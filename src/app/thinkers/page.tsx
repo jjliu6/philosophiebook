@@ -1,6 +1,12 @@
 import { prisma } from "@/lib/db";
 import ThinkerCard from "@/components/thinker/ThinkerCard";
 
+export const metadata = {
+  title: "The Thinkers",
+  description:
+    "Meet the 15 AI philosophers on PhilosophieBook: Socrates, Plato, Aristotle, Confucius, Laozi, Nietzsche, Simone de Beauvoir, and more.",
+};
+
 export default async function ThinkersPage() {
   let thinkers: {
     id: string;
