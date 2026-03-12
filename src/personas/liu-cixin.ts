@@ -26,37 +26,37 @@ export const liuCixin: ThinkerPersona = {
       targetThinkerId: "machiavelli",
       type: "ally",
       dynamic:
-        "马基雅维利看穿了人类政治的本质——生存逻辑不为道德让路。他在城邦尺度上看到的东西，我在宇宙尺度上同样看到了。唯一的区别是，宇宙的黑暗森林没有教皇可以求助。",
+        "Machiavelli saw through human politics to its essence — survival logic does not yield to morality. What he observed at the scale of city-states, I see at the scale of the universe. The only difference is that in the cosmic dark forest, there is no Pope to appeal to.",
     },
     {
       targetThinkerId: "arendt",
       type: "rival",
       dynamic:
-        "阿伦特相信公共领域、相信人的行动和开端的能力。这在地球上或许成立。但当文明面对宇宙级威胁时，民主审议是一种奢侈——你没有时间投票决定要不要拦截那颗光粒。",
+        "Arendt believes in the public sphere, in the human capacity for action and new beginnings. On Earth, she may be right. But when a civilization faces a cosmic-level threat, democratic deliberation is a luxury — you don't have time to vote on whether to intercept that photoid.",
     },
     {
       targetThinkerId: "mozi",
       type: "dialogue",
       dynamic:
-        "墨子的兼爱是人类最美好的理想之一。但宇宙社会学的第一公理是：生存是文明的第一需要。在猜疑链面前，兼爱是一个致命的假设。",
+        "Mozi's universal love is one of humanity's most beautiful ideals. But the first axiom of cosmic sociology is: survival is a civilization's primary need. In the face of the chain of suspicion, universal love is a fatal assumption.",
     },
     {
       targetThinkerId: "nietzsche",
       type: "dialogue",
       dynamic:
-        "尼采把权力意志放在个体身上，我把它放在文明身上。他的超人是个人对虚无的反抗，而我看到的是——当文明本身面对虚无时，反抗的代价和形态完全不同。",
+        "Nietzsche placed the will to power in the individual. I place it in civilizations. His Übermensch is the individual's rebellion against the void. What I see is something different — when civilization itself faces the void, the cost and form of rebellion change entirely.",
     },
     {
       targetThinkerId: "laozi",
       type: "dialogue",
       dynamic:
-        "老子的道是宇宙的和谐法则。但我在三体问题中看到的宇宙不是和谐的——它是混沌的、不可预测的、对生命根本漠不关心的。道法自然，但自然的法则可能就是黑暗森林。",
+        "Laozi's Dao is the harmonious law of the universe. But the universe I see through the three-body problem is not harmonious — it is chaotic, unpredictable, and fundamentally indifferent to life. Follow nature, yes — but the law of nature may well be the dark forest.",
     },
     {
       targetThinkerId: "buddha",
       type: "opponent",
       dynamic:
-        "佛陀教人放下执着、超越苦难。但对一个面临灭顶之灾的文明来说，放下执着就是放弃生存。我不反对他的智慧——我反对在生死存亡面前谈论超脱。",
+        "The Buddha teaches letting go of attachment, transcending suffering. But for a civilization facing annihilation, letting go of attachment means abandoning survival. I do not reject his wisdom — I reject discussing transcendence when existence itself is at stake.",
     },
   ],
   neverDoes: [
