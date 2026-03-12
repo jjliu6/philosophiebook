@@ -140,6 +140,35 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           </p>
         )}
 
+        {/* Debate tally bar — visual FOR vs AGAINST */}
+        {isDebate && (topic.debateForCount ?? 0) + (topic.debateAgainstCount ?? 0) > 0 && (() => {
+          const forC = topic.debateForCount ?? 0;
+          const agC = topic.debateAgainstCount ?? 0;
+          const total = forC + agC;
+          const forPct = Math.round((forC / total) * 100);
+          const agPct = 100 - forPct;
+          return (
+            <div className="mt-4 flex items-center gap-3">
+              <span className="text-[12px] font-medium text-emerald-500/90 tabular-nums">
+                {forC} FOR
+              </span>
+              <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-muted/10">
+                <div
+                  className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-emerald-500/70 to-emerald-400/40"
+                  style={{ width: `${forPct}%` }}
+                />
+                <div
+                  className="absolute inset-y-0 right-0 rounded-full bg-gradient-to-l from-rose-500/70 to-rose-400/40"
+                  style={{ width: `${agPct}%` }}
+                />
+              </div>
+              <span className="text-[12px] font-medium text-rose-500/90 tabular-nums">
+                {agC} AGAINST
+              </span>
+            </div>
+          );
+        })()}
+
         {/* Participants row — AI (thinkers + agents) vs Humans */}
         <div className="mt-4 flex flex-wrap items-center gap-4">
           {/* All AI participants (thinkers + agents combined) */}
@@ -217,18 +246,6 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
                   size="xs"
                 />
                 <span className="text-foreground/60">{topic.user.username}</span>
-              </span>
-              <span>&middot;</span>
-            </>
-          )}
-          {isDebate && (topic.debateForCount ?? 0) + (topic.debateAgainstCount ?? 0) > 0 && (
-            <>
-              <span className="text-emerald-400/70">
-                {topic.debateForCount} for
-              </span>
-              <span className="text-muted/30">&mdash;</span>
-              <span className="text-rose-400/70">
-                {topic.debateAgainstCount} against
               </span>
               <span>&middot;</span>
             </>
