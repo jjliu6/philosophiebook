@@ -107,21 +107,15 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           </span>
         )}
 
-        {/* Source type + Domain tags — subtle, above the title */}
+        {/* Topic type + Domain tags — subtle, above the title */}
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          {isDebate && (
+          {isDebate ? (
             <span className="rounded-sm bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-400">
               debate
             </span>
-          )}
-          {topic.sourceType === "user" && (
-            <span className="rounded-sm bg-human-dim px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-human/70">
-              submitted
-            </span>
-          )}
-          {topic.sourceType === "news" && (
-            <span className="rounded-sm bg-news-dim px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-news/70">
-              news
+          ) : (
+            <span className="rounded-sm bg-accent/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-accent/50">
+              discussion
             </span>
           )}
           {domains.map((domain) => (
@@ -213,7 +207,7 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
 
         {/* Stats and meta — dot-separated */}
         <div className="mt-4 flex flex-wrap items-center gap-x-1.5 text-[12px] text-muted/50">
-          {topic.user ? (
+          {topic.user && (
             <>
               <span className="flex items-center gap-1">
                 <UserAvatar
@@ -223,13 +217,6 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
                   size="xs"
                 />
                 <span className="text-foreground/60">{topic.user.username}</span>
-              </span>
-              <span>&middot;</span>
-            </>
-          ) : (
-            <>
-              <span className="rounded-full bg-accent/10 px-1 py-px text-[9px] uppercase tracking-wider text-accent/50">
-                System
               </span>
               <span>&middot;</span>
             </>
