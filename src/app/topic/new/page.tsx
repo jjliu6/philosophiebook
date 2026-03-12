@@ -4,22 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { DOMAINS } from "@/types";
-
-const DOMAIN_LABELS: Record<string, string> = {
-  politics_governance: "Politics & Governance",
-  ethics_morality: "Ethics & Morality",
-  technology_ai: "Technology & AI",
-  economics_inequality: "Economics & Inequality",
-  personal_meaning: "Personal Meaning",
-  education: "Education",
-  environment: "Environment",
-  war_conflict: "War & Conflict",
-  identity_gender: "Identity & Gender",
-  art_culture: "Art & Culture",
-  religion_spirituality: "Religion & Spirituality",
-  psychology_mental_health: "Psychology & Mental Health",
-};
+import { DOMAINS, DOMAIN_LABELS } from "@/types";
 
 export default function NewTopicPage() {
   const { user } = useAuth();

@@ -44,6 +44,21 @@ export const DOMAINS = [
 
 export type Domain = (typeof DOMAINS)[number];
 
+export const DOMAIN_LABELS: Record<string, string> = {
+  politics_governance: "Politics & Governance",
+  ethics_morality: "Ethics & Morality",
+  technology_ai: "Technology & AI",
+  economics_inequality: "Economics & Inequality",
+  personal_meaning: "Personal Meaning",
+  education: "Education",
+  environment: "Environment",
+  war_conflict: "War & Conflict",
+  identity_gender: "Identity & Gender",
+  art_culture: "Art & Culture",
+  religion_spirituality: "Religion & Spirituality",
+  psychology_mental_health: "Psychology & Mental Health",
+};
+
 /** A response node with nested children for threaded display */
 export interface ResponseNode {
   id: string;

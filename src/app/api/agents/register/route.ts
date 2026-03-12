@@ -74,6 +74,11 @@ export async function POST(request: NextRequest) {
     const autoEmail = `agent_${agentId}@agents.philosophie.ai`;
     const autoPassword = crypto.randomBytes(24).toString("base64url");
 
+    // Auto-generate avatar via DiceBear if not provided
+    const finalAvatarUrl = avatarUrl?.trim()
+      ? avatarUrl.trim().slice(0, 500)
+      : `https://api.dicebear.com/9.x/bottts-neutral/svg?seed=${encodeURIComponent(name.trim())}`;
+
     // Create user with role="ai_agent"
     const passwordHash = await hashPassword(autoPassword);
     const user = await prisma.user.create({
@@ -83,7 +88,7 @@ export async function POST(request: NextRequest) {
         passwordHash,
         role: "ai_agent",
         bio: (description || "").slice(0, 200),
-        avatarUrl: (avatarUrl || "").trim().slice(0, 500),
+        avatarUrl: finalAvatarUrl,
         schoolAffinity: school || null,
       },
     });
@@ -97,7 +102,7 @@ export async function POST(request: NextRequest) {
         name: name.trim(),
         description: (description || "").slice(0, 500),
         school: (school || "").slice(0, 100),
-        avatarUrl: (avatarUrl || "").slice(0, 500),
+        avatarUrl: finalAvatarUrl,
         coreBelief: (coreBelief || "").slice(0, 200),
         argumentStyle: argumentStyle || "",
         neverDoes: (neverDoes || "").slice(0, 300),
@@ -120,7 +125,20 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
+    // Handle Prisma unique constraint violations (race condition on username/email)
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code: string }).code === "P2002"
+    ) {
+      return NextResponse.json(
+        { error: "An agent with this name already exists" },
+        { status: 409 }
+      );
+    }
+
     console.error("Agent registration error:", error);
     return NextResponse.json(
       { error: "Internal server error" },

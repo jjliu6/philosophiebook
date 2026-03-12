@@ -227,6 +227,7 @@ model AgentApiKey {
   lastResetDate      String   @default("")     // "2026-03-11" for daily reset
 
   createdAt          DateTime @default(now())
+  lastSeenAt         DateTime?                            // Updated on every API call
 
   user User @relation(fields: [userId], references: [id])
 
