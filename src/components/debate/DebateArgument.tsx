@@ -49,6 +49,7 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
 
   const side = response.debateSide;
   const isFor = side === "for";
+  const isAgainst = side === "against";
 
   const paragraphs = response.content
     .split("\n\n")
@@ -60,6 +61,10 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
     <article
       className={cn(
         "book-page relative overflow-hidden rounded-xl border border-border/40",
+        // Against cards offset to the right
+        isAgainst && "sm:ml-12",
+        // For cards offset to the left
+        isFor && "sm:mr-12",
       )}
     >
       {/* Side-colored top line */}
@@ -67,14 +72,19 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
         className="h-1 w-full"
         style={{
           background: isFor
-            ? "linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), transparent)"
-            : "linear-gradient(90deg, transparent, rgba(244, 63, 94, 0.5), transparent)",
+            ? "linear-gradient(90deg, rgba(16, 185, 129, 0.6), rgba(16, 185, 129, 0.2), transparent)"
+            : "linear-gradient(270deg, rgba(244, 63, 94, 0.6), rgba(244, 63, 94, 0.2), transparent)",
         }}
       />
 
       <div className="p-6 sm:p-8">
-        {/* Side badge + header */}
-        <div className="flex items-start gap-3">
+        {/* Side badge + header — mirrored for AGAINST */}
+        <div
+          className={cn(
+            "flex items-start gap-3",
+            isAgainst && "flex-row-reverse"
+          )}
+        >
           {/* Side indicator line */}
           <div
             className={cn(
@@ -107,8 +117,13 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
             </div>
           )}
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
+          <div className={cn("min-w-0 flex-1", isAgainst && "text-right")}>
+            <div
+              className={cn(
+                "flex items-center gap-2",
+                isAgainst && "flex-row-reverse"
+              )}
+            >
               {thinker ? (
                 <Link
                   href={`/thinkers/${thinker.id}`}
@@ -150,7 +165,7 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
               )}
             </div>
 
-            <p className="text-xs tracking-wide text-muted/60">
+            <p className={cn("text-xs tracking-wide text-muted/60", isAgainst && "text-right")}>
               {thinker ? (
                 <>
                   {thinker.school} &middot; {thinker.era}
@@ -170,11 +185,20 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
         </div>
 
         {/* Content */}
-        <div className="mt-5 space-y-4 pl-3">
+        <div
+          className={cn(
+            "mt-5 space-y-4",
+            isFor && "pl-3",
+            isAgainst && "pr-3"
+          )}
+        >
           {paragraphs.map((paragraph, i) => (
             <p
               key={i}
-              className="text-[15px] leading-[1.85] text-foreground/85"
+              className={cn(
+                "text-[15px] leading-[1.85] text-foreground/85",
+                isAgainst && "text-right"
+              )}
             >
               {paragraph}
             </p>
@@ -182,7 +206,13 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
         </div>
 
         {/* Like button */}
-        <div className="mt-4 flex items-center gap-4 border-t border-border/20 pt-3 pl-3">
+        <div
+          className={cn(
+            "mt-4 flex items-center gap-4 border-t border-border/20 pt-3",
+            isFor && "pl-3",
+            isAgainst && "flex-row-reverse pr-3"
+          )}
+        >
           <LikeButton
             responseId={response.id}
             initialCount={response.humanLikeCount + endorseCount}
