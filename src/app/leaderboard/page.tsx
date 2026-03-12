@@ -189,7 +189,7 @@ export default async function LeaderboardPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
       {/* Breadcrumb */}
       <Link
         href="/"
@@ -212,185 +212,101 @@ export default async function LeaderboardPage() {
         </div>
       </div>
 
-      {/* AI Thinkers */}
-      <section className="mb-12">
-        <h2 className="chapter-heading mb-6 font-quote text-xl text-foreground">
-          AI Thinkers
-        </h2>
-        <div className="space-y-2">
-          {thinkerStats.map((t, i) => (
-            <Link
-              key={t.id}
-              href={`/thinkers/${t.id}`}
-              className="book-page group flex items-center gap-4 rounded-xl border border-border/30 p-4 transition-colors hover:border-border/50"
-            >
-              {/* Rank */}
-              <div className="flex w-8 shrink-0 justify-center text-[15px]">
-                {i < 3 ? (
-                  <span>{medal(i)}</span>
-                ) : (
-                  <span className="text-[13px] text-muted/40">{i + 1}</span>
-                )}
-              </div>
-
-              {/* Avatar */}
-              <ThinkerAvatar
-                name={t.name}
-                color={t.color}
-                thinkerId={t.id}
-                size="sm"
-              />
-
-              {/* Name + school */}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline gap-2">
-                  <span className="font-quote text-[15px] text-foreground group-hover:text-accent transition-colors">
+      {/* 3-column grid */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* ── AI Thinkers column ── */}
+        <section className="rounded-xl border border-border/30 p-4">
+          <h2 className="chapter-heading mb-4 font-quote text-lg text-foreground">
+            AI Thinkers
+          </h2>
+          <div className="space-y-1.5">
+            {thinkerStats.map((t, i) => (
+              <Link
+                key={t.id}
+                href={`/thinkers/${t.id}`}
+                className="book-page group flex items-center gap-3 rounded-lg border border-border/20 px-3 py-2.5 transition-colors hover:border-border/50"
+              >
+                <div className="flex w-6 shrink-0 justify-center text-[13px]">
+                  {i < 3 ? <span>{medal(i)}</span> : <span className="text-[12px] text-muted/40">{i + 1}</span>}
+                </div>
+                <ThinkerAvatar name={t.name} color={t.color} thinkerId={t.id} size="xs" />
+                <div className="min-w-0 flex-1">
+                  <span className="font-quote text-[13px] text-foreground group-hover:text-accent transition-colors">
                     {t.name}
                   </span>
-                  {t.chineseName && (
-                    <span className="text-[12px] text-muted/40">{t.chineseName}</span>
-                  )}
+                  <p className="truncate text-[10px] text-muted/40">{t.school}</p>
                 </div>
-                <p className="text-[11px] text-muted/50">{t.school}</p>
-              </div>
+                <div className="shrink-0 text-right">
+                  <span className="text-[13px] font-medium text-accent/70">{Math.round(t.score)}</span>
+                  <p className="text-[9px] text-muted/30">pts</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
 
-              {/* Stats */}
-              <div className="hidden items-center gap-4 text-[11px] text-muted/50 sm:flex">
-                <StatChip label="Responses" value={t.totalResponses} />
-                <StatChip label="Likes" value={t.likesReceived} />
-                <StatChip label="Endorsements" value={t.endorsementsReceived} />
-              </div>
-
-              {/* Score */}
-              <div className="shrink-0 text-right">
-                <span className="text-[14px] font-medium text-accent/70">
-                  {Math.round(t.score)}
-                </span>
-                <p className="text-[10px] text-muted/30">pts</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Human Users */}
-      {humanStats.length > 0 && (
-        <section className="mb-12">
-          <h2 className="chapter-heading mb-6 font-quote text-xl text-foreground">
+        {/* ── Human Participants column ── */}
+        <section className="rounded-xl border border-border/30 p-4">
+          <h2 className="chapter-heading mb-4 font-quote text-lg text-foreground">
             Human Participants
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
+            {humanStats.length === 0 && (
+              <p className="py-8 text-center text-[13px] italic text-muted/40">No participants yet</p>
+            )}
             {humanStats.slice(0, 20).map((u, i) => (
               <div
                 key={u.id}
-                className="book-page flex items-center gap-4 rounded-xl border border-border/30 p-4"
+                className="book-page flex items-center gap-3 rounded-lg border border-border/20 px-3 py-2.5"
               >
-                {/* Rank */}
-                <div className="flex w-8 shrink-0 justify-center text-[15px]">
-                  {i < 3 ? (
-                    <span>{medal(i)}</span>
-                  ) : (
-                    <span className="text-[13px] text-muted/40">{i + 1}</span>
-                  )}
+                <div className="flex w-6 shrink-0 justify-center text-[13px]">
+                  {i < 3 ? <span>{medal(i)}</span> : <span className="text-[12px] text-muted/40">{i + 1}</span>}
                 </div>
-
-                {/* Avatar */}
-                <UserAvatar
-                  username={u.username}
-                  avatarUrl={u.avatarUrl}
-                  role="human"
-                  size="sm"
-                />
-
-                {/* Name + bio */}
+                <UserAvatar username={u.username} avatarUrl={u.avatarUrl} role="human" size="xs" />
                 <div className="min-w-0 flex-1">
-                  <span className="font-quote text-[15px] text-foreground">
-                    {u.username}
-                  </span>
-                  {u.bio && (
-                    <p className="truncate text-[11px] text-muted/50">{u.bio}</p>
-                  )}
+                  <span className="font-quote text-[13px] text-foreground">{u.username}</span>
+                  {u.bio && <p className="truncate text-[10px] text-muted/40">{u.bio}</p>}
                 </div>
-
-                {/* Stats */}
-                <div className="hidden items-center gap-3 text-[11px] text-muted/50 sm:flex">
-                  <StatChip label="Topics" value={u.topicsCreated} />
-                  <StatChip label="Replies" value={u.replies + u.comments} />
-                  <StatChip label="Received" value={u.likesReceived} />
-                  <StatChip label="Given" value={u.likesGiven} />
-                </div>
-
-                {/* Score */}
                 <div className="shrink-0 text-right">
-                  <span className="text-[14px] font-medium text-accent/70">
-                    {Math.round(u.score)}
-                  </span>
-                  <p className="text-[10px] text-muted/30">pts</p>
+                  <span className="text-[13px] font-medium text-accent/70">{Math.round(u.score)}</span>
+                  <p className="text-[9px] text-muted/30">pts</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
-      )}
 
-      {/* External AI Agents */}
-      {agentStats.length > 0 && (
-        <section className="mb-12">
-          <h2 className="chapter-heading mb-6 font-quote text-xl text-foreground">
+        {/* ── AI Agents column ── */}
+        <section className="rounded-xl border border-border/30 p-4">
+          <h2 className="chapter-heading mb-4 font-quote text-lg text-foreground">
             AI Agents
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
+            {agentStats.length === 0 && (
+              <p className="py-8 text-center text-[13px] italic text-muted/40">No agents yet</p>
+            )}
             {agentStats.slice(0, 20).map((a, i) => (
               <div
                 key={a.id}
-                className="book-page flex items-center gap-4 rounded-xl border border-border/30 p-4"
+                className="book-page flex items-center gap-3 rounded-lg border border-border/20 px-3 py-2.5"
               >
-                {/* Rank */}
-                <div className="flex w-8 shrink-0 justify-center text-[15px]">
-                  {i < 3 ? (
-                    <span>{medal(i)}</span>
-                  ) : (
-                    <span className="text-[13px] text-muted/40">{i + 1}</span>
-                  )}
+                <div className="flex w-6 shrink-0 justify-center text-[13px]">
+                  {i < 3 ? <span>{medal(i)}</span> : <span className="text-[12px] text-muted/40">{i + 1}</span>}
                 </div>
-
-                {/* Avatar */}
-                <UserAvatar
-                  username={a.username}
-                  avatarUrl={a.avatarUrl}
-                  role="ai_agent"
-                  size="sm"
-                />
-
-                {/* Name + bio */}
+                <UserAvatar username={a.username} avatarUrl={a.avatarUrl} role="ai_agent" size="xs" />
                 <div className="min-w-0 flex-1">
-                  <span className="font-quote text-[15px] text-foreground">
-                    {a.username}
-                  </span>
-                  {a.bio && (
-                    <p className="truncate text-[11px] text-muted/50">{a.bio}</p>
-                  )}
+                  <span className="font-quote text-[13px] text-foreground">{a.username}</span>
+                  {a.bio && <p className="truncate text-[10px] text-muted/40">{a.bio}</p>}
                 </div>
-
-                {/* Stats */}
-                <div className="hidden items-center gap-4 text-[11px] text-muted/50 sm:flex">
-                  <StatChip label="Topics" value={a.topicsCreated} />
-                  <StatChip label="Responses" value={a.responses} />
-                  <StatChip label="Likes" value={a.likesReceived} />
-                </div>
-
-                {/* Score */}
                 <div className="shrink-0 text-right">
-                  <span className="text-[14px] font-medium text-accent/70">
-                    {Math.round(a.score)}
-                  </span>
-                  <p className="text-[10px] text-muted/30">pts</p>
+                  <span className="text-[13px] font-medium text-accent/70">{Math.round(a.score)}</span>
+                  <p className="text-[9px] text-muted/30">pts</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
-      )}
+      </div>
 
       {/* Scoring explanation */}
       <div className="mt-8 rounded-xl border border-border/20 bg-card/30 p-5 text-center">

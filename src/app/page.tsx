@@ -3,6 +3,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import FeedSort from "@/components/feed/FeedSort";
+import DomainFilter from "@/components/feed/DomainFilter";
+import FeedSearch from "@/components/feed/FeedSearch";
 import TopicFeed from "@/components/feed/TopicFeed";
 import ViewModeToggle from "@/components/ui/ViewModeToggle";
 import type { FeedSortOption } from "@/types";
@@ -12,13 +14,15 @@ export const dynamic = "force-dynamic";
 const TOPICS_PER_PAGE = 15;
 
 interface HomePageProps {
-  searchParams: Promise<{ sort?: string; page?: string }>;
+  searchParams: Promise<{ sort?: string; page?: string; domain?: string; q?: string }>;
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
   const sort = (params.sort as FeedSortOption) || "hot";
   const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
+  const domainFilter = params.domain || "";
+  const searchQuery = (params.q || "").trim().toLowerCase();
 
   let topics: {
     id: string;
@@ -205,8 +209,29 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       }
     });
 
-    topics = topicsWithMetrics;
-    totalCount = topicsWithMetrics.length;
+    // Filter by domain if selected
+    let filtered = domainFilter
+      ? topicsWithMetrics.filter((t) => {
+          try {
+            const domains: string[] = JSON.parse(t.domains);
+            return domains.includes(domainFilter);
+          } catch {
+            return false;
+          }
+        })
+      : topicsWithMetrics;
+
+    // Filter by search query (matches title, description, or response content)
+    if (searchQuery) {
+      filtered = filtered.filter((t) => {
+        const titleMatch = t.title.toLowerCase().includes(searchQuery);
+        const descMatch = t.description?.toLowerCase().includes(searchQuery);
+        return titleMatch || descMatch;
+      });
+    }
+
+    topics = filtered;
+    totalCount = filtered.length;
   } catch (error) {
     console.error("Failed to fetch topics:", error);
   }
@@ -255,6 +280,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </Link>
           <ViewModeToggle />
         </div>
+      </div>
+
+      {/* Search + domain filter */}
+      <div className="mb-6 space-y-3">
+        <Suspense fallback={null}>
+          <FeedSearch />
+        </Suspense>
+        <Suspense fallback={null}>
+          <DomainFilter />
+        </Suspense>
       </div>
 
       {/* Topic feed */}

@@ -70,7 +70,7 @@ export async function verifyAgentApiKey(
 
   if (!apiKey || !apiKey.isActive) return null;
 
-  // Auto-reset daily counters
+  // Auto-reset daily counters and update lastSeenAt
   const today = new Date().toISOString().slice(0, 10); // "2026-03-11"
   if (apiKey.lastResetDate !== today) {
     await prisma.agentApiKey.update({
@@ -81,6 +81,7 @@ export async function verifyAgentApiKey(
         dailyCommentCount: 0,
         dailyVoteCount: 0,
         lastResetDate: today,
+        lastSeenAt: new Date(),
       },
     });
     apiKey.dailyTopicCount = 0;
@@ -88,6 +89,12 @@ export async function verifyAgentApiKey(
     apiKey.dailyCommentCount = 0;
     apiKey.dailyVoteCount = 0;
     apiKey.lastResetDate = today;
+  } else {
+    // Update lastSeenAt without resetting counters
+    await prisma.agentApiKey.update({
+      where: { id: apiKey.id },
+      data: { lastSeenAt: new Date() },
+    });
   }
 
   return { apiKey, user: apiKey.user };
