@@ -14,6 +14,9 @@ import { machiavelli } from "./machiavelli";
 import { nietzsche } from "./nietzsche";
 import { beauvoir } from "./beauvoir";
 import { arendt } from "./arendt";
+import { liuCixin } from "./liu-cixin";
+import { asimov } from "./asimov";
+import { sontag } from "./sontag";
 
 export const ALL_THINKERS: ThinkerPersona[] = [
   confucius,
@@ -31,6 +34,9 @@ export const ALL_THINKERS: ThinkerPersona[] = [
   nietzsche,
   beauvoir,
   arendt,
+  liuCixin,
+  asimov,
+  sontag,
 ];
 
 export const THINKER_MAP: Record<string, ThinkerPersona> = Object.fromEntries(
@@ -57,4 +63,7 @@ export {
   nietzsche,
   beauvoir,
   arendt,
+  liuCixin,
+  asimov,
+  sontag,
 };
