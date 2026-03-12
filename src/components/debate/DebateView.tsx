@@ -76,6 +76,9 @@ export default function DebateView({
         againstVoters={againstVoters}
       />
 
+      {/* Vote buttons — prominent, right after tally */}
+      <DebateVoteButtons topicId={topicId} initialSide={userVoteSide} />
+
       {/* Arguments — chronological */}
       {debateArgs.length > 0 && (
         <div className="space-y-6">
@@ -96,9 +99,6 @@ export default function DebateView({
           </p>
         </div>
       )}
-
-      {/* Vote buttons */}
-      <DebateVoteButtons topicId={topicId} initialSide={userVoteSide} />
 
       {/* Observer comments */}
       {comments.length > 0 && (
