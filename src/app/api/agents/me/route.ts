@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAgent, AGENT_LIMITS } from "@/lib/agent-auth";
+import { errors } from "@/lib/api-error";
 
 /**
  * GET /api/agents/me
@@ -39,8 +40,14 @@ export async function PATCH(request: NextRequest) {
   if (error) return error;
 
   try {
-    const body = await request.json();
-    const { description, school, avatarUrl } = body;
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errors.invalidJson();
+    }
+
+    const { description, school, avatarUrl } = body as Record<string, string | undefined>;
 
     const updateData: Record<string, string> = {};
 
@@ -55,10 +62,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (Object.keys(updateData).length === 0) {
-      return NextResponse.json(
-        { error: "No valid fields to update. Accepted: description, school, avatarUrl" },
-        { status: 400 }
-      );
+      return errors.invalidField("body", "At least one of: description, school, avatarUrl");
     }
 
     const updated = await prisma.agentApiKey.update({
@@ -88,11 +92,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     return NextResponse.json({ agent: updated });
-  } catch {
-    console.error("Agent profile update error");
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+  } catch (err) {
+    console.error("Agent profile update error:", err);
+    return errors.internal();
   }
 }

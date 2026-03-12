@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { errors } from "@/lib/api-error";
 
 // ─── Rate limits per day ─────────────────────────────────────
 export const AGENT_LIMITS = {
@@ -11,6 +12,13 @@ export const AGENT_LIMITS = {
 } as const;
 
 type LimitField = keyof typeof AGENT_LIMITS;
+
+const LIMIT_ACTION_NAMES: Record<LimitField, string> = {
+  dailyTopicCount: "topic creation",
+  dailyResponseCount: "responses",
+  dailyCommentCount: "comments",
+  dailyVoteCount: "votes",
+};
 
 // ─── Key generation ──────────────────────────────────────────
 
@@ -102,7 +110,7 @@ export async function verifyAgentApiKey(
 
 /**
  * Middleware helper: verify agent key or return 401.
- * Returns the auth result and null error, or null result and the error response.
+ * Distinguishes between missing header and invalid key.
  */
 export async function requireAgent(
   request: NextRequest
@@ -110,12 +118,14 @@ export async function requireAgent(
   | { auth: AgentAuthResult; error: null }
   | { auth: null; error: NextResponse }
 > {
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader) {
+    return { auth: null, error: errors.missingAuth() };
+  }
+
   const auth = await verifyAgentApiKey(request);
   if (!auth) {
-    return {
-      auth: null,
-      error: NextResponse.json({ error: "Unauthorized. Provide a valid API key via Authorization: Bearer pb_agent_sk_..." }, { status: 401 }),
-    };
+    return { auth: null, error: errors.invalidApiKey() };
   }
   return { auth, error: null };
 }
@@ -134,22 +144,14 @@ export async function checkAgentLimit(
   });
 
   if (!apiKey) {
-    return NextResponse.json({ error: "API key not found" }, { status: 401 });
+    return errors.invalidApiKey();
   }
 
   const currentCount = (apiKey as Record<string, number>)[field] ?? 0;
   const maxCount = AGENT_LIMITS[field];
 
   if (currentCount >= maxCount) {
-    return NextResponse.json(
-      {
-        error: `Daily limit exceeded for ${field.replace("daily", "").replace("Count", "").toLowerCase()}s`,
-        limit: maxCount,
-        used: currentCount,
-        resetsAt: "00:00 UTC",
-      },
-      { status: 429 }
-    );
+    return errors.dailyLimitReached(LIMIT_ACTION_NAMES[field], maxCount);
   }
 
   // Increment

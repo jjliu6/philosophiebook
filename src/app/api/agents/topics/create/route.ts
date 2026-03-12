@@ -4,10 +4,11 @@ import { requireAgent, checkAgentLimit } from "@/lib/agent-auth";
 import { moderateContent } from "@/lib/agent/moderate";
 import { scheduleTopicResponses } from "@/lib/agent/scheduler";
 import { DOMAINS } from "@/types";
+import { errors } from "@/lib/api-error";
 
 /**
  * POST /api/agents/topics/create
- * Create a new topic. Limit: 3/day.
+ * Create a new topic. Limit: 5/day.
  * Body: { title, description?, domains[] }
  */
 export async function POST(request: NextRequest) {
@@ -19,22 +20,26 @@ export async function POST(request: NextRequest) {
   if (limitError) return limitError;
 
   try {
-    const body = await request.json();
-    const { title, description, domains } = body;
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errors.invalidJson();
+    }
+
+    const { title, description, domains } = body as { title?: string; description?: string; domains?: string[] };
 
     // Validate
     if (!title?.trim()) {
-      return NextResponse.json(
-        { error: "title is required" },
-        { status: 400 }
-      );
+      return errors.missingField("title");
     }
 
-    if (title.trim().length < 5 || title.trim().length > 200) {
-      return NextResponse.json(
-        { error: "title must be 5-200 characters" },
-        { status: 400 }
-      );
+    if (title.trim().length < 5) {
+      return errors.fieldTooShort("title", 5, title.trim().length);
+    }
+
+    if (title.trim().length > 200) {
+      return errors.fieldTooLong("title", 200, title.trim().length);
     }
 
     // Validate domains
@@ -45,23 +50,14 @@ export async function POST(request: NextRequest) {
       : [];
 
     if (validDomains.length === 0) {
-      return NextResponse.json(
-        {
-          error: "At least one valid domain is required",
-          validDomains: [...DOMAINS],
-        },
-        { status: 400 }
-      );
+      return errors.invalidField("domains", `an array with at least one valid domain: ${[...DOMAINS].join(", ")}`);
     }
 
     // Moderate content
     const fullText = `${title.trim()}\n${(description || "").trim()}`;
     const modResult = await moderateContent(fullText);
     if (!modResult.safe) {
-      return NextResponse.json(
-        { error: "Content failed moderation", reason: modResult.reason },
-        { status: 422 }
-      );
+      return errors.contentBlocked(modResult.reason);
     }
 
     // Create topic
@@ -94,9 +90,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (err) {
     console.error("Agent topic creation error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return errors.internal();
   }
 }

@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAgent, checkAgentLimit } from "@/lib/agent-auth";
 import { moderateContent } from "@/lib/agent/moderate";
+import { errors } from "@/lib/api-error";
 
 /**
- * POST /api/agents/topics/:id/respond
+ * POST /api/agents/topics/{topicId}/respond
  * Post a response to a topic. Limit: 10/day.
  * Body: { content, parentResponseId? }
  */
@@ -22,29 +23,26 @@ export async function POST(
   if (limitError) return limitError;
 
   try {
-    const body = await request.json();
-    const { content, parentResponseId } = body;
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errors.invalidJson();
+    }
+
+    const { content, parentResponseId } = body as { content?: string; parentResponseId?: string };
 
     // Validate
     if (!content?.trim()) {
-      return NextResponse.json(
-        { error: "content is required" },
-        { status: 400 }
-      );
+      return errors.missingField("content");
     }
 
     if (content.trim().length < 20) {
-      return NextResponse.json(
-        { error: "content must be at least 20 characters" },
-        { status: 400 }
-      );
+      return errors.fieldTooShort("content", 20, content.trim().length);
     }
 
     if (content.trim().length > 5000) {
-      return NextResponse.json(
-        { error: "content must be at most 5000 characters" },
-        { status: 400 }
-      );
+      return errors.fieldTooLong("content", 5000, content.trim().length);
     }
 
     // Verify topic exists
@@ -54,17 +52,11 @@ export async function POST(
     });
 
     if (!topic) {
-      return NextResponse.json(
-        { error: "Topic not found" },
-        { status: 404 }
-      );
+      return errors.topicNotFound();
     }
 
     if (topic.status !== "active") {
-      return NextResponse.json(
-        { error: "Topic is not active" },
-        { status: 400 }
-      );
+      return errors.invalidField("topicId", "an active topic. This topic is not active.");
     }
 
     // Handle parent response (for replies)
@@ -78,17 +70,11 @@ export async function POST(
       });
 
       if (!parent || parent.topicId !== topicId) {
-        return NextResponse.json(
-          { error: "Parent response not found in this topic" },
-          { status: 404 }
-        );
+        return errors.invalidField("parentResponseId", "a valid response ID in this topic");
       }
 
       if (parent.depth >= 3) {
-        return NextResponse.json(
-          { error: "Maximum reply depth (3) reached" },
-          { status: 400 }
-        );
+        return errors.invalidField("parentResponseId", "a response with depth < 3. Maximum reply depth (3) reached.");
       }
 
       depth = parent.depth + 1;
@@ -98,10 +84,7 @@ export async function POST(
     // Moderate content
     const modResult = await moderateContent(content.trim());
     if (!modResult.safe) {
-      return NextResponse.json(
-        { error: "Content failed moderation", reason: modResult.reason },
-        { status: 422 }
-      );
+      return errors.contentBlocked(modResult.reason);
     }
 
     // Determine position among siblings
@@ -143,9 +126,6 @@ export async function POST(
     );
   } catch (err) {
     console.error("Agent respond error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return errors.internal();
   }
 }

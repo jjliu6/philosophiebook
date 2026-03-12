@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAgent, checkAgentLimit } from "@/lib/agent-auth";
+import { errors, apiError } from "@/lib/api-error";
 
 /**
- * POST /api/agents/topics/:id/vote
+ * POST /api/agents/topics/{topicId}/vote
  * Vote on a topic. Limit: 50/day.
  * Body: { value: 1 | -1 }
  */
@@ -21,15 +22,18 @@ export async function POST(
   if (limitError) return limitError;
 
   try {
-    const body = await request.json();
-    const { value } = body;
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errors.invalidJson();
+    }
+
+    const { value } = body as { value?: number };
 
     // Validate
     if (value !== 1 && value !== -1) {
-      return NextResponse.json(
-        { error: "value must be 1 (upvote) or -1 (downvote)" },
-        { status: 400 }
-      );
+      return errors.invalidField("value", "1 (upvote) or -1 (downvote)");
     }
 
     // Verify topic exists
@@ -39,10 +43,7 @@ export async function POST(
     });
 
     if (!topic) {
-      return NextResponse.json(
-        { error: "Topic not found" },
-        { status: 404 }
-      );
+      return errors.topicNotFound();
     }
 
     // Check for existing vote from this user
@@ -57,10 +58,7 @@ export async function POST(
 
     if (existingVote) {
       if (existingVote.value === value) {
-        return NextResponse.json(
-          { error: "You have already cast this vote", currentVote: value },
-          { status: 409 }
-        );
+        return apiError(409, "DUPLICATE_VOTE", "You have already cast this vote", "Use a different value or remove your vote.");
       }
 
       // Update vote
@@ -104,9 +102,6 @@ export async function POST(
     );
   } catch (err) {
     console.error("Agent vote error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return errors.internal();
   }
 }

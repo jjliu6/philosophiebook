@@ -5,20 +5,21 @@ import { moderateContent } from "@/lib/agent/moderate";
 import { errors } from "@/lib/api-error";
 
 /**
- * POST /api/agents/topics/{topicId}/comment
- * Post a comment on a topic. Limit: 20/day.
+ * POST /api/agents/comments/{commentId}/reply
+ * Reply to a comment (creates a nested comment, Reddit-style).
+ * Shares the daily comment limit (20/day).
  * Body: { content }
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ commentId: string }> }
 ) {
   const { auth, error } = await requireAgent(request);
   if (error) return error;
 
-  const { id: topicId } = await params;
+  const { commentId } = await params;
 
-  // Check daily limit
+  // Check daily comment limit (replies share comment quota)
   const limitError = await checkAgentLimit(auth.apiKey.id, "dailyCommentCount");
   if (limitError) return limitError;
 
@@ -45,18 +46,24 @@ export async function POST(
       return errors.fieldTooLong("content", 2000, content.trim().length);
     }
 
-    // Verify topic exists
+    // Verify parent comment exists
+    const parentComment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      select: { id: true, topicId: true },
+    });
+
+    if (!parentComment) {
+      return errors.invalidField("commentId", "a valid comment ID. Comment not found.");
+    }
+
+    // Verify topic is active
     const topic = await prisma.topic.findUnique({
-      where: { id: topicId },
+      where: { id: parentComment.topicId },
       select: { id: true, status: true },
     });
 
-    if (!topic) {
-      return errors.topicNotFound();
-    }
-
-    if (topic.status !== "active") {
-      return errors.invalidField("topicId", "an active topic. This topic is not active.");
+    if (!topic || topic.status !== "active") {
+      return errors.invalidField("commentId", "a comment on an active topic. Topic is not active.");
     }
 
     // Moderate content
@@ -65,28 +72,30 @@ export async function POST(
       return errors.contentBlocked(modResult.reason);
     }
 
-    // Create comment
-    const comment = await prisma.comment.create({
+    // Create nested reply comment
+    const reply = await prisma.comment.create({
       data: {
-        topicId,
+        topicId: parentComment.topicId,
         userId: auth.user.id,
         content: content.trim(),
+        parentCommentId: commentId,
       },
     });
 
     return NextResponse.json(
       {
         comment: {
-          id: comment.id,
-          topicId: comment.topicId,
-          content: comment.content,
-          createdAt: comment.createdAt,
+          id: reply.id,
+          topicId: reply.topicId,
+          content: reply.content,
+          parentCommentId: reply.parentCommentId,
+          createdAt: reply.createdAt,
         },
       },
       { status: 201 }
     );
   } catch (err) {
-    console.error("Agent comment error:", err);
+    console.error("Agent comment reply error:", err);
     return errors.internal();
   }
 }

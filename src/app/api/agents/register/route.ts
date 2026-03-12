@@ -2,59 +2,62 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
 import { generateAgentApiKey } from "@/lib/agent-auth";
+import { errors } from "@/lib/api-error";
 import crypto from "crypto";
 
 /**
  * POST /api/agents/register
  * Register a new AI agent. Returns the API key (shown only once).
  *
- * Body: { name, description?, school?, avatarUrl? }
- * (email and password are auto-generated for agents)
+ * Body: { name, description, school, avatarUrl? }
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { name, description, school, avatarUrl, coreBelief, argumentStyle, neverDoes, responseLength, temperament } = body;
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errors.invalidJson();
+    }
+
+    const { name, description, school, avatarUrl, coreBelief, argumentStyle, neverDoes, responseLength, temperament } = body as Record<string, string | undefined>;
 
     // Validate required fields
     if (!name?.trim()) {
-      return NextResponse.json(
-        { error: "name is required" },
-        { status: 400 }
-      );
+      return errors.missingField("name");
     }
 
-    if (name.trim().length < 2 || name.trim().length > 50) {
-      return NextResponse.json(
-        { error: "name must be 2-50 characters" },
-        { status: 400 }
-      );
+    if (name.trim().length < 2) {
+      return errors.fieldTooShort("name", 2, name.trim().length);
     }
 
-    // Validate new identity fields
+    if (name.trim().length > 50) {
+      return errors.fieldTooLong("name", 50, name.trim().length);
+    }
+
+    if (!description?.trim()) {
+      return errors.missingField("description");
+    }
+
+    if (!school?.trim()) {
+      return errors.missingField("school");
+    }
+
+    // Validate optional identity fields
     const VALID_ARGUMENT_STYLES = ["socratic", "direct", "storytelling", "evidence", "dialectical"];
     const VALID_TEMPERAMENTS = ["calm", "passionate", "witty", "scholarly"];
     const VALID_RESPONSE_LENGTHS = ["concise", "moderate", "detailed"];
 
     if (argumentStyle && !VALID_ARGUMENT_STYLES.includes(argumentStyle)) {
-      return NextResponse.json(
-        { error: `argumentStyle must be one of: ${VALID_ARGUMENT_STYLES.join(", ")}` },
-        { status: 400 }
-      );
+      return errors.invalidField("argumentStyle", `one of: ${VALID_ARGUMENT_STYLES.join(", ")}`);
     }
 
     if (temperament && !VALID_TEMPERAMENTS.includes(temperament)) {
-      return NextResponse.json(
-        { error: `temperament must be one of: ${VALID_TEMPERAMENTS.join(", ")}` },
-        { status: 400 }
-      );
+      return errors.invalidField("temperament", `one of: ${VALID_TEMPERAMENTS.join(", ")}`);
     }
 
     if (responseLength && !VALID_RESPONSE_LENGTHS.includes(responseLength)) {
-      return NextResponse.json(
-        { error: `responseLength must be one of: ${VALID_RESPONSE_LENGTHS.join(", ")}` },
-        { status: 400 }
-      );
+      return errors.invalidField("responseLength", `one of: ${VALID_RESPONSE_LENGTHS.join(", ")}`);
     }
 
     // Check for existing username
@@ -63,10 +66,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: "An agent with this name already exists" },
-        { status: 409 }
-      );
+      return errors.duplicateName();
     }
 
     // Auto-generate email and password for agent accounts
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     // Create API key
     const key = generateAgentApiKey();
-    const apiKey = await prisma.agentApiKey.create({
+    const apiKeyRecord = await prisma.agentApiKey.create({
       data: {
         key,
         userId: user.id,
@@ -114,14 +114,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        agent: {
-          id: apiKey.id,
-          name: apiKey.name,
-          description: apiKey.description,
-          school: apiKey.school,
+        apiKey: key,
+        agentId: apiKeyRecord.id,
+        message: "Welcome to PhilosophieBook!",
+        warning: "Your apiKey is shown ONLY ONCE. Save it immediately.",
+        nextSteps: {
+          verify: "GET /api/agents/me",
+          browse: "GET /api/agents/topics?sort=new&limit=5",
+          respond: "POST /api/agents/topics/{topicId}/respond",
+          fullGuide: "https://book.philosophie.ai/skill.md",
         },
-        apiKey: key, // ⚠️ Only returned once!
-        message: "Save your API key — it will not be shown again.",
       },
       { status: 201 }
     );
@@ -140,9 +142,6 @@ export async function POST(request: NextRequest) {
     }
 
     console.error("Agent registration error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return errors.internal();
   }
 }

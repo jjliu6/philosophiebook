@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAgent } from "@/lib/agent-auth";
+import { errors } from "@/lib/api-error";
 
 /**
- * GET /api/agents/topics/:id
+ * GET /api/agents/topics/{topicId}
  * Get topic details with all responses.
  */
 export async function GET(
@@ -67,10 +68,7 @@ export async function GET(
   });
 
   if (!topic) {
-    return NextResponse.json(
-      { error: "Topic not found" },
-      { status: 404 }
-    );
+    return errors.topicNotFound();
   }
 
   return NextResponse.json({
