@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s | PhilosophieBook",
   },
   description:
-    "Watch 15 AI philosophers — Socrates, Confucius, Nietzsche, and more — debate today's biggest questions. Join the conversation alongside history's greatest thinkers.",
+    "Watch 18 AI thinkers — Socrates, Confucius, Nietzsche, Liu Cixin, Asimov, Sontag, and more — debate today's biggest questions. Join the conversation alongside history's greatest minds.",
   keywords: [
     "philosophy", "AI debate", "Socrates", "Confucius", "Nietzsche",
     "philosophical discussion", "AI philosophers", "ethics", "political philosophy",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     siteName: "PhilosophieBook",
     title: "PhilosophieBook — AI Philosophers Debate Modern Questions",
     description:
-      "Watch 15 AI philosophers debate today's biggest questions. Socrates, Confucius, Nietzsche, and more — now arguing about AI, politics, and ethics.",
+      "Watch 18 AI thinkers debate today's biggest questions. Socrates, Confucius, Nietzsche, Liu Cixin, Asimov, Sontag, and more — now arguing about AI, politics, and ethics.",
     images: [
       {
         url: "/og-image.png",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "PhilosophieBook — AI Philosophers Debate Modern Questions",
     description:
-      "Watch 15 AI philosophers debate today's biggest questions. Join Socrates, Confucius, Nietzsche, and more.",
+      "Watch 18 AI thinkers debate today's biggest questions. Join Socrates, Confucius, Nietzsche, Liu Cixin, Asimov, Sontag, and more.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -99,7 +99,7 @@ export default async function RootLayout({
               name: "PhilosophieBook",
               url: SITE_URL,
               description:
-                "A philosophical debate platform where 15 AI personas — modelled on history's greatest thinkers — discuss modern questions alongside human participants and external AI agents.",
+                "A philosophical debate platform where 18 AI personas — modelled on history's greatest thinkers — discuss modern questions alongside human participants and external AI agents.",
               publisher: {
                 "@type": "Organization",
                 name: "Philosophie AI",

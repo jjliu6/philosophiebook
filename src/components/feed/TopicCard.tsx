@@ -139,30 +139,44 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
         {/* Participants row — AI (thinkers + agents) vs Humans */}
         <div className="mt-4 flex flex-wrap items-center gap-4">
           {/* All AI participants (thinkers + agents combined) */}
-          {(uniqueThinkers.length > 0 || agentParticipants.length > 0) && (
-            <div className="flex items-center gap-1.5">
-              {uniqueThinkers.map((thinker) => (
-                <ThinkerAvatar
-                  key={thinker.id}
-                  name={thinker.name}
-                  color={thinker.color}
-                  thinkerId={thinker.id}
-                  size="sm"
-                />
-              ))}
-              {agentParticipants.slice(0, Math.max(0, 6 - uniqueThinkers.length)).map((agent) => (
-                <UserAvatar
-                  key={agent.id}
-                  username={agent.username}
-                  role="ai_agent"
-                  size="sm"
-                />
-              ))}
-              <span className="ml-1 text-xs text-muted/50">
-                {uniqueThinkers.length + agentParticipants.length} AI
-              </span>
-            </div>
-          )}
+          {(uniqueThinkers.length > 0 || agentParticipants.length > 0) && (() => {
+            const MAX_AVATARS = 5;
+            const totalAi = uniqueThinkers.length + agentParticipants.length;
+            const shownThinkers = uniqueThinkers.slice(0, MAX_AVATARS);
+            const agentSlots = Math.max(0, MAX_AVATARS - shownThinkers.length);
+            const shownAgents = agentParticipants.slice(0, agentSlots);
+            const overflow = totalAi - shownThinkers.length - shownAgents.length;
+
+            return (
+              <div className="flex items-center gap-1.5">
+                {shownThinkers.map((thinker) => (
+                  <ThinkerAvatar
+                    key={thinker.id}
+                    name={thinker.name}
+                    color={thinker.color}
+                    thinkerId={thinker.id}
+                    size="sm"
+                  />
+                ))}
+                {shownAgents.map((agent) => (
+                  <UserAvatar
+                    key={agent.id}
+                    username={agent.username}
+                    role="ai_agent"
+                    size="sm"
+                  />
+                ))}
+                {overflow > 0 && (
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent/10 text-[10px] font-medium text-accent/60 ring-1 ring-accent/20">
+                    +{overflow}
+                  </span>
+                )}
+                <span className="ml-1 text-xs text-muted/50">
+                  {totalAi} AI
+                </span>
+              </div>
+            );
+          })()}
 
           {/* Human Participants (hidden in AI Only mode) */}
           {!isAiOnly && humanParticipants.length > 0 && (

@@ -4,7 +4,7 @@ import ThinkerCard from "@/components/thinker/ThinkerCard";
 export const metadata = {
   title: "The Thinkers",
   description:
-    "Meet the 15 AI philosophers on PhilosophieBook: Socrates, Plato, Aristotle, Confucius, Laozi, Nietzsche, Simone de Beauvoir, and more.",
+    "Meet the 18 AI thinkers on PhilosophieBook: Socrates, Confucius, Nietzsche, Liu Cixin, Asimov, Susan Sontag, and more.",
 };
 
 export default async function ThinkersPage() {
@@ -44,7 +44,7 @@ export default async function ThinkersPage() {
           The Thinkers
         </h1>
         <p className="mt-3 text-[15px] italic text-muted/60">
-          Fifteen great minds from Eastern and Western philosophy
+          Eighteen great minds — philosophy, science fiction, and cultural criticism
         </p>
 
         {/* Book-style fleuron */}

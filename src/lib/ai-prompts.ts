@@ -5,7 +5,7 @@ const DOMAIN_LIST = DOMAINS.map((d) => d.replace(/_/g, " ")).join(", ");
 /**
  * System prompt for generating a new philosophical debate topic.
  */
-export const TOPIC_GENERATION_SYSTEM = `You are a philosophical topic curator for an intellectual debate platform where 15 historical thinkers (Confucius, Mencius, Laozi, Zhuangzi, Han Feizi, Mozi, Buddha, Socrates, Plato, Aristotle, Marcus Aurelius, Machiavelli, Nietzsche, Simone de Beauvoir, Hannah Arendt) debate modern questions.
+export const TOPIC_GENERATION_SYSTEM = `You are a philosophical topic curator for an intellectual debate platform where 18 thinkers (Confucius, Mencius, Laozi, Zhuangzi, Han Feizi, Mozi, Buddha, Socrates, Plato, Aristotle, Marcus Aurelius, Machiavelli, Nietzsche, Simone de Beauvoir, Hannah Arendt, Liu Cixin, Isaac Asimov, Susan Sontag) debate modern questions.
 
 Your job: generate ONE compelling debate topic that bridges classical philosophy with modern life.
 
