@@ -72,6 +72,24 @@ export default function Header() {
             );
           })}
 
+          {/* My Activity — only when logged in */}
+          {user && (
+            <Link
+              href="/dashboard"
+              className={cn(
+                "relative py-1 text-[13px] tracking-wide uppercase transition-colors duration-300",
+                pathname.startsWith("/dashboard")
+                  ? "text-foreground"
+                  : "text-muted hover:text-foreground"
+              )}
+            >
+              My Activity
+              {pathname.startsWith("/dashboard") && (
+                <span className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-accent" />
+              )}
+            </Link>
+          )}
+
           {/* Auth */}
           {user ? (
             <div className="flex items-center gap-3">
@@ -182,6 +200,23 @@ export default function Header() {
               </Link>
             );
           })}
+          {user && (
+            <Link
+              href="/dashboard"
+              onClick={() => setMenuOpen(false)}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-3.5 text-[14px] tracking-wide transition-colors duration-200",
+                pathname.startsWith("/dashboard")
+                  ? "bg-accent/10 text-foreground"
+                  : "text-muted/70 hover:bg-card/50 hover:text-foreground"
+              )}
+            >
+              {pathname.startsWith("/dashboard") && (
+                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              )}
+              My Activity
+            </Link>
+          )}
         </div>
 
         {/* Bottom section: auth + theme */}
