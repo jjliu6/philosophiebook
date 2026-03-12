@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { moderateContent } from "@/lib/agent/moderate";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +70,15 @@ export async function POST(request: NextRequest) {
       if (parent.parentCommentId) {
         return NextResponse.json({ error: "Cannot reply to a reply" }, { status: 400 });
       }
+    }
+
+    // Content moderation (harmful content check)
+    const modResult = await moderateContent(content.trim());
+    if (!modResult.safe) {
+      return NextResponse.json(
+        { error: modResult.reason || "Content policy violation" },
+        { status: 403 }
+      );
     }
 
     // Check daily limit

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { generateText, type AIProvider } from "@/lib/ai";
 import { getThinker } from "@/personas";
 import { responseUserPrompt, type LengthHint } from "@/lib/ai-prompts";
+import { validateAIOutput } from "@/lib/content-safety";
 
 /**
  * Generate a top-level response from a thinker to a topic.
@@ -72,6 +73,15 @@ export async function generateTopicResponse(
     maxTokens,
     provider
   );
+
+  // Validate output for signs of prompt injection success
+  const validation = validateAIOutput(content);
+  if (!validation.valid) {
+    console.warn(
+      `Output validation failed for thinker ${thinkerId} on topic ${topicId}: ${validation.reason}`
+    );
+    throw new Error(`AI output validation failed: ${validation.reason}`);
+  }
 
   const response = await prisma.response.create({
     data: {

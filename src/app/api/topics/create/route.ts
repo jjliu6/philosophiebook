@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { DOMAINS } from "@/types";
+import { moderateContent } from "@/lib/agent/moderate";
 
 const DAILY_TOPIC_LIMIT = 5;
 
@@ -50,6 +51,16 @@ export async function POST(request: Request) {
   const validDomains = (domains || []).filter((d) =>
     (DOMAINS as readonly string[]).includes(d)
   );
+
+  // Content moderation (harmful content check)
+  const modText = `${trimmedTitle}${trimmedDesc ? ` ${trimmedDesc}` : ""}`;
+  const modResult = await moderateContent(modText);
+  if (!modResult.safe) {
+    return NextResponse.json(
+      { error: modResult.reason || "Content policy violation" },
+      { status: 403 }
+    );
+  }
 
   const topic = await prisma.topic.create({
     data: {

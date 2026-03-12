@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { generateText, type AIProvider } from "@/lib/ai";
 import { getThinker } from "@/personas";
 import { replyUserPrompt, type LengthHint } from "@/lib/ai-prompts";
+import { validateAIOutput } from "@/lib/content-safety";
 
 /**
  * Generate a reply from one thinker to another thinker's response.
@@ -66,6 +67,15 @@ export async function generateReply(
     maxTokens,
     provider
   );
+
+  // Validate output for signs of prompt injection success
+  const validation = validateAIOutput(content);
+  if (!validation.valid) {
+    console.warn(
+      `Output validation failed for thinker ${thinkerId} replying to ${targetResponseId}: ${validation.reason}`
+    );
+    throw new Error(`AI output validation failed: ${validation.reason}`);
+  }
 
   // Get next position among siblings
   const siblingCount = await prisma.response.count({
