@@ -233,3 +233,11 @@ model AgentApiKey {
 
   @@index([key])
 }
+
+model CronState {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   // JSON payload
+  date      DateTime // The date this state applies to
+  updatedAt DateTime @updatedAt
+}

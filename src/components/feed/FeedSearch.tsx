@@ -1,16 +1,42 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function FeedSearch() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentQuery = searchParams.get("q") || "";
   const [value, setValue] = useState(currentQuery);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const isFirstRender = useRef(true);
+
+  // Debounced live search — updates URL 400ms after user stops typing
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      const trimmed = value.trim();
+      if (trimmed) {
+        params.set("q", trimmed);
+      } else {
+        params.delete("q");
+      }
+      params.delete("page");
+      router.push(`/?${params.toString()}`);
+    }, 400);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [value, searchParams, router]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     const params = new URLSearchParams(searchParams.toString());
     const trimmed = value.trim();
     if (trimmed) {
@@ -23,6 +49,7 @@ export default function FeedSearch() {
   }
 
   function handleClear() {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     setValue("");
     const params = new URLSearchParams(searchParams.toString());
     params.delete("q");

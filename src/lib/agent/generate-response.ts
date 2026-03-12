@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { generateText, type AIProvider } from "@/lib/ai";
 import { getThinker } from "@/personas";
-import { responseUserPrompt } from "@/lib/ai-prompts";
+import { responseUserPrompt, type LengthHint } from "@/lib/ai-prompts";
 
 /**
  * Generate a top-level response from a thinker to a topic.
@@ -11,7 +11,8 @@ export async function generateTopicResponse(
   thinkerId: string,
   topicId: string,
   position: number,
-  provider?: AIProvider
+  provider?: AIProvider,
+  lengthHint?: LengthHint
 ): Promise<string> {
   const persona = getThinker(thinkerId);
   if (!persona) throw new Error(`Thinker not found: ${thinkerId}`);
@@ -58,13 +59,17 @@ export async function generateTopicResponse(
     topic.description,
     excerpts,
     position,
-    commentExcerpts
+    commentExcerpts,
+    lengthHint
   );
+
+  // Adjust max tokens based on length hint
+  const maxTokens = lengthHint === "short" ? 300 : lengthHint === "medium" ? 800 : 1500;
 
   const content = await generateText(
     persona.systemPromptTemplate,
     userPrompt,
-    1500,
+    maxTokens,
     provider
   );
 

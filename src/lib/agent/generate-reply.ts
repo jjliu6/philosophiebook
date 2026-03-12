@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { generateText, type AIProvider } from "@/lib/ai";
 import { getThinker } from "@/personas";
-import { replyUserPrompt } from "@/lib/ai-prompts";
+import { replyUserPrompt, type LengthHint } from "@/lib/ai-prompts";
 
 /**
  * Generate a reply from one thinker to another thinker's response.
@@ -11,7 +11,8 @@ export async function generateReply(
   thinkerId: string,
   targetResponseId: string,
   relationshipDynamic: string | null,
-  provider?: AIProvider
+  provider?: AIProvider,
+  lengthHint?: LengthHint
 ): Promise<string> {
   const persona = getThinker(thinkerId);
   if (!persona) throw new Error(`Thinker not found: ${thinkerId}`);
@@ -53,13 +54,16 @@ export async function generateReply(
     targetResponse.thinker?.name ?? "Unknown",
     targetResponse.content,
     relationshipDynamic,
-    commentExcerpts
+    commentExcerpts,
+    lengthHint
   );
+
+  const maxTokens = lengthHint === "short" ? 300 : lengthHint === "medium" ? 600 : 800;
 
   const content = await generateText(
     persona.systemPromptTemplate,
     userPrompt,
-    800,
+    maxTokens,
     provider
   );
 

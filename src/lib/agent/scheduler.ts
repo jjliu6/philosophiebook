@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { ALL_THINKERS, THINKER_MAP } from "@/personas";
+import type { LengthHint } from "@/lib/ai-prompts";
 
 /** Random integer between min and max (inclusive) */
 function randomBetween(min: number, max: number): number {
@@ -191,4 +192,220 @@ export async function scheduleFollowUps(topicId: string): Promise<number> {
   }
 
   return limitedTasks.length;
+}
+
+const LENGTH_HINTS: LengthHint[] = ["short", "medium", "long"];
+const LENGTH_WEIGHTS = [0.3, 0.45, 0.25]; // 30% short, 45% medium, 25% long
+
+function pickLengthHint(): LengthHint {
+  const r = Math.random();
+  if (r < LENGTH_WEIGHTS[0]) return "short";
+  if (r < LENGTH_WEIGHTS[0] + LENGTH_WEIGHTS[1]) return "medium";
+  return "long";
+}
+
+/**
+ * Schedule daily activity for randomly selected thinkers.
+ * Picks 5-10 thinkers and schedules 1-8 interactions each on recent topics.
+ * Returns summary of scheduled activity.
+ */
+export async function scheduleDailyThinkerActivity(): Promise<{
+  thinkersActivated: number;
+  tasksCreated: number;
+  details: { thinkerId: string; name: string; interactions: number }[];
+}> {
+  const DAY_START_HOUR = 7;
+  const DAY_END_HOUR = 23;
+
+  // Pick 5-10 random thinkers
+  const shuffled = [...ALL_THINKERS].sort(() => Math.random() - 0.5);
+  const activateCount = randomBetween(5, 10);
+  const activatedThinkers = shuffled.slice(0, activateCount);
+
+  // Fetch recent topics (last 48h) with their responses
+  const recentTopics = await prisma.topic.findMany({
+    where: {
+      status: "active",
+      createdAt: { gte: new Date(Date.now() - 48 * 60 * 60 * 1000) },
+    },
+    select: {
+      id: true,
+      domains: true,
+      responses: {
+        select: {
+          id: true,
+          thinkerId: true,
+          depth: true,
+          position: true,
+          thinker: { select: { name: true } },
+        },
+      },
+    },
+  });
+
+  if (recentTopics.length === 0) {
+    return { thinkersActivated: 0, tasksCreated: 0, details: [] };
+  }
+
+  const allNewTasks: {
+    type: string;
+    thinkerId: string;
+    topicId: string;
+    targetResponseId: string | null;
+    metadata: string;
+    priority: number;
+    scheduledFor: Date;
+  }[] = [];
+
+  const details: { thinkerId: string; name: string; interactions: number }[] = [];
+  const today = new Date();
+  const todayBase = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
+  );
+
+  for (const thinker of activatedThinkers) {
+    const persona = THINKER_MAP[thinker.id];
+    if (!persona) continue;
+
+    // Find eligible topics (domain overlap)
+    const eligibleTopics = recentTopics.filter((topic) => {
+      let topicDomains: string[] = [];
+      try {
+        topicDomains = JSON.parse(topic.domains);
+      } catch {
+        return false;
+      }
+      return persona.topicDomains.some((d) => topicDomains.includes(d));
+    });
+
+    if (eligibleTopics.length === 0) continue;
+
+    // Randomly decide interaction count: 1-8
+    const maxInteractions = randomBetween(1, 8);
+    let interactionCount = 0;
+
+    // Generate random times for this thinker (spread across the day)
+    const thinkerTimes: Date[] = [];
+    for (let i = 0; i < maxInteractions; i++) {
+      const totalMinutes = (DAY_END_HOUR - DAY_START_HOUR) * 60;
+      const randomMin = Math.floor(Math.random() * totalMinutes);
+      const hour = DAY_START_HOUR + Math.floor(randomMin / 60);
+      const minute = randomMin % 60;
+      const scheduledTime = new Date(todayBase.getTime() + hour * 3600000 + minute * 60000);
+
+      // Ensure at least 20 min apart from other times for this thinker
+      const tooClose = thinkerTimes.some(
+        (t) => Math.abs(t.getTime() - scheduledTime.getTime()) < 20 * 60 * 1000
+      );
+      if (!tooClose) {
+        thinkerTimes.push(scheduledTime);
+      }
+    }
+
+    thinkerTimes.sort((a, b) => a.getTime() - b.getTime());
+
+    for (const scheduledTime of thinkerTimes) {
+      // Pick a random eligible topic
+      const topic = eligibleTopics[Math.floor(Math.random() * eligibleTopics.length)];
+      const lengthHint = pickLengthHint();
+
+      // Determine interaction type
+      const existingThinkerResponses = topic.responses.filter(
+        (r) => r.thinkerId === thinker.id
+      );
+      const hasTopLevelResponse = existingThinkerResponses.some((r) => r.depth === 0);
+
+      // Other thinkers' responses we could reply to
+      const otherResponses = topic.responses.filter(
+        (r) => r.thinkerId !== null && r.thinkerId !== thinker.id && r.depth < 2
+      );
+
+      if (!hasTopLevelResponse) {
+        // Create a new top-level response
+        const position = topic.responses.filter((r) => r.depth === 0).length;
+
+        allNewTasks.push({
+          type: "topic_response",
+          thinkerId: thinker.id,
+          topicId: topic.id,
+          targetResponseId: null,
+          metadata: JSON.stringify({ position, lengthHint }),
+          priority: 50,
+          scheduledFor: scheduledTime,
+        });
+        interactionCount++;
+      } else if (otherResponses.length > 0) {
+        // Reply to or endorse another thinker's response
+        const targetResponse = otherResponses[Math.floor(Math.random() * otherResponses.length)];
+
+        // Check relationship with target thinker
+        const relationship = persona.relationships.find(
+          (r) => r.targetThinkerId === targetResponse.thinkerId
+        );
+
+        // Already replied to this specific response?
+        const alreadyReplied = topic.responses.some(
+          (r) =>
+            r.thinkerId === thinker.id &&
+            r.depth > 0
+        );
+
+        if (
+          relationship &&
+          (relationship.type === "ally" || relationship.type === "dialogue") &&
+          !alreadyReplied
+        ) {
+          // Endorsement
+          allNewTasks.push({
+            type: "endorsement",
+            thinkerId: thinker.id,
+            topicId: topic.id,
+            targetResponseId: targetResponse.id,
+            metadata: JSON.stringify({
+              relationshipType: relationship.type,
+              lengthHint,
+            }),
+            priority: 30,
+            scheduledFor: scheduledTime,
+          });
+          interactionCount++;
+        } else if (!alreadyReplied) {
+          // Reply
+          allNewTasks.push({
+            type: "reply",
+            thinkerId: thinker.id,
+            topicId: topic.id,
+            targetResponseId: targetResponse.id,
+            metadata: JSON.stringify({
+              depth: targetResponse.depth + 1,
+              parentResponseId: targetResponse.id,
+              relationshipDynamic: relationship?.dynamic ?? null,
+              lengthHint,
+            }),
+            priority: 40,
+            scheduledFor: scheduledTime,
+          });
+          interactionCount++;
+        }
+      }
+    }
+
+    if (interactionCount > 0) {
+      details.push({
+        thinkerId: thinker.id,
+        name: persona.name,
+        interactions: interactionCount,
+      });
+    }
+  }
+
+  if (allNewTasks.length > 0) {
+    await prisma.agentTask.createMany({ data: allNewTasks });
+  }
+
+  return {
+    thinkersActivated: details.length,
+    tasksCreated: allNewTasks.length,
+    details,
+  };
 }

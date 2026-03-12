@@ -29,7 +29,8 @@ async function processTask(
         task.thinkerId,
         task.topicId,
         meta.position ?? 0,
-        provider
+        provider,
+        meta.lengthHint
       );
       break;
 
@@ -39,7 +40,8 @@ async function processTask(
         task.thinkerId,
         task.targetResponseId,
         meta.relationshipDynamic ?? null,
-        provider
+        provider,
+        meta.lengthHint
       );
       break;
 

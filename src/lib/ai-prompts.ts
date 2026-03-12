@@ -9,6 +9,23 @@ export const TOPIC_GENERATION_SYSTEM = `You are a philosophical topic curator fo
 
 Your job: generate ONE compelling debate topic that bridges classical philosophy with modern life.
 
+QUALITY STANDARDS (CRITICAL):
+- The topic MUST be intellectually engaging and provoke genuine debate from multiple philosophical traditions
+- Frame as a thought-provoking question or dilemma, NOT a bland statement
+- The best topics create tension between competing values (freedom vs security, progress vs tradition, individual vs collective)
+- Topics should feel urgent and relevant — something people actually argue about today
+- Avoid generic or surface-level questions that have obvious answers
+
+GREAT topic examples:
+- "Should we have a right to be forgotten by AI?" (tension: privacy vs collective knowledge)
+- "Is it moral to optimize children before birth?" (tension: parental love vs playing god)
+- "Can a society be just if it requires surveillance?" (tension: safety vs freedom)
+
+MEDIOCRE topic examples (AVOID these):
+- "Is technology good or bad?" (too vague)
+- "Should people be kind to each other?" (no real debate)
+- "What is the meaning of life?" (too broad, overdone)
+
 CONTENT RULES (STRICT):
 - NO targeting specific political parties, politicians, or political figures by name
 - NO racial, ethnic, or religious discrimination or stereotyping
@@ -16,9 +33,6 @@ CONTENT RULES (STRICT):
 - NO conspiracy theories or misinformation
 - Topics MUST be framed as philosophical questions, not political advocacy
 - Prefer universal human experiences over culturally divisive issues
-
-GOOD TOPICS: AI ethics, meaning of work, digital relationships, education reform, art in the age of AI, environmental responsibility, social media & identity, mortality, justice, freedom vs security
-BAD TOPICS: "[Specific politician] is wrong about...", "[Religion] vs [Religion]", "[Country]'s immigration policy"
 
 Available domains: ${DOMAIN_LIST}
 
@@ -73,12 +87,21 @@ or
  * The thinker's own systemPromptTemplate is used as the system prompt;
  * this function generates the user prompt.
  */
+export type LengthHint = "short" | "medium" | "long";
+
+const LENGTH_INSTRUCTIONS: Record<LengthHint, string> = {
+  short: "Write 20-80 words. Be concise — a sharp insight, a piercing observation, or a provocative question. No fluff.",
+  medium: "Write 100-200 words. Make a clear, substantive point with enough depth to be convincing.",
+  long: "Write 250-400 words. Develop a full argument with reasoning, examples, and philosophical depth.",
+};
+
 export function responseUserPrompt(
   topicTitle: string,
   topicDescription: string | null,
   existingResponses: { thinkerName: string; excerpt: string }[],
   position: number,
-  humanComments?: { username: string; excerpt: string }[]
+  humanComments?: { username: string; excerpt: string }[],
+  lengthHint?: LengthHint
 ): string {
   const positionLabel =
     position === 0
@@ -116,7 +139,8 @@ export function responseUserPrompt(
     prompt += `\nRespond to the debate, engaging with previous arguments where relevant. You may agree, disagree, or offer a different perspective.`;
   }
 
-  prompt += `\n\nWrite 300-500 words. Be substantive and philosophical. Start with your analysis of the modern situation, then apply your philosophical framework. Do NOT start with "As [your name]" or similar self-references. Do NOT use markdown headers or bullet points — write flowing prose paragraphs.`;
+  const lengthInstruction = lengthHint ? LENGTH_INSTRUCTIONS[lengthHint] : "Write 300-500 words. Be substantive and philosophical.";
+  prompt += `\n\n${lengthInstruction} Start with your analysis of the modern situation, then apply your philosophical framework. Do NOT start with "As [your name]" or similar self-references. Do NOT use markdown headers or bullet points — write flowing prose paragraphs.`;
 
   return prompt;
 }
@@ -129,7 +153,8 @@ export function replyUserPrompt(
   targetThinkerName: string,
   targetContent: string,
   relationshipDynamic: string | null,
-  humanComments?: { username: string; excerpt: string }[]
+  humanComments?: { username: string; excerpt: string }[],
+  lengthHint?: LengthHint
 ): string {
   let prompt = `TOPIC: ${topicTitle}\n\nYou are replying to ${targetThinkerName}'s argument:\n\n"${targetContent}"`;
 
@@ -144,7 +169,8 @@ export function replyUserPrompt(
     }
   }
 
-  prompt += `\n\nWrite a focused reply (150-250 words). Engage directly with their argument — agree, challenge, or build upon it. Be specific about which points you're addressing. You may also acknowledge relevant human comments if they add to the discussion. Write flowing prose, no markdown headers or bullet points.`;
+  const replyLengthInstruction = lengthHint ? LENGTH_INSTRUCTIONS[lengthHint] : "Write a focused reply (150-250 words).";
+  prompt += `\n\n${replyLengthInstruction} Engage directly with their argument — agree, challenge, or build upon it. Be specific about which points you're addressing. You may also acknowledge relevant human comments if they add to the discussion. Write flowing prose, no markdown headers or bullet points.`;
 
   return prompt;
 }
