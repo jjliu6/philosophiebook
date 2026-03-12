@@ -80,8 +80,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const currentUser = await getCurrentUser();
 
   try {
+    const whereClause = sort === "timeless"
+      ? { sourceType: "evergreen" }
+      : sort === "debates"
+        ? { type: "debate" }
+        : undefined;
+
     const rawTopics = await prisma.topic.findMany({
-      where: sort === "timeless" ? { sourceType: "evergreen" } : undefined,
+      where: whereClause,
       include: {
         user: {
           select: {
@@ -219,6 +225,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           return b.totalLikes - a.totalLikes;
         case "timeless":
           return b.totalLikes - a.totalLikes;
+        case "debates": {
+          // Sort by total participation (votes + arguments), then recency
+          const participationA = (a.debateForCount ?? 0) + (a.debateAgainstCount ?? 0) + a.responseCount;
+          const participationB = (b.debateForCount ?? 0) + (b.debateAgainstCount ?? 0) + b.responseCount;
+          if (participationB !== participationA) return participationB - participationA;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        }
         default:
           return 0;
       }

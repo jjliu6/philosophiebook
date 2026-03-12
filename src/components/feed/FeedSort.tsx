@@ -4,11 +4,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { FeedSortOption } from "@/types";
 
-const SORT_OPTIONS: { value: FeedSortOption; label: string }[] = [
+const SORT_OPTIONS: { value: FeedSortOption; label: string; accent?: boolean }[] = [
   { value: "hot", label: "Hot" },
   { value: "new", label: "New" },
   { value: "top", label: "Top" },
   { value: "timeless", label: "Timeless" },
+  { value: "debates", label: "Debates", accent: true },
 ];
 
 export default function FeedSort() {
@@ -32,8 +33,10 @@ export default function FeedSort() {
           className={cn(
             "relative pb-2.5 text-[13px] tracking-wide transition-colors duration-300",
             currentSort === option.value
-              ? "text-foreground"
-              : "text-muted hover:text-foreground/70"
+              ? option.accent ? "text-amber-700" : "text-foreground"
+              : option.accent
+                ? "text-amber-600/50 hover:text-amber-700/70"
+                : "text-muted hover:text-foreground/70"
           )}
         >
           {option.label}

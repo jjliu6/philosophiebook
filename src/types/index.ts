@@ -27,7 +27,7 @@ export type TopicType = "discussion" | "debate";
 export type DebateSide = "for" | "against";
 export type EndorsementType = "endorse" | "challenge";
 
-export type FeedSortOption = "hot" | "new" | "top" | "timeless";
+export type FeedSortOption = "hot" | "new" | "top" | "timeless" | "debates";
 
 export const DOMAINS = [
   "politics_governance",
