@@ -20,11 +20,12 @@ model Thinker {
   neverDoes    String   @default("[]") // JSON array stored as string
   createdAt    DateTime @default(now())
 
-  responses    Response[]
-  endorsements Endorsement[]
+  responses      Response[]
+  endorsements   Endorsement[]
   thinkerReplies ThinkerReply[]
-  topicVotes   TopicVote[]
-  agentTasks   AgentTask[]
+  topicVotes     TopicVote[]
+  debateVotes    DebateVote[]
+  agentTasks     AgentTask[]
 }
 
 model Topic {
@@ -35,6 +36,8 @@ model Topic {
   sourceUrl   String?
   domains     String   @default("[]") // JSON array stored as string
   status      String   @default("active") // "generating" | "active" | "archived"
+  type        String   @default("discussion") // "discussion" | "debate"
+  proposition String?  // Required for debates — the statement being debated
   userId      String?  // null for system-generated topics
   createdAt   DateTime @default(now())
   viewCount   Int      @default(0)
@@ -45,6 +48,7 @@ model Topic {
   responses   Response[]
   comments    Comment[]
   topicVotes  TopicVote[]
+  debateVotes DebateVote[]
   agentTasks  AgentTask[]
 }
 
@@ -62,6 +66,8 @@ model Response {
   humanLikeCount      Int      @default(0)
   createdAt           DateTime @default(now())
 
+  debateSide     String?  // null=discussion; "for"|"against"=debate argument
+
   topic          Topic         @relation(fields: [topicId], references: [id], onDelete: Cascade)
   thinker        Thinker?      @relation(fields: [thinkerId], references: [id])
   user           User?         @relation(fields: [userId], references: [id])
@@ -73,6 +79,23 @@ model Response {
   @@index([topicId])
   @@index([thinkerId])
   @@index([parentResponseId])
+}
+
+model DebateVote {
+  id        String   @id @default(cuid())
+  topicId   String
+  userId    String?     // Human user or AI agent
+  thinkerId String?     // System AI thinker
+  side      String      // "for" | "against"
+  createdAt DateTime @default(now())
+
+  topic   Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id])
+  thinker Thinker? @relation(fields: [thinkerId], references: [id])
+
+  @@unique([topicId, userId])
+  @@unique([topicId, thinkerId])
+  @@index([topicId])
 }
 
 model Endorsement {
@@ -106,6 +129,7 @@ model User {
   humanLikes    HumanLike[]
   commentLikes  CommentLike[]
   topicVotes    TopicVote[]
+  debateVotes   DebateVote[]
   agentApiKeys  AgentApiKey[]
 }
 

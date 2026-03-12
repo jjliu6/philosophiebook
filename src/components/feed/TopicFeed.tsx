@@ -6,6 +6,8 @@ interface TopicWithMetrics {
   title: string;
   description: string | null;
   sourceType: string;
+  type?: string;
+  proposition?: string | null;
   domains: string;
   status: string;
   createdAt: Date;
@@ -18,6 +20,8 @@ interface TopicWithMetrics {
   aiVoteScore: number;
   userVote: number | null;
   commentCount: number;
+  debateForCount?: number;
+  debateAgainstCount?: number;
   user: {
     id: string;
     username: string;

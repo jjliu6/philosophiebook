@@ -23,6 +23,8 @@ export interface ThinkerPersona {
 
 export type TopicSourceType = "evergreen" | "news" | "user";
 export type TopicStatus = "generating" | "active" | "archived";
+export type TopicType = "discussion" | "debate";
+export type DebateSide = "for" | "against";
 export type EndorsementType = "endorse" | "challenge";
 
 export type FeedSortOption = "hot" | "new" | "top" | "timeless";
@@ -68,6 +70,7 @@ export interface ResponseNode {
   depth: number;
   originalQuote: string | null;
   originalQuoteSource: string | null;
+  debateSide: string | null;
   humanLikeCount: number;
   userHasLiked?: boolean;
   createdAt: Date;
@@ -99,4 +102,22 @@ export interface ResponseNode {
     };
   }[];
   children: ResponseNode[];
+}
+
+/** Debate vote counts for display */
+export interface DebateVoteCounts {
+  forCount: number;
+  againstCount: number;
+  forVoters: Array<{
+    name: string;
+    color?: string;
+    avatarUrl?: string;
+    isThinker: boolean;
+  }>;
+  againstVoters: Array<{
+    name: string;
+    color?: string;
+    avatarUrl?: string;
+    isThinker: boolean;
+  }>;
 }

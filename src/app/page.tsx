@@ -122,6 +122,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         topicVotes: {
           select: { value: true, userId: true, thinkerId: true },
         },
+        debateVotes: {
+          select: { side: true },
+        },
       },
     });
 
@@ -172,6 +175,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         ? topic.topicVotes.find((v) => v.userId === currentUser.id)?.value ?? null
         : null;
 
+      // Debate vote counts
+      const debateForCount = topic.debateVotes.filter((v) => v.side === "for").length;
+      const debateAgainstCount = topic.debateVotes.filter((v) => v.side === "against").length;
+
       return {
         ...topic,
         responseCount,
@@ -184,6 +191,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         commentCount: topic.comments.length,
         humanParticipants,
         agentParticipants,
+        debateForCount,
+        debateAgainstCount,
       };
     });
 

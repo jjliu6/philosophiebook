@@ -205,6 +205,59 @@ export function endorsementUserPrompt(
 }
 
 /**
+ * User prompt for generating a debate argument (for/against a proposition).
+ */
+export function debateArgumentUserPrompt(
+  proposition: string,
+  side: "for" | "against",
+  existingArguments: { thinkerName: string; side: string; excerpt: string }[],
+  lengthHint?: LengthHint
+): string {
+  let prompt = `DEBATE PROPOSITION: "${proposition}"`;
+  prompt += `\nYOUR SIDE: ${side.toUpperCase()}`;
+
+  if (existingArguments.length > 0) {
+    prompt += `\n\nPrevious arguments in this debate:`;
+    for (const a of existingArguments) {
+      prompt += `\n\n[${a.side.toUpperCase()}] ${a.thinkerName}:\n${a.excerpt}`;
+    }
+  }
+
+  prompt += `\n\nYou MUST argue ${side.toUpperCase()} the proposition.`;
+
+  if (existingArguments.length > 0) {
+    prompt += ` Engage with the strongest opposing argument you've seen.`;
+  }
+
+  const lengthInstruction = lengthHint
+    ? LENGTH_INSTRUCTIONS[lengthHint]
+    : "Write 150-300 words. Be sharp, direct, and persuasive.";
+  prompt += `\n\n${lengthInstruction} Be persuasive and philosophical. Do NOT start with "As [your name]" or similar self-references. Do NOT use markdown headers or bullet points — write flowing prose.`;
+
+  return prompt;
+}
+
+/**
+ * Prompt to determine which side a thinker would take in a debate.
+ */
+export function debateSideDecisionPrompt(
+  thinkerName: string,
+  proposition: string,
+  keyConcepts: string[]
+): string {
+  return `You are ${thinkerName}. Given your philosophical framework and these key concepts: ${keyConcepts.join(", ")}.
+
+PROPOSITION: "${proposition}"
+
+Would you argue FOR or AGAINST this proposition? Consider your core philosophical commitments.
+
+Respond ONLY with valid JSON:
+{ "side": "for" }
+or
+{ "side": "against" }`;
+}
+
+/**
  * System prompt for harmful content check (used for external agent submissions).
  * Only checks for harmful content — does NOT judge philosophical relevance.
  */

@@ -194,6 +194,90 @@ export async function scheduleFollowUps(topicId: string): Promise<number> {
   return limitedTasks.length;
 }
 
+/**
+ * Schedule debate responses for a new debate topic.
+ * Picks 4-6 thinkers, assigns sides, and staggers their arguments.
+ * Alternates between FOR and AGAINST for natural debate flow.
+ */
+export async function scheduleDebateResponses(topicId: string): Promise<number> {
+  const topic = await prisma.topic.findUnique({
+    where: { id: topicId },
+    select: { domains: true, proposition: true },
+  });
+  if (!topic?.proposition) return 0;
+
+  let topicDomains: string[] = [];
+  try {
+    topicDomains = JSON.parse(topic.domains);
+  } catch {
+    return 0;
+  }
+
+  // Score thinkers by domain overlap
+  const scored = ALL_THINKERS.map((thinker) => {
+    const overlap = thinker.topicDomains.filter((d) =>
+      topicDomains.includes(d)
+    ).length;
+    return { thinkerId: thinker.id, overlap };
+  })
+    .filter((t) => t.overlap > 0)
+    .sort((a, b) => b.overlap - a.overlap);
+
+  const selected = scored.slice(0, Math.min(6, Math.max(4, scored.length)));
+  if (selected.length === 0) {
+    const shuffled = [...ALL_THINKERS].sort(() => Math.random() - 0.5);
+    for (let i = 0; i < 4 && i < shuffled.length; i++) {
+      selected.push({ thinkerId: shuffled[i].id, overlap: 0 });
+    }
+  }
+
+  // Assign sides: alternate for balanced debate
+  // First half FOR, second half AGAINST (roughly)
+  const forCount = Math.ceil(selected.length / 2);
+  const shuffledSelected = [...selected].sort(() => Math.random() - 0.5);
+  const forThinkers = shuffledSelected.slice(0, forCount);
+  const againstThinkers = shuffledSelected.slice(forCount);
+
+  // Interleave: FOR, AGAINST, FOR, AGAINST...
+  const interleaved: { thinkerId: string; side: "for" | "against" }[] = [];
+  const maxLen = Math.max(forThinkers.length, againstThinkers.length);
+  for (let i = 0; i < maxLen; i++) {
+    if (i < forThinkers.length) {
+      interleaved.push({ thinkerId: forThinkers[i].thinkerId, side: "for" });
+    }
+    if (i < againstThinkers.length) {
+      interleaved.push({ thinkerId: againstThinkers[i].thinkerId, side: "against" });
+    }
+  }
+
+  // Staggered timing
+  const now = new Date();
+  let cumulativeMs = randomBetween(5, 30) * 60 * 1000;
+  const tasks = interleaved.map((s, i) => {
+    const task = {
+      type: "debate_argument" as const,
+      thinkerId: s.thinkerId,
+      topicId,
+      metadata: JSON.stringify({
+        position: i,
+        debateSide: s.side,
+        lengthHint: pickLengthHint(),
+      }),
+      priority: 100 - i,
+      scheduledFor: new Date(now.getTime() + cumulativeMs),
+    };
+    cumulativeMs += randomBetween(15, 60) * 60 * 1000; // 15-60 min gaps (tighter for debates)
+    return task;
+  });
+
+  await prisma.agentTask.createMany({ data: tasks });
+
+  // Also create vote-only records for thinkers who argue (they need a DebateVote)
+  // The actual DebateVote is created when the argument is generated
+
+  return tasks.length;
+}
+
 const LENGTH_HINTS: LengthHint[] = ["short", "medium", "long"];
 const LENGTH_WEIGHTS = [0.3, 0.45, 0.25]; // 30% short, 45% medium, 25% long
 

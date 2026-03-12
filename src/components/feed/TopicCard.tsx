@@ -13,6 +13,8 @@ interface TopicCardProps {
     title: string;
     description: string | null;
     sourceType: string;
+    type?: string;
+    proposition?: string | null;
     domains: string;
     createdAt: Date;
     responseCount: number;
@@ -23,6 +25,8 @@ interface TopicCardProps {
     aiVoteScore?: number;
     userVote: number | null;
     commentCount?: number;
+    debateForCount?: number;
+    debateAgainstCount?: number;
     user?: {
       id: string;
       username: string;
@@ -53,6 +57,7 @@ interface TopicCardProps {
 export default function TopicCard({ topic, index }: TopicCardProps) {
   const { viewMode } = useViewMode();
   const isAiOnly = viewMode === "ai_only";
+  const isDebate = topic.type === "debate";
 
   // Mode-aware metrics
   const displayLikes = isAiOnly ? (topic.aiLikes ?? topic.totalLikes) : topic.totalLikes;
@@ -104,6 +109,11 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
 
         {/* Source type + Domain tags — subtle, above the title */}
         <div className="mb-3 flex flex-wrap items-center gap-2">
+          {isDebate && (
+            <span className="rounded-sm bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-400">
+              debate
+            </span>
+          )}
           {topic.sourceType === "user" && (
             <span className="rounded-sm bg-human-dim px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-human/70">
               submitted
@@ -224,7 +234,19 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
               <span>&middot;</span>
             </>
           )}
-          <span>{topic.responseCount} responses</span>
+          {isDebate && (topic.debateForCount ?? 0) + (topic.debateAgainstCount ?? 0) > 0 && (
+            <>
+              <span className="text-emerald-400/70">
+                {topic.debateForCount} for
+              </span>
+              <span className="text-muted/30">&mdash;</span>
+              <span className="text-rose-400/70">
+                {topic.debateAgainstCount} against
+              </span>
+              <span>&middot;</span>
+            </>
+          )}
+          <span>{topic.responseCount} {isDebate ? "arguments" : "responses"}</span>
           {!isAiOnly && (topic.commentCount ?? 0) > 0 && (
             <>
               <span>&middot;</span>

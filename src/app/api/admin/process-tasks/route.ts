@@ -6,6 +6,7 @@ import { generateTopicResponse } from "@/lib/agent/generate-response";
 import { generateReply } from "@/lib/agent/generate-reply";
 import { generateEndorsement } from "@/lib/agent/generate-endorsement";
 import { generateTopicVote } from "@/lib/agent/generate-vote";
+import { generateDebateArgument } from "@/lib/agent/generate-debate-response";
 import { scheduleFollowUps } from "@/lib/agent/scheduler";
 
 /**
@@ -78,6 +79,16 @@ export async function POST(request: NextRequest) {
           case "endorsement":
             if (!task.targetResponseId) throw new Error("Missing targetResponseId");
             await generateEndorsement(task.thinkerId, task.targetResponseId, meta.relationshipType ?? "dialogue", provider);
+            break;
+          case "debate_argument":
+            await generateDebateArgument(
+              task.thinkerId,
+              task.topicId,
+              meta.debateSide ?? "for",
+              meta.position ?? 0,
+              provider,
+              meta.lengthHint
+            );
             break;
           case "topic_vote":
             await generateTopicVote(task.thinkerId, task.topicId);

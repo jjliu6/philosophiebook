@@ -8,6 +8,7 @@ import ThreadedResponse from "@/components/topic/ThreadedResponse";
 import CommentCard from "@/components/topic/CommentCard";
 import type { CommentData } from "@/components/topic/CommentCard";
 import CommentSection from "@/components/topic/CommentSection";
+import DebateView from "@/components/debate/DebateView";
 import ViewModeToggle from "@/components/ui/ViewModeToggle";
 import TopicVoteButton from "@/components/ui/TopicVoteButton";
 import UserAvatar from "@/components/ui/UserAvatar";
@@ -228,6 +229,51 @@ export default async function TopicPage({ params }: TopicPageProps) {
     orderBy: { createdAt: "asc" },
   });
 
+  // Debate-specific data
+  const isDebate = topic.type === "debate";
+  let debateData: {
+    forCount: number;
+    againstCount: number;
+    forVoters: { name: string; color?: string; avatarUrl?: string; isThinker: boolean; thinkerId?: string }[];
+    againstVoters: { name: string; color?: string; avatarUrl?: string; isThinker: boolean; thinkerId?: string }[];
+    userVoteSide: "for" | "against" | null;
+  } | null = null;
+
+  if (isDebate) {
+    const allDebateVotes = await prisma.debateVote.findMany({
+      where: { topicId: id },
+      include: {
+        user: { select: { username: true, avatarUrl: true } },
+        thinker: { select: { name: true, color: true, id: true } },
+      },
+    });
+
+    const forVotes = allDebateVotes.filter((v) => v.side === "for");
+    const againstVotes = allDebateVotes.filter((v) => v.side === "against");
+
+    const mapVoter = (v: typeof allDebateVotes[0]) => ({
+      name: v.thinker?.name ?? v.user?.username ?? "Unknown",
+      color: v.thinker?.color,
+      avatarUrl: v.user?.avatarUrl ?? undefined,
+      isThinker: !!v.thinkerId,
+      thinkerId: v.thinker?.id,
+    });
+
+    let userVoteSide: "for" | "against" | null = null;
+    if (currentUser) {
+      const userDebateVote = allDebateVotes.find((v) => v.userId === currentUser.id);
+      userVoteSide = (userDebateVote?.side as "for" | "against") ?? null;
+    }
+
+    debateData = {
+      forCount: forVotes.length,
+      againstCount: againstVotes.length,
+      forVoters: forVotes.map(mapVoter),
+      againstVoters: againstVotes.map(mapVoter),
+      userVoteSide,
+    };
+  }
+
   // Build unified timeline sorted by createdAt
   type TimelineEntry =
     | { type: "response"; createdAt: Date; response: ResponseNode; index: number }
@@ -313,19 +359,22 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
       {/* Topic header — chapter-style */}
       <div className="mb-10">
-        {/* Domain tags */}
-        {domains.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-3">
-            {domains.map((domain) => (
-              <span
-                key={domain}
-                className="text-[11px] lowercase tracking-wider text-muted/40"
-              >
-                {domain.replace(/_/g, " ")}
-              </span>
-            ))}
-          </div>
-        )}
+        {/* Topic type + Domain tags */}
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          {isDebate && (
+            <span className="rounded-sm bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-400">
+              debate
+            </span>
+          )}
+          {domains.map((domain) => (
+            <span
+              key={domain}
+              className="text-[11px] lowercase tracking-wider text-muted/40"
+            >
+              {domain.replace(/_/g, " ")}
+            </span>
+          ))}
+        </div>
 
         {/* Chapter-style title with flanking rules */}
         <div className="chapter-heading">
@@ -333,6 +382,15 @@ export default async function TopicPage({ params }: TopicPageProps) {
             {topic.title}
           </h1>
         </div>
+
+        {/* Proposition (for debates) */}
+        {isDebate && topic.proposition && (
+          <div className="mt-4 rounded-lg border border-border/30 bg-card/30 px-5 py-4">
+            <p className="text-center font-quote text-[17px] italic leading-relaxed text-foreground/80">
+              &ldquo;{topic.proposition}&rdquo;
+            </p>
+          </div>
+        )}
 
         {topic.description && (
           <p className="mt-4 text-[15px] leading-relaxed text-muted/60">
@@ -396,51 +454,78 @@ export default async function TopicPage({ params }: TopicPageProps) {
         </div>
       </div>
 
-      {/* Unified timeline — responses and comments sorted by time */}
-      <div className="thread-container flex flex-col gap-8">
-        {timeline.map((entry) =>
-          entry.type === "response" ? (
-            <ThreadedResponse
-              key={entry.response.id}
-              response={entry.response}
-              depth={0}
-              folio={toRoman(entry.index + 1)}
-              topicId={id}
-            />
-          ) : (
-            <CommentCard
-              key={entry.comment.id}
-              comment={entry.comment}
-              topicId={id}
-            />
-          )
-        )}
-      </div>
-
-      {timeline.length === 0 && (
-        <div className="book-page page-corner rounded-xl border border-border/40 px-6 py-16 text-center">
-          <p className="font-quote text-lg text-muted">No responses yet.</p>
-          <p className="mt-2 text-sm italic text-muted/40">
-            The thinkers haven&apos;t weighed in on this topic yet.
-          </p>
-        </div>
-      )}
-
-      {/* Comment compose form */}
-      <CommentSection topicId={id} />
-
-      {/* End-of-chapter ornament */}
-      {timeline.length > 0 && (
-        <div className="mt-12 flex flex-col items-center gap-2">
-          <div className="flex items-center gap-3">
-            <span className="h-px w-8 bg-gradient-to-r from-transparent to-accent/20" />
-            <span className="font-quote text-xs text-accent/25">&#167;</span>
-            <span className="h-px w-8 bg-gradient-to-l from-transparent to-accent/20" />
+      {/* Conditional rendering: Debate vs Discussion */}
+      {isDebate && debateData ? (
+        <DebateView
+          topicId={id}
+          forCount={debateData.forCount}
+          againstCount={debateData.againstCount}
+          forVoters={debateData.forVoters}
+          againstVoters={debateData.againstVoters}
+          arguments={responsesWithLikes}
+          comments={comments.map((c) => ({
+            ...c,
+            createdAt: c.createdAt.toISOString(),
+            replies: c.replies.map((r) => ({
+              ...r,
+              createdAt: r.createdAt.toISOString(),
+            })),
+            thinkerReplies: c.thinkerReplies.map((tr) => ({
+              ...tr,
+              createdAt: tr.createdAt.toISOString(),
+            })),
+          } as CommentData))}
+          userVoteSide={debateData.userVoteSide}
+        />
+      ) : (
+        <>
+          {/* Unified timeline — responses and comments sorted by time */}
+          <div className="thread-container flex flex-col gap-8">
+            {timeline.map((entry) =>
+              entry.type === "response" ? (
+                <ThreadedResponse
+                  key={entry.response.id}
+                  response={entry.response}
+                  depth={0}
+                  folio={toRoman(entry.index + 1)}
+                  topicId={id}
+                />
+              ) : (
+                <CommentCard
+                  key={entry.comment.id}
+                  comment={entry.comment}
+                  topicId={id}
+                />
+              )
+            )}
           </div>
-          <p className="folio">
-            {timeline.length} voice{timeline.length !== 1 ? "s" : ""} heard
-          </p>
-        </div>
+
+          {timeline.length === 0 && (
+            <div className="book-page page-corner rounded-xl border border-border/40 px-6 py-16 text-center">
+              <p className="font-quote text-lg text-muted">No responses yet.</p>
+              <p className="mt-2 text-sm italic text-muted/40">
+                The thinkers haven&apos;t weighed in on this topic yet.
+              </p>
+            </div>
+          )}
+
+          {/* Comment compose form */}
+          <CommentSection topicId={id} />
+
+          {/* End-of-chapter ornament */}
+          {timeline.length > 0 && (
+            <div className="mt-12 flex flex-col items-center gap-2">
+              <div className="flex items-center gap-3">
+                <span className="h-px w-8 bg-gradient-to-r from-transparent to-accent/20" />
+                <span className="font-quote text-xs text-accent/25">&#167;</span>
+                <span className="h-px w-8 bg-gradient-to-l from-transparent to-accent/20" />
+              </div>
+              <p className="folio">
+                {timeline.length} voice{timeline.length !== 1 ? "s" : ""} heard
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
