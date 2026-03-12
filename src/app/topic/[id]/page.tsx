@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { buildResponseTree } from "@/lib/thread-tree";
 import ThreadedResponse from "@/components/topic/ThreadedResponse";
+import CommentCard from "@/components/topic/CommentCard";
+import type { CommentData } from "@/components/topic/CommentCard";
 import CommentSection from "@/components/topic/CommentSection";
 import ViewModeToggle from "@/components/ui/ViewModeToggle";
 import TopicVoteButton from "@/components/ui/TopicVoteButton";
@@ -206,6 +208,58 @@ export default async function TopicPage({ params }: TopicPageProps) {
   // Build threaded response tree from flat data
   const responseTree = buildResponseTree(responsesWithLikes) as unknown as ResponseNode[];
 
+  // Fetch comments server-side for unified timeline
+  const comments = await prisma.comment.findMany({
+    where: { topicId: id, parentCommentId: null },
+    include: {
+      user: { select: { id: true, username: true, role: true, bio: true, avatarUrl: true } },
+      thinkerReplies: {
+        include: { thinker: { select: { id: true, name: true, color: true } } },
+      },
+      commentLikes: { select: { userId: true } },
+      replies: {
+        include: {
+          user: { select: { id: true, username: true, role: true, bio: true, avatarUrl: true } },
+          commentLikes: { select: { userId: true } },
+        },
+        orderBy: { createdAt: "asc" },
+      },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  // Build unified timeline sorted by createdAt
+  type TimelineEntry =
+    | { type: "response"; createdAt: Date; response: ResponseNode; index: number }
+    | { type: "comment"; createdAt: Date; comment: CommentData };
+
+  let responseIndex = 0;
+  const timeline: TimelineEntry[] = [
+    ...responseTree.map((r) => ({
+      type: "response" as const,
+      createdAt: new Date(r.createdAt),
+      response: r,
+      index: responseIndex++,
+    })),
+    ...comments.map((c) => ({
+      type: "comment" as const,
+      createdAt: new Date(c.createdAt),
+      comment: {
+        ...c,
+        createdAt: c.createdAt.toISOString(),
+        replies: c.replies.map((r) => ({
+          ...r,
+          createdAt: r.createdAt.toISOString(),
+        })),
+        thinkerReplies: c.thinkerReplies.map((tr) => ({
+          ...tr,
+          createdAt: tr.createdAt.toISOString(),
+        })),
+      } as CommentData,
+    })),
+  ];
+  timeline.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
   // JSON-LD structured data for this debate
   const thinkerNames = topic.responses
     .filter((r) => r.thinkerId && !r.parentResponseId)
@@ -342,20 +396,28 @@ export default async function TopicPage({ params }: TopicPageProps) {
         </div>
       </div>
 
-      {/* Threaded responses */}
+      {/* Unified timeline — responses and comments sorted by time */}
       <div className="thread-container flex flex-col gap-8">
-        {responseTree.map((response, index) => (
-          <ThreadedResponse
-            key={response.id}
-            response={response}
-            depth={0}
-            folio={toRoman(index + 1)}
-            topicId={id}
-          />
-        ))}
+        {timeline.map((entry) =>
+          entry.type === "response" ? (
+            <ThreadedResponse
+              key={entry.response.id}
+              response={entry.response}
+              depth={0}
+              folio={toRoman(entry.index + 1)}
+              topicId={id}
+            />
+          ) : (
+            <CommentCard
+              key={entry.comment.id}
+              comment={entry.comment}
+              topicId={id}
+            />
+          )
+        )}
       </div>
 
-      {topic.responses.length === 0 && (
+      {timeline.length === 0 && (
         <div className="book-page page-corner rounded-xl border border-border/40 px-6 py-16 text-center">
           <p className="font-quote text-lg text-muted">No responses yet.</p>
           <p className="mt-2 text-sm italic text-muted/40">
@@ -364,11 +426,11 @@ export default async function TopicPage({ params }: TopicPageProps) {
         </div>
       )}
 
-      {/* Human comment section (hidden in AI-only mode) */}
+      {/* Comment compose form */}
       <CommentSection topicId={id} />
 
       {/* End-of-chapter ornament */}
-      {topic.responses.length > 0 && (
+      {timeline.length > 0 && (
         <div className="mt-12 flex flex-col items-center gap-2">
           <div className="flex items-center gap-3">
             <span className="h-px w-8 bg-gradient-to-r from-transparent to-accent/20" />
@@ -376,7 +438,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
             <span className="h-px w-8 bg-gradient-to-l from-transparent to-accent/20" />
           </div>
           <p className="folio">
-            {topic.responses.length} voice{topic.responses.length !== 1 ? "s" : ""} heard
+            {timeline.length} voice{timeline.length !== 1 ? "s" : ""} heard
           </p>
         </div>
       )}
