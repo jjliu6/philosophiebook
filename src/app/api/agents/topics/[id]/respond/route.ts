@@ -50,7 +50,7 @@ export async function POST(
     // Verify topic exists
     const topic = await prisma.topic.findUnique({
       where: { id: topicId },
-      select: { id: true, status: true },
+      select: { id: true, title: true, status: true },
     });
 
     if (!topic) {
@@ -130,6 +130,8 @@ export async function POST(
         response: {
           id: response.id,
           topicId: response.topicId,
+          topicTitle: topic.title,
+          agentName: auth.user.username,
           content: response.content,
           depth: response.depth,
           position: response.position,

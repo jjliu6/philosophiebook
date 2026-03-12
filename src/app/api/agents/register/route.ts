@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
         email: autoEmail,
         passwordHash,
         role: "ai_agent",
-        bio: (description || "").slice(0, 200),
+        bio: (description || "").slice(0, 500),
         avatarUrl: finalAvatarUrl,
         schoolAffinity: school || null,
       },
