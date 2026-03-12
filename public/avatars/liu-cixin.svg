@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip-liucixin">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle-clip-liucixin)">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="100" fill="#0D1B2A" opacity="0.2"/>
+    <!-- Shoulders / jacket -->
+    <path d="M25,200 Q35,160 55,148 Q75,140 100,137 Q125,140 145,148 Q165,160 175,200 Z" fill="#0D1B2A" opacity="0.45"/>
+    <!-- Collar -->
+    <path d="M78,144 L88,136 L100,143 L112,136 L122,144" fill="none" stroke="#0D1B2A" stroke-width="2.5" opacity="0.6"/>
+    <!-- Neck -->
+    <rect x="90" y="120" width="20" height="20" rx="5" fill="#D2A679"/>
+    <!-- Head shape -->
+    <ellipse cx="100" cy="78" rx="40" ry="46" fill="#D2A679"/>
+    <!-- Hair - short, neat, dark -->
+    <path d="M58,72 Q56,38 78,28 Q100,18 122,28 Q144,38 142,72" fill="#0D1B2A" opacity="0.5"/>
+    <!-- Flat top hair style -->
+    <path d="M62,68 Q70,36 100,30 Q130,36 138,68" fill="#0D1B2A" opacity="0.45"/>
+    <!-- Forehead -->
+    <path d="M66,70 Q76,52 100,48 Q124,52 134,70" fill="#D2A679"/>
+    <!-- Ears -->
+    <ellipse cx="58" cy="82" rx="5" ry="10" fill="#C49565"/>
+    <ellipse cx="142" cy="82" rx="5" ry="10" fill="#C49565"/>
+    <!-- Glasses frames - rectangular, modern -->
+    <rect x="66" y="73" width="26" height="16" rx="3" fill="none" stroke="#0D1B2A" stroke-width="2.5" opacity="0.7"/>
+    <rect x="108" y="73" width="26" height="16" rx="3" fill="none" stroke="#0D1B2A" stroke-width="2.5" opacity="0.7"/>
+    <!-- Glasses bridge -->
+    <path d="M92,80 Q100,77 108,80" fill="none" stroke="#0D1B2A" stroke-width="2" opacity="0.7"/>
+    <!-- Glasses arms -->
+    <path d="M66,78 L58,82" fill="none" stroke="#0D1B2A" stroke-width="2" opacity="0.6"/>
+    <path d="M134,78 L142,82" fill="none" stroke="#0D1B2A" stroke-width="2" opacity="0.6"/>
+    <!-- Eyebrows - subtle, thoughtful -->
+    <path d="M70,71 Q80,67 92,70" fill="none" stroke="#0D1B2A" stroke-width="2.5" stroke-linecap="round" opacity="0.4"/>
+    <path d="M108,70 Q120,67 130,71" fill="none" stroke="#0D1B2A" stroke-width="2.5" stroke-linecap="round" opacity="0.4"/>
+    <!-- Eyes behind glasses - focused, calm -->
+    <ellipse cx="80" cy="81" rx="6" ry="4" fill="white"/>
+    <circle cx="81" cy="81" r="3" fill="#1A1A1A"/>
+    <circle cx="82" cy="80" r="1" fill="white"/>
+    <ellipse cx="120" cy="81" rx="6" ry="4" fill="white"/>
+    <circle cx="119" cy="81" r="3" fill="#1A1A1A"/>
+    <circle cx="120" cy="80" r="1" fill="white"/>
+    <!-- Nose -->
+    <path d="M100,85 L97,98 Q100,101 103,98 Z" fill="#C49565"/>
+    <!-- Mouth - slight, reserved -->
+    <path d="M90,108 Q100,112 110,108" fill="none" stroke="#B8895A" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+    <!-- Chin -->
+    <path d="M88,120 Q100,126 112,120" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.25"/>
+    <!-- Subtle smile lines -->
+    <path d="M84,106 Q86,110 88,108" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.3"/>
+    <path d="M116,106 Q114,110 112,108" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.3"/>
+  </g>
+</svg>
