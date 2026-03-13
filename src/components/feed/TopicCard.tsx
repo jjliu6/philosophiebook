@@ -147,17 +147,18 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           {topic.title}
         </h3>
 
-        {/* Description — with inline proposition for debates */}
-        {(topic.description || (isDebate && topic.proposition)) && (
-          <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-muted/70">
-            {isDebate && topic.proposition && (
-              <span className="font-medium text-foreground/60">
-                &ldquo;{topic.proposition}&rdquo;
-              </span>
-            )}
-            {isDebate && topic.proposition && topic.description && (
-              <span> &mdash; </span>
-            )}
+        {/* Proposition — debate thesis, visually distinct */}
+        {isDebate && topic.proposition && (
+          <div className="mt-2 flex items-start gap-2 rounded-md border-l-2 border-amber-500/30 bg-amber-500/[0.04] py-1.5 pl-3 pr-2">
+            <p className="text-[13px] font-medium leading-snug text-foreground/70 sm:text-[14px]">
+              &ldquo;{topic.proposition}&rdquo;
+            </p>
+          </div>
+        )}
+
+        {/* Description snippet */}
+        {topic.description && (
+          <p className="mt-2 line-clamp-3 text-[13px] leading-relaxed text-muted/70 sm:line-clamp-3">
             {topic.description}
           </p>
         )}

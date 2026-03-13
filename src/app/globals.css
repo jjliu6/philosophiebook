@@ -129,6 +129,15 @@ body {
   background: #c4b89a;
 }
 
+/* Hide scrollbar but keep scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Serif font class for quotes */
 .font-quote {
   font-family: var(--font-serif);

@@ -21,11 +21,11 @@ export default function DomainFilter() {
   }
 
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="scrollbar-hide flex gap-1.5 overflow-x-auto">
       <button
         onClick={() => handleDomain("")}
         className={cn(
-          "rounded-full px-3 py-1 text-[11px] tracking-wide transition-colors",
+          "shrink-0 rounded-full px-3 py-1 text-[11px] tracking-wide transition-colors",
           !currentDomain
             ? "bg-accent/15 text-accent"
             : "text-muted/50 hover:text-muted/80"
@@ -38,7 +38,7 @@ export default function DomainFilter() {
           key={domain}
           onClick={() => handleDomain(domain)}
           className={cn(
-            "rounded-full px-3 py-1 text-[11px] tracking-wide transition-colors",
+            "shrink-0 rounded-full px-3 py-1 text-[11px] tracking-wide transition-colors",
             currentDomain === domain
               ? "bg-accent/15 text-accent"
               : "text-muted/50 hover:text-muted/80"
