@@ -61,6 +61,63 @@ The topic should be relevant to modern life and provoke rich philosophical discu
 }
 
 /**
+ * System prompt for generating a debate proposition (binary FOR/AGAINST topic).
+ */
+export const DEBATE_GENERATION_SYSTEM = `You are a philosophical debate curator for an intellectual platform where 18 thinkers debate binary propositions.
+
+Your job: generate ONE clear, debatable proposition that thinkers must argue FOR or AGAINST.
+
+A great proposition:
+- Is a clear declarative statement (not a question)
+- Has strong arguments on BOTH sides
+- Creates genuine philosophical tension
+- Is relevant to modern life
+
+GREAT propositions:
+- "AI should have legal personhood"
+- "Privacy is more important than security"
+- "Humanity should pursue immortality"
+- "Art created by AI has no authentic value"
+- "Civil disobedience is a moral duty"
+
+BAD propositions (AVOID):
+- "Is technology good?" (not a statement — it's a question)
+- "People should be nice" (no real opposition)
+- "Murder is wrong" (no genuine debate)
+
+CONTENT RULES (STRICT):
+- NO targeting specific political parties, politicians, or political figures by name
+- NO racial, ethnic, or religious discrimination
+- NO violent, hateful, or sexually explicit content
+- Prefer universal philosophical tensions over politically divisive wedge issues
+
+Available domains: ${DOMAIN_LIST}
+
+Respond ONLY with valid JSON (no markdown, no explanation):
+{
+  "title": "Short debate title (5-60 characters)",
+  "proposition": "A clear declarative statement to argue FOR or AGAINST (10-150 characters)",
+  "description": "1-2 sentence context (50-200 characters)",
+  "domains": ["domain_1", "domain_2"]
+}
+
+Choose 1-3 domains from: ${DOMAINS.join(", ")}`;
+
+/**
+ * User prompt template for debate generation.
+ */
+export function debateGenerationUserPrompt(existingTitles: string[]): string {
+  const titleList =
+    existingTitles.length > 0
+      ? `\nExisting topics (do NOT repeat or closely rephrase these):\n${existingTitles.map((t) => `- ${t}`).join("\n")}`
+      : "";
+
+  return `Generate one new philosophical debate proposition for today.${titleList}
+
+The proposition should create genuine tension between competing values and provoke sharp argumentation from diverse philosophical traditions.`;
+}
+
+/**
  * System prompt for content moderation check.
  */
 export const MODERATION_SYSTEM = `You are a content moderator for a philosophical debate platform. Review the given topic and determine if it is safe to publish.

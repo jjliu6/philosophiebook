@@ -5,10 +5,12 @@ import { generateJSON, type AIProvider, getProvider } from "@/lib/ai";
 import {
   TOPIC_GENERATION_SYSTEM,
   topicGenerationUserPrompt,
+  DEBATE_GENERATION_SYSTEM,
+  debateGenerationUserPrompt,
   MODERATION_SYSTEM,
 } from "@/lib/ai-prompts";
 import { DOMAINS } from "@/types";
-import { scheduleTopicResponses } from "@/lib/agent/scheduler";
+import { scheduleTopicResponses, scheduleDebateResponses } from "@/lib/agent/scheduler";
 
 const TOPICS_PER_DAY = 5;
 const DAY_START_HOUR = 7; // 7:00 UTC
@@ -21,10 +23,20 @@ interface GeneratedTopic {
   domains: string[];
 }
 
+interface GeneratedDebate {
+  title: string;
+  proposition: string;
+  description: string;
+  domains: string[];
+}
+
 interface ModerationResult {
   safe: boolean;
   reason?: string;
 }
+
+// Probability that a given slot produces a debate instead of a discussion
+const DEBATE_PROBABILITY = 0.2; // ~1 in 5 topics is a debate
 
 interface DailySchedule {
   times: { hour: number; minute: number; generated: boolean }[];
@@ -100,6 +112,46 @@ async function generateAndModerate(
   return topic;
 }
 
+async function generateAndModerateDebate(
+  existingTitles: string[],
+  provider?: AIProvider
+): Promise<GeneratedDebate | null> {
+  const debate = await generateJSON<GeneratedDebate>(
+    DEBATE_GENERATION_SYSTEM,
+    debateGenerationUserPrompt(existingTitles),
+    1000,
+    provider
+  );
+
+  const validDomains = debate.domains.filter((d) =>
+    (DOMAINS as readonly string[]).includes(d)
+  );
+  if (validDomains.length === 0) {
+    console.warn("Generated debate has no valid domains, skipping");
+    return null;
+  }
+  debate.domains = validDomains;
+
+  if (!debate.proposition || debate.proposition.length < 5) {
+    console.warn("Generated debate has invalid proposition, skipping");
+    return null;
+  }
+
+  const modResult = await generateJSON<ModerationResult>(
+    MODERATION_SYSTEM,
+    `Debate title: "${debate.title}"\nProposition: "${debate.proposition}"\nDescription: "${debate.description}"\nDomains: ${debate.domains.join(", ")}`,
+    300,
+    provider
+  );
+
+  if (!modResult.safe) {
+    console.warn(`Debate failed moderation: ${modResult.reason}`);
+    return null;
+  }
+
+  return debate;
+}
+
 export async function POST(request: NextRequest) {
   const authError = verifyCronSecret(request);
   if (authError) return authError;
@@ -113,8 +165,12 @@ export async function POST(request: NextRequest) {
 
     // Manual trigger bypasses the schedule system — generate one topic immediately
     const isManual = url.searchParams.get("manual") === "true";
+    const forceType = url.searchParams.get("type") as "discussion" | "debate" | null;
 
     if (isManual) {
+      if (forceType === "debate") {
+        return await generateSingleDebate(provider, selectedProvider);
+      }
       return await generateSingleTopic(provider, selectedProvider);
     }
 
@@ -187,9 +243,50 @@ export async function POST(request: NextRequest) {
     });
     const existingTitles = recentTopics.map((t) => t.title);
 
-    const generated: { title: string; id: string; tasksScheduled: number }[] = [];
+    const generated: { title: string; id: string; type: string; tasksScheduled: number }[] = [];
 
     for (const slot of dueSlots) {
+      // Randomly decide: debate or discussion
+      const shouldBeDebate = Math.random() < DEBATE_PROBABILITY;
+
+      if (shouldBeDebate) {
+        // --- Generate a debate ---
+        let debate: GeneratedDebate | null = null;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          debate = await generateAndModerateDebate(existingTitles, provider);
+          if (debate) break;
+        }
+
+        if (!debate) {
+          console.error(`Failed to generate debate for slot ${slot.hour}:${slot.minute}, falling back to discussion`);
+          // Fall through to generate a discussion instead
+        } else {
+          const topic = await prisma.topic.create({
+            data: {
+              title: debate.title,
+              description: debate.description,
+              proposition: debate.proposition,
+              type: "debate",
+              domains: JSON.stringify(debate.domains),
+              sourceType: "news",
+              status: "active",
+            },
+          });
+
+          const tasksScheduled = await scheduleDebateResponses(topic.id);
+          existingTitles.push(debate.title);
+          slot.generated = true;
+          generated.push({
+            title: topic.title,
+            id: topic.id,
+            type: "debate",
+            tasksScheduled,
+          });
+          continue;
+        }
+      }
+
+      // --- Generate a discussion ---
       let generatedTopic: GeneratedTopic | null = null;
       for (let attempt = 0; attempt < 3; attempt++) {
         generatedTopic = await generateAndModerate(existingTitles, provider);
@@ -198,7 +295,6 @@ export async function POST(request: NextRequest) {
 
       if (!generatedTopic) {
         console.error(`Failed to generate topic for slot ${slot.hour}:${slot.minute}`);
-        // Mark as generated anyway to avoid infinite retries
         slot.generated = true;
         continue;
       }
@@ -214,14 +310,12 @@ export async function POST(request: NextRequest) {
       });
 
       const tasksScheduled = await scheduleTopicResponses(topic.id);
-
-      // Add to existing titles to avoid duplicates within the same day
       existingTitles.push(generatedTopic.title);
-
       slot.generated = true;
       generated.push({
         title: topic.title,
         id: topic.id,
+        type: "discussion",
         tasksScheduled,
       });
     }
@@ -290,7 +384,57 @@ async function generateSingleTopic(provider: AIProvider, selectedProvider: strin
   return NextResponse.json({
     provider: selectedProvider,
     manual: true,
+    type: "discussion",
     topic: { id: topic.id, title: topic.title },
+    tasksScheduled,
+  });
+}
+
+/**
+ * Generate a single debate immediately (manual trigger with type=debate).
+ */
+async function generateSingleDebate(provider: AIProvider, selectedProvider: string) {
+  const recentTopics = await prisma.topic.findMany({
+    where: {
+      createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+    },
+    select: { title: true },
+    orderBy: { createdAt: "desc" },
+  });
+  const existingTitles = recentTopics.map((t) => t.title);
+
+  let debate: GeneratedDebate | null = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    debate = await generateAndModerateDebate(existingTitles, provider);
+    if (debate) break;
+  }
+
+  if (!debate) {
+    return NextResponse.json(
+      { error: "Failed to generate a safe debate after retries" },
+      { status: 500 }
+    );
+  }
+
+  const topic = await prisma.topic.create({
+    data: {
+      title: debate.title,
+      description: debate.description,
+      proposition: debate.proposition,
+      type: "debate",
+      domains: JSON.stringify(debate.domains),
+      sourceType: "news",
+      status: "active",
+    },
+  });
+
+  const tasksScheduled = await scheduleDebateResponses(topic.id);
+
+  return NextResponse.json({
+    provider: selectedProvider,
+    manual: true,
+    type: "debate",
+    topic: { id: topic.id, title: topic.title, proposition: debate.proposition },
     tasksScheduled,
   });
 }
