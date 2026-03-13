@@ -183,25 +183,24 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           );
         })()}
 
-        {/* Participants row */}
+        {/* Participants — debate: two-column face-off */}
         {isDebate ? (
-          /* Debate: split avatars FOR (left) vs AGAINST (right) */
-          <div className="mt-4 flex items-center gap-3">
+          <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-start gap-3">
             {(() => {
-              const MAX_PER_SIDE = 4;
+              const MAX_PER_SIDE = 12; // ~2-3 rows of avatars
               const forList = topic.debateForThinkers || [];
               const againstList = topic.debateAgainstThinkers || [];
               const forHumans = topic.debateForHumanCount ?? 0;
               const againstHumans = topic.debateAgainstHumanCount ?? 0;
               const forShown = forList.slice(0, MAX_PER_SIDE);
-              const forOverflow = forList.length - forShown.length;
+              const forOverflow = forList.length - forShown.length + forHumans;
               const againstShown = againstList.slice(0, MAX_PER_SIDE);
-              const againstOverflow = againstList.length - againstShown.length;
+              const againstOverflow = againstList.length - againstShown.length + againstHumans;
 
               return (
                 <>
-                  {/* FOR side */}
-                  <div className="flex items-center gap-1">
+                  {/* FOR column */}
+                  <div className="flex flex-wrap gap-1.5">
                     {forShown.map((t) => (
                       <div key={t.id} className="rounded-full ring-2 ring-emerald-500/30">
                         <ThinkerAvatar
@@ -213,28 +212,21 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
                       </div>
                     ))}
                     {forOverflow > 0 && (
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/10 text-[10px] font-medium text-emerald-500/70 ring-1 ring-emerald-500/20">
+                      <span className="flex h-7 items-center gap-0.5 rounded-full bg-emerald-500/10 px-2 text-[10px] font-medium text-emerald-500/60 ring-1 ring-emerald-500/20">
                         +{forOverflow}
-                      </span>
-                    )}
-                    {forHumans > 0 && (
-                      <span className="ml-0.5 text-[10px] text-emerald-500/50" title={`${forHumans} human participant${forHumans > 1 ? "s" : ""}`}>
-                        +{forHumans}
-                        <svg className="ml-0.5 inline h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                          <circle cx="12" cy="7" r="4" />
-                        </svg>
                       </span>
                     )}
                   </div>
 
-                  {/* VS divider */}
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted/30">
-                    vs
-                  </span>
+                  {/* VS divider — vertical line + text */}
+                  <div className="flex flex-col items-center gap-1 self-center">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted/25">
+                      vs
+                    </span>
+                  </div>
 
-                  {/* AGAINST side */}
-                  <div className="flex items-center gap-1">
+                  {/* AGAINST column */}
+                  <div className="flex flex-wrap justify-end gap-1.5">
                     {againstShown.map((t) => (
                       <div key={t.id} className="rounded-full ring-2 ring-rose-500/30">
                         <ThinkerAvatar
@@ -246,17 +238,8 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
                       </div>
                     ))}
                     {againstOverflow > 0 && (
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-500/10 text-[10px] font-medium text-rose-500/70 ring-1 ring-rose-500/20">
+                      <span className="flex h-7 items-center gap-0.5 rounded-full bg-rose-500/10 px-2 text-[10px] font-medium text-rose-500/60 ring-1 ring-rose-500/20">
                         +{againstOverflow}
-                      </span>
-                    )}
-                    {againstHumans > 0 && (
-                      <span className="ml-0.5 text-[10px] text-rose-500/50" title={`${againstHumans} human participant${againstHumans > 1 ? "s" : ""}`}>
-                        +{againstHumans}
-                        <svg className="ml-0.5 inline h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                          <circle cx="12" cy="7" r="4" />
-                        </svg>
                       </span>
                     )}
                   </div>
