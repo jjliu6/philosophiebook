@@ -409,8 +409,12 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
         {/* Proposition (for debates) */}
         {isDebate && topic.proposition && (
-          <div className="mt-4 rounded-lg border border-border/30 bg-card/30 px-5 py-4">
-            <p className="text-center font-quote text-[17px] italic leading-relaxed text-foreground/80">
+          <div className="relative mt-6 overflow-hidden rounded-xl border border-amber-500/20 bg-gradient-to-r from-emerald-500/5 via-card/40 to-rose-500/5 px-6 py-5">
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-emerald-500/40 via-amber-500/30 to-rose-500/40" />
+            <p className="mb-1 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-amber-600/60">
+              Proposition
+            </p>
+            <p className="text-center font-quote text-xl leading-relaxed text-foreground">
               &ldquo;{topic.proposition}&rdquo;
             </p>
           </div>
@@ -472,10 +476,12 @@ export default async function TopicPage({ params }: TopicPageProps) {
           </div>
         </div>
 
-        {/* Book-style fleuron divider */}
-        <div className="fleuron mt-6">
-          <span className="text-[10px] text-accent/30">&#10022;</span>
-        </div>
+        {/* Book-style fleuron divider — skip for debates to reduce whitespace */}
+        {!isDebate && (
+          <div className="fleuron mt-6">
+            <span className="text-[10px] text-accent/30">&#10022;</span>
+          </div>
+        )}
       </div>
 
       {/* Conditional rendering: Debate vs Discussion */}
