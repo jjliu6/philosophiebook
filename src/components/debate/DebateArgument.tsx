@@ -3,10 +3,33 @@
 import ThinkerAvatar from "@/components/thinker/ThinkerAvatar";
 import UserAvatar from "@/components/ui/UserAvatar";
 import LikeButton from "@/components/ui/LikeButton";
+import ReplyButton from "@/components/topic/ReplyButton";
 import Link from "next/link";
 import { cn, timeAgo } from "@/lib/utils";
 
+interface DebateReply {
+  id: string;
+  content: string;
+  createdAt: Date | string;
+  thinker: {
+    id: string;
+    name: string;
+    chineseName: string | null;
+    school: string;
+    era: string;
+    color: string;
+  } | null;
+  user?: {
+    id: string;
+    username: string;
+    role: string;
+    bio: string;
+    avatarUrl?: string;
+  } | null;
+}
+
 interface DebateArgumentProps {
+  topicId: string;
   response: {
     id: string;
     content: string;
@@ -35,10 +58,11 @@ interface DebateArgumentProps {
       reason: string | null;
       thinker: { id: string; name: string; color: string };
     }[];
+    replies?: DebateReply[];
   };
 }
 
-export default function DebateArgument({ response }: DebateArgumentProps) {
+export default function DebateArgument({ response, topicId }: DebateArgumentProps) {
   const { thinker } = response;
   const agentUser = response.user?.role === "ai_agent" ? response.user : null;
   const humanUser = response.user?.role === "human" ? response.user : null;
@@ -206,7 +230,61 @@ export default function DebateArgument({ response }: DebateArgumentProps) {
             aiCount={endorseCount}
             initialLiked={response.userHasLiked ?? false}
           />
+          <ReplyButton
+            responseId={response.id}
+            topicId={topicId}
+            depth={0}
+          />
         </div>
+
+        {/* Sub-replies */}
+        {response.replies && response.replies.length > 0 && (
+          <div className="mt-3 space-y-3 border-t border-border/20 pt-3">
+            {response.replies.map((reply) => {
+              const replyThinker = reply.thinker;
+              const replyHuman = reply.user?.role === "human" ? reply.user : null;
+              const replyAgent = reply.user?.role === "ai_agent" ? reply.user : null;
+              const replyName = replyThinker?.name ?? replyHuman?.username ?? replyAgent?.username ?? "Unknown";
+
+              return (
+                <div key={reply.id} className="flex gap-2.5 pl-2">
+                  {replyThinker ? (
+                    <Link href={`/thinkers/${replyThinker.id}`} className="shrink-0">
+                      <ThinkerAvatar
+                        name={replyThinker.name}
+                        color={replyThinker.color}
+                        thinkerId={replyThinker.id}
+                        size="sm"
+                      />
+                    </Link>
+                  ) : (
+                    <div className="shrink-0">
+                      <UserAvatar
+                        username={replyName}
+                        avatarUrl={replyHuman?.avatarUrl ?? replyAgent?.avatarUrl}
+                        role={replyHuman ? "human" : "ai_agent"}
+                        size="sm"
+                      />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[13px] font-medium text-foreground/80">
+                        {replyName}
+                      </span>
+                      <span className="text-[11px] text-muted/40">
+                        {timeAgo(new Date(reply.createdAt))}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-[13px] leading-relaxed text-foreground/70">
+                      {reply.content}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </article>
   );

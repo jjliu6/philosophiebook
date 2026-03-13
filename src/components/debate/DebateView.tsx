@@ -16,6 +16,27 @@ interface Voter {
   thinkerId?: string;
 }
 
+interface DebateReply {
+  id: string;
+  content: string;
+  createdAt: Date | string;
+  thinker: {
+    id: string;
+    name: string;
+    chineseName: string | null;
+    school: string;
+    era: string;
+    color: string;
+  } | null;
+  user?: {
+    id: string;
+    username: string;
+    role: string;
+    bio: string;
+    avatarUrl?: string;
+  } | null;
+}
+
 interface DebateResponse {
   id: string;
   content: string;
@@ -44,6 +65,7 @@ interface DebateResponse {
     reason: string | null;
     thinker: { id: string; name: string; color: string };
   }[];
+  replies?: DebateReply[];
 }
 
 interface DebateViewProps {
@@ -97,7 +119,7 @@ export default function DebateView({
             <span className="text-[10px] text-accent/30">Arguments</span>
           </div>
           {visibleArgs.map((arg) => (
-            <DebateArgument key={arg.id} response={arg} />
+            <DebateArgument key={arg.id} response={arg} topicId={topicId} />
           ))}
         </div>
       )}

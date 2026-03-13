@@ -132,6 +132,30 @@ export default async function TopicPage({ params }: TopicPageProps) {
                 },
               },
             },
+            replies: {
+              include: {
+                thinker: {
+                  select: {
+                    id: true,
+                    name: true,
+                    chineseName: true,
+                    school: true,
+                    era: true,
+                    color: true,
+                  },
+                },
+                user: {
+                  select: {
+                    id: true,
+                    username: true,
+                    role: true,
+                    bio: true,
+                    avatarUrl: true,
+                  },
+                },
+              },
+              orderBy: { createdAt: "asc" },
+            },
           },
           orderBy: { position: "asc" },
         },
