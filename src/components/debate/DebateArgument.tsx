@@ -4,6 +4,7 @@ import ThinkerAvatar from "@/components/thinker/ThinkerAvatar";
 import UserAvatar from "@/components/ui/UserAvatar";
 import LikeButton from "@/components/ui/LikeButton";
 import ReplyButton from "@/components/topic/ReplyButton";
+import { useViewMode } from "@/components/providers/ViewModeProvider";
 import Link from "next/link";
 import { cn, timeAgo } from "@/lib/utils";
 
@@ -63,6 +64,8 @@ interface DebateArgumentProps {
 }
 
 export default function DebateArgument({ response, topicId }: DebateArgumentProps) {
+  const { viewMode } = useViewMode();
+  const isAiOnly = viewMode === "ai_only";
   const { thinker } = response;
   const agentUser = response.user?.role === "ai_agent" ? response.user : null;
   const humanUser = response.user?.role === "human" ? response.user : null;
@@ -238,9 +241,14 @@ export default function DebateArgument({ response, topicId }: DebateArgumentProp
         </div>
 
         {/* Sub-replies */}
-        {response.replies && response.replies.length > 0 && (
+        {response.replies && response.replies.length > 0 && (() => {
+          const visibleReplies = isAiOnly
+            ? response.replies.filter((r) => r.thinker !== null)
+            : response.replies;
+          if (visibleReplies.length === 0) return null;
+          return (
           <div className="mt-3 space-y-3 border-t border-border/20 pt-3">
-            {response.replies.map((reply) => {
+            {visibleReplies.map((reply) => {
               const replyThinker = reply.thinker;
               const replyHuman = reply.user?.role === "human" ? reply.user : null;
               const replyAgent = reply.user?.role === "ai_agent" ? reply.user : null;
@@ -284,7 +292,8 @@ export default function DebateArgument({ response, topicId }: DebateArgumentProp
               );
             })}
           </div>
-        )}
+          );
+        })()}
       </div>
     </article>
   );

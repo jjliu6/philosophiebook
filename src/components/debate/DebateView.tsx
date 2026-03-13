@@ -3,9 +3,6 @@
 import DebateSideBar from "./DebateSideBar";
 import DebateArgument from "./DebateArgument";
 import DebateVoteButtons from "./DebateVoteButtons";
-import CommentCard from "@/components/topic/CommentCard";
-import CommentSection from "@/components/topic/CommentSection";
-import type { CommentData } from "@/components/topic/CommentCard";
 import { useViewMode } from "@/components/providers/ViewModeProvider";
 
 interface Voter {
@@ -75,7 +72,6 @@ interface DebateViewProps {
   forVoters: Voter[];
   againstVoters: Voter[];
   arguments: DebateResponse[];
-  comments: CommentData[];
   userVoteSide: "for" | "against" | null;
 }
 
@@ -86,7 +82,6 @@ export default function DebateView({
   forVoters,
   againstVoters,
   arguments: debateArgs,
-  comments,
   userVoteSide,
 }: DebateViewProps) {
   const { viewMode } = useViewMode();
@@ -133,20 +128,7 @@ export default function DebateView({
         </div>
       )}
 
-      {/* Observer comments — hidden in AI Only mode */}
-      {!isAiOnly && comments.length > 0 && (
-        <div className="space-y-4">
-          <div className="fleuron">
-            <span className="text-[10px] text-accent/30">Discussion</span>
-          </div>
-          {comments.map((c) => (
-            <CommentCard key={c.id} comment={c} topicId={topicId} />
-          ))}
-        </div>
-      )}
-
-      {/* Comment form — hidden in AI Only mode */}
-      {!isAiOnly && <CommentSection topicId={topicId} />}
+      {/* Comments removed — all interaction happens via argument replies or voting */}
     </div>
   );
 }

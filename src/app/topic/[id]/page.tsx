@@ -487,18 +487,6 @@ export default async function TopicPage({ params }: TopicPageProps) {
           forVoters={debateData.forVoters}
           againstVoters={debateData.againstVoters}
           arguments={responsesWithLikes}
-          comments={comments.map((c) => ({
-            ...c,
-            createdAt: c.createdAt.toISOString(),
-            replies: c.replies.map((r) => ({
-              ...r,
-              createdAt: r.createdAt.toISOString(),
-            })),
-            thinkerReplies: c.thinkerReplies.map((tr) => ({
-              ...tr,
-              createdAt: tr.createdAt.toISOString(),
-            })),
-          } as CommentData))}
           userVoteSide={debateData.userVoteSide}
         />
       ) : (
