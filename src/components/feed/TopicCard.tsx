@@ -156,8 +156,9 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
 
         {/* Debate tally bar — visual FOR vs AGAINST */}
         {isDebate && (topic.debateForCount ?? 0) + (topic.debateAgainstCount ?? 0) > 0 && (() => {
-          const forC = topic.debateForCount ?? 0;
-          const agC = topic.debateAgainstCount ?? 0;
+          // In AI Only mode, show only AI thinker counts
+          const forC = isAiOnly ? (topic.debateForThinkers?.length ?? 0) : (topic.debateForCount ?? 0);
+          const agC = isAiOnly ? (topic.debateAgainstThinkers?.length ?? 0) : (topic.debateAgainstCount ?? 0);
           const total = forC + agC;
           const forPct = Math.round((forC / total) * 100);
           const agPct = 100 - forPct;
@@ -193,9 +194,9 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
               const forHumans = topic.debateForHumanCount ?? 0;
               const againstHumans = topic.debateAgainstHumanCount ?? 0;
               const forShown = forList.slice(0, MAX_PER_SIDE);
-              const forOverflow = forList.length - forShown.length + forHumans;
+              const forOverflow = forList.length - forShown.length + (isAiOnly ? 0 : forHumans);
               const againstShown = againstList.slice(0, MAX_PER_SIDE);
-              const againstOverflow = againstList.length - againstShown.length + againstHumans;
+              const againstOverflow = againstList.length - againstShown.length + (isAiOnly ? 0 : againstHumans);
 
               return (
                 <>
