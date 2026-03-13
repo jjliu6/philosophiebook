@@ -275,16 +275,49 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         case "timeless":
           return b.totalLikes - a.totalLikes;
         case "debates": {
-          // Sort by total participation (votes + arguments), then recency
-          const participationA = (a.debateForCount ?? 0) + (a.debateAgainstCount ?? 0) + a.responseCount;
-          const participationB = (b.debateForCount ?? 0) + (b.debateAgainstCount ?? 0) + b.responseCount;
-          if (participationB !== participationA) return participationB - participationA;
+          // Score by participation + controversy (closer sides = more interesting)
+          const forA = a.debateForCount ?? 0;
+          const againstA = a.debateAgainstCount ?? 0;
+          const totalA = forA + againstA + a.responseCount;
+          const controversyA = totalA > 0 ? 1 - Math.abs(forA - againstA) / (forA + againstA || 1) : 0;
+          const scoreA = totalA * (1 + controversyA * 0.5);
+
+          const forB = b.debateForCount ?? 0;
+          const againstB = b.debateAgainstCount ?? 0;
+          const totalB = forB + againstB + b.responseCount;
+          const controversyB = totalB > 0 ? 1 - Math.abs(forB - againstB) / (forB + againstB || 1) : 0;
+          const scoreB = totalB * (1 + controversyB * 0.5);
+
+          if (scoreB !== scoreA) return scoreB - scoreA;
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         }
         default:
           return 0;
       }
     });
+
+    // For debates tab: interleave new (<24h) and established debates
+    if (sort === "debates") {
+      const now = Date.now();
+      const DAY = 24 * 60 * 60 * 1000;
+      const fresh = topicsWithMetrics.filter(
+        (t) => now - new Date(t.createdAt).getTime() < DAY
+      );
+      const established = topicsWithMetrics.filter(
+        (t) => now - new Date(t.createdAt).getTime() >= DAY
+      );
+      // Sort fresh by newest first
+      fresh.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      // Interleave: established1, fresh1, established2, fresh2, ...
+      const interleaved: typeof topicsWithMetrics = [];
+      let ei = 0, fi = 0;
+      while (ei < established.length || fi < fresh.length) {
+        if (ei < established.length) interleaved.push(established[ei++]);
+        if (fi < fresh.length) interleaved.push(fresh[fi++]);
+      }
+      topicsWithMetrics.length = 0;
+      topicsWithMetrics.push(...interleaved);
+    }
 
     // Filter by domain if selected
     let filtered = domainFilter
