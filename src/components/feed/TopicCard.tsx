@@ -147,6 +147,13 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           {topic.title}
         </h3>
 
+        {/* Proposition — debate thesis, compact italic */}
+        {isDebate && topic.proposition && (
+          <p className="mt-1.5 font-quote text-[14px] italic leading-snug text-foreground/60">
+            &ldquo;{topic.proposition}&rdquo;
+          </p>
+        )}
+
         {/* Description snippet */}
         {topic.description && (
           <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-muted/70">

@@ -185,6 +185,12 @@ export default async function TopicPage({ params }: TopicPageProps) {
     notFound();
   }
 
+  // Increment view count (fire-and-forget)
+  prisma.topic.update({
+    where: { id },
+    data: { viewCount: { increment: 1 } },
+  }).catch(() => {});
+
   // Parse domains
   let domains: string[] = [];
   try {

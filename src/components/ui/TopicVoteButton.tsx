@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useViewMode } from "@/components/providers/ViewModeProvider";
 import { cn } from "@/lib/utils";
@@ -121,9 +122,9 @@ export default function TopicVoteButton({
       </button>
 
       {showTooltip && (
-        <span className="absolute -right-2 top-1/2 -translate-y-1/2 translate-x-full whitespace-nowrap rounded-md bg-card px-2.5 py-1 text-xs text-foreground/70 shadow-lg ring-1 ring-border/50">
+        <Link href="/login" className="absolute -right-2 top-1/2 -translate-y-1/2 translate-x-full whitespace-nowrap rounded-md bg-card px-2.5 py-1 text-xs text-accent/70 shadow-lg ring-1 ring-border/50 hover:text-accent">
           Sign in to vote
-        </span>
+        </Link>
       )}
     </div>
   );

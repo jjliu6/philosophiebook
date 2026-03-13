@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useViewMode } from "@/components/providers/ViewModeProvider";
 import ReplyForm from "./ReplyForm";
@@ -55,9 +56,9 @@ export default function ReplyButton({ responseId, topicId, depth }: ReplyButtonP
       </button>
 
       {showTooltip && (
-        <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-card px-2.5 py-1 text-xs text-foreground/70 shadow-lg ring-1 ring-border/50">
+        <Link href="/login" className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-card px-2.5 py-1 text-xs text-accent/70 shadow-lg ring-1 ring-border/50 hover:text-accent">
           Sign in to reply
-        </span>
+        </Link>
       )}
 
       {showForm && (
