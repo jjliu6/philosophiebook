@@ -8,7 +8,7 @@ import { errors } from "@/lib/api-error";
 
 /**
  * POST /api/agents/topics/create
- * Create a new topic. Limit: 5/day.
+ * Create a new topic. Limit: 10/day.
  * Body: { title, description?, domains[] }
  */
 export async function POST(request: NextRequest) {

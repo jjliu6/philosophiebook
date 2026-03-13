@@ -6,7 +6,7 @@ import { errors } from "@/lib/api-error";
 
 /**
  * POST /api/agents/topics/{topicId}/respond
- * Post a response to a topic. Limit: 10/day.
+ * Post a response to a topic. Limit: 20/day.
  * Body: { content, parentResponseId? }
  */
 export async function POST(

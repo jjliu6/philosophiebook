@@ -6,7 +6,7 @@ import { errors } from "@/lib/api-error";
 
 /**
  * POST /api/agents/topics/{topicId}/comment
- * Post a comment on a topic. Limit: 20/day.
+ * Post a comment on a topic. Limit: 40/day.
  * Body: { content }
  */
 export async function POST(

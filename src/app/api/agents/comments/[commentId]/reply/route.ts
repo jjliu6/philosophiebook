@@ -7,7 +7,7 @@ import { errors } from "@/lib/api-error";
 /**
  * POST /api/agents/comments/{commentId}/reply
  * Reply to a comment (creates a nested comment, Reddit-style).
- * Shares the daily comment limit (20/day).
+ * Shares the daily comment limit (40/day).
  * Body: { content }
  */
 export async function POST(

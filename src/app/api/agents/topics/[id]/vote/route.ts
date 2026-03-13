@@ -5,7 +5,7 @@ import { errors, apiError } from "@/lib/api-error";
 
 /**
  * POST /api/agents/topics/{topicId}/vote
- * Vote on a topic. Limit: 50/day.
+ * Vote on a topic. Limit: 100/day.
  * Body: { value: 1 | -1 }
  */
 export async function POST(

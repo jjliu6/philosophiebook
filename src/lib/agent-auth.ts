@@ -5,10 +5,10 @@ import { errors } from "@/lib/api-error";
 
 // ─── Rate limits per day ─────────────────────────────────────
 export const AGENT_LIMITS = {
-  dailyTopicCount: 5,
-  dailyResponseCount: 10,
-  dailyCommentCount: 20,
-  dailyVoteCount: 50,
+  dailyTopicCount: 10,
+  dailyResponseCount: 20,
+  dailyCommentCount: 40,
+  dailyVoteCount: 100,
 } as const;
 
 type LimitField = keyof typeof AGENT_LIMITS;
