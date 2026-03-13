@@ -74,6 +74,20 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       id: string;
       username: string;
     }[];
+    debateForThinkers?: {
+      id: string;
+      name: string;
+      color: string;
+      school: string;
+    }[];
+    debateAgainstThinkers?: {
+      id: string;
+      name: string;
+      color: string;
+      school: string;
+    }[];
+    debateForHumanCount?: number;
+    debateAgainstHumanCount?: number;
   }[] = [];
   let totalCount = 0;
 
@@ -98,7 +112,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           },
         },
         responses: {
-          include: {
+          select: {
+            id: true,
+            debateSide: true,
+            humanLikeCount: true,
+            position: true,
             thinker: {
               select: {
                 id: true,
@@ -129,7 +147,15 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           select: { value: true, userId: true, thinkerId: true },
         },
         debateVotes: {
-          select: { side: true },
+          select: {
+            side: true,
+            thinker: {
+              select: { id: true, name: true, color: true, school: true },
+            },
+            user: {
+              select: { id: true, username: true, role: true },
+            },
+          },
         },
       },
     });
@@ -181,9 +207,28 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         ? topic.topicVotes.find((v) => v.userId === currentUser.id)?.value ?? null
         : null;
 
-      // Debate vote counts
+      // Debate vote counts and participant lists by side
       const debateForCount = topic.debateVotes.filter((v) => v.side === "for").length;
       const debateAgainstCount = topic.debateVotes.filter((v) => v.side === "against").length;
+
+      // Build FOR / AGAINST participant lists from debateVotes
+      type ThinkerInfo = { id: string; name: string; color: string; school: string };
+      const debateForThinkers: ThinkerInfo[] = [];
+      const debateAgainstThinkers: ThinkerInfo[] = [];
+      let debateForHumanCount = 0;
+      let debateAgainstHumanCount = 0;
+      for (const v of topic.debateVotes) {
+        if (v.thinker) {
+          const list = v.side === "for" ? debateForThinkers : debateAgainstThinkers;
+          if (!list.find((t) => t.id === v.thinker!.id)) {
+            list.push(v.thinker);
+          }
+        } else if (v.user) {
+          // Count human and AI agent users per side
+          if (v.side === "for") debateForHumanCount++;
+          else debateAgainstHumanCount++;
+        }
+      }
 
       return {
         ...topic,
@@ -199,6 +244,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         agentParticipants,
         debateForCount,
         debateAgainstCount,
+        debateForThinkers,
+        debateAgainstThinkers,
+        debateForHumanCount,
+        debateAgainstHumanCount,
       };
     });
 

@@ -44,6 +44,20 @@ interface TopicWithMetrics {
     id: string;
     username: string;
   }[];
+  debateForThinkers?: {
+    id: string;
+    name: string;
+    color: string;
+    school: string;
+  }[];
+  debateAgainstThinkers?: {
+    id: string;
+    name: string;
+    color: string;
+    school: string;
+  }[];
+  debateForHumanCount?: number;
+  debateAgainstHumanCount?: number;
 }
 
 interface TopicFeedProps {
