@@ -403,11 +403,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </div>
 
       {/* Topic feed */}
-      <TopicFeed
-        topics={paginatedTopics}
-        currentPage={safePage}
-        totalPages={totalPages}
-      />
+      <Suspense fallback={null}>
+        <TopicFeed
+          topics={paginatedTopics}
+          currentPage={safePage}
+          totalPages={totalPages}
+        />
+      </Suspense>
     </div>
   );
 }
