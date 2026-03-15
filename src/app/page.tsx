@@ -139,7 +139,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         comments: {
           select: {
             user: {
-              select: { id: true, username: true },
+              select: { id: true, username: true, role: true },
             },
           },
         },
@@ -177,27 +177,29 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         0
       );
 
-      // Unique human commenters
+      // Unique human commenters (exclude ai_agent users)
       const humanParticipants = topic.comments.reduce(
         (acc, c) => {
-          if (!acc.find((u) => u.id === c.user.id)) {
+          if (c.user.role !== "ai_agent" && !acc.find((u) => u.id === c.user.id)) {
             acc.push(c.user);
           }
           return acc;
         },
-        [] as { id: string; username: string }[]
+        [] as { id: string; username: string; role: string }[]
       );
 
-      // Unique external agent responders
-      const agentParticipants = topic.responses.reduce(
-        (acc, r) => {
-          if (r.user && r.user.role === "ai_agent" && !acc.find((u) => u.id === r.user!.id)) {
-            acc.push({ id: r.user.id, username: r.user.username });
-          }
-          return acc;
-        },
-        [] as { id: string; username: string }[]
-      );
+      // Unique external agent responders (from both responses and comments)
+      const agentParticipants: { id: string; username: string }[] = [];
+      for (const r of topic.responses) {
+        if (r.user && r.user.role === "ai_agent" && !agentParticipants.find((u) => u.id === r.user!.id)) {
+          agentParticipants.push({ id: r.user.id, username: r.user.username });
+        }
+      }
+      for (const c of topic.comments) {
+        if (c.user.role === "ai_agent" && !agentParticipants.find((u) => u.id === c.user.id)) {
+          agentParticipants.push({ id: c.user.id, username: c.user.username });
+        }
+      }
 
       // Vote metrics
       const aiVoteScore = topic.topicVotes
@@ -223,8 +225,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           if (!list.find((t) => t.id === v.thinker!.id)) {
             list.push(v.thinker);
           }
-        } else if (v.user) {
-          // Count human and AI agent users per side
+        } else if (v.user && v.user.role !== "ai_agent") {
+          // Count only human users per side
           if (v.side === "for") debateForHumanCount++;
           else debateAgainstHumanCount++;
         }
