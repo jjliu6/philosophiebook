@@ -24,7 +24,16 @@ interface PersonaDetail {
   relationships: Relationship[];
   systemPromptTemplate: string;
   isActive: boolean;
+  avatarUrl: string;
 }
+
+const DICEBEAR_STYLES = [
+  { id: "notionists", label: "Sketched" },
+  { id: "personas", label: "Personas" },
+  { id: "avataaars", label: "Cartoon" },
+  { id: "lorelei", label: "Lorelei" },
+  { id: "micah", label: "Micah" },
+];
 
 function EditableList({
   label,
@@ -114,6 +123,9 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
   const [saving, setSaving] = useState(false);
   const [testResult, setTestResult] = useState<string | null>(null);
   const [testing, setTesting] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [generatedAvatars, setGeneratedAvatars] = useState<string[]>([]);
 
   // Form state
   const [name, setName] = useState("");
@@ -144,6 +156,7 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
         setNeverDoes(data.neverDoes);
         setSystemPromptTemplate(data.systemPromptTemplate);
         setIsActive(data.isActive);
+        setAvatarUrl(data.avatarUrl || "");
         setLoading(false);
       });
   }, [id]);
@@ -175,6 +188,46 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
     setTesting(false);
   };
 
+  const currentAvatarSrc = avatarUrl || `/avatars/${id}.svg`;
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`/api/admin/personas/${id}/avatar`, { method: "POST", body: formData });
+    const data = await res.json();
+    if (data.avatarUrl) setAvatarUrl(data.avatarUrl);
+    setAvatarUploading(false);
+  };
+
+  const handleAvatarGenerate = () => {
+    const seed = `${name}-${Date.now()}`;
+    const urls = DICEBEAR_STYLES.map(
+      (s) => `https://api.dicebear.com/9.x/${s.id}/svg?seed=${encodeURIComponent(seed)}&backgroundColor=transparent`
+    );
+    setGeneratedAvatars(urls);
+  };
+
+  const handleSelectGenerated = async (url: string) => {
+    setAvatarUploading(true);
+    const formData = new FormData();
+    formData.append("generatedUrl", url);
+    const res = await fetch(`/api/admin/personas/${id}/avatar`, { method: "POST", body: formData });
+    const data = await res.json();
+    if (data.avatarUrl) setAvatarUrl(data.avatarUrl);
+    setGeneratedAvatars([]);
+    setAvatarUploading(false);
+  };
+
+  const handleAvatarReset = async () => {
+    setAvatarUploading(true);
+    await fetch(`/api/admin/personas/${id}/avatar`, { method: "DELETE" });
+    setAvatarUrl("");
+    setAvatarUploading(false);
+  };
+
   const toggleDomain = (d: string) => {
     setTopicDomains((prev) =>
       prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]
@@ -193,12 +246,8 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div
-            className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white"
-            style={{ background: color }}
-          >
-            {name.charAt(0)}
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={currentAvatarSrc} alt={name} className="h-10 w-10 rounded-full object-cover" style={{ background: color }} />
           <h1 className="text-2xl font-semibold" style={{ color: "var(--foreground)" }}>
             Edit: {name}
           </h1>
@@ -210,6 +259,89 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
         >
           ← Back to list
         </button>
+      </div>
+
+      {/* Avatar Management */}
+      <div
+        className="rounded-lg border p-6"
+        style={{ background: "var(--card)", borderColor: "var(--border)" }}
+      >
+        <label className="mb-3 block text-xs font-medium" style={{ color: "var(--muted)" }}>Avatar</label>
+        <div className="flex items-start gap-6">
+          {/* Current avatar preview */}
+          <div className="flex flex-col items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={currentAvatarSrc}
+              alt={name}
+              className="h-24 w-24 rounded-full border-2 object-cover"
+              style={{ borderColor: color, background: color + "20" }}
+            />
+            <span className="text-[10px]" style={{ color: "var(--muted)" }}>
+              {avatarUrl ? "Custom" : "Default SVG"}
+            </span>
+          </div>
+
+          {/* Actions */}
+          <div className="flex-1 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <label
+                className="cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
+                style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
+              >
+                {avatarUploading ? "Uploading..." : "Upload Image"}
+                <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+              </label>
+              <button
+                onClick={handleAvatarGenerate}
+                className="rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
+                style={{ borderColor: "var(--color-agent)", color: "var(--color-agent)" }}
+              >
+                Generate Avatars
+              </button>
+              {avatarUrl && (
+                <button
+                  onClick={handleAvatarReset}
+                  className="rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
+                  style={{ borderColor: "var(--color-error)", color: "var(--color-error)" }}
+                >
+                  Reset to Default
+                </button>
+              )}
+            </div>
+
+            {/* Generated avatar options */}
+            {generatedAvatars.length > 0 && (
+              <div>
+                <p className="mb-2 text-[11px]" style={{ color: "var(--muted)" }}>Click to select:</p>
+                <div className="flex flex-wrap gap-3">
+                  {generatedAvatars.map((url, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSelectGenerated(url)}
+                      className="group relative overflow-hidden rounded-full border-2 transition-all hover:scale-110"
+                      style={{ borderColor: "var(--border)" }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt={`Style ${i + 1}`} className="h-16 w-16" />
+                      <span className="absolute bottom-0 left-0 right-0 bg-black/60 py-0.5 text-center text-[9px] text-white opacity-0 transition-opacity group-hover:opacity-100">
+                        {DICEBEAR_STYLES[i]?.label}
+                      </span>
+                    </button>
+                  ))}
+                  <button
+                    onClick={handleAvatarGenerate}
+                    className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed text-lg transition-colors hover:opacity-70"
+                    style={{ borderColor: "var(--border)", color: "var(--muted)" }}
+                    title="Regenerate"
+                  >
+                    ↻
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div

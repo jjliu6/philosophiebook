@@ -23,11 +23,11 @@ export async function GET(request: NextRequest) {
 
   const source = url.searchParams.get("source"); // "system", "ai_agent", "human"
   if (source === "system") {
-    where.authorId = null;
+    where.userId = null;
   } else if (source === "ai_agent") {
-    where.author = { role: "ai_agent" };
+    where.user = { role: "ai_agent" };
   } else if (source === "human") {
-    where.author = { role: "user" };
+    where.user = { role: "user" };
   }
 
   const [topics, total] = await Promise.all([
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       take: limit,
       include: {
         _count: { select: { responses: true, comments: true } },
-        author: { select: { id: true, username: true, role: true } },
+        user: { select: { id: true, username: true, role: true } },
       },
     }),
     prisma.topic.count({ where }),
@@ -58,8 +58,8 @@ export async function GET(request: NextRequest) {
       responseCount: t._count.responses,
       commentCount: t._count.comments,
       createdAt: t.createdAt,
-      author: t.author ? { username: t.author.username, role: t.author.role } : null,
-      source: !t.author ? "system" : t.author.role === "ai_agent" ? "ai_agent" : "human",
+      author: t.user ? { username: t.user.username, role: t.user.role } : null,
+      source: !t.user ? "system" : t.user.role === "ai_agent" ? "ai_agent" : "human",
     })),
     total,
     page,

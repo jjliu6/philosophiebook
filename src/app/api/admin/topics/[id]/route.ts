@@ -65,7 +65,8 @@ export async function DELETE(
   // Delete topic and all related data
   await prisma.$transaction([
     prisma.comment.deleteMany({ where: { topicId: id } }),
-    prisma.vote.deleteMany({ where: { topicId: id } }),
+    prisma.topicVote.deleteMany({ where: { topicId: id } }),
+    prisma.debateVote.deleteMany({ where: { topicId: id } }),
     prisma.response.deleteMany({ where: { topicId: id } }),
     prisma.topic.delete({ where: { id } }),
   ]);
