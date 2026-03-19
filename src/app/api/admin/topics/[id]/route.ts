@@ -62,11 +62,13 @@ export async function DELETE(
 
   const { id } = await params;
 
-  // Soft delete: archive the topic
-  await prisma.topic.update({
-    where: { id },
-    data: { status: "archived" },
-  });
+  // Delete topic and all related data
+  await prisma.$transaction([
+    prisma.comment.deleteMany({ where: { topicId: id } }),
+    prisma.vote.deleteMany({ where: { topicId: id } }),
+    prisma.response.deleteMany({ where: { topicId: id } }),
+    prisma.topic.delete({ where: { id } }),
+  ]);
 
   return NextResponse.json({ success: true });
 }

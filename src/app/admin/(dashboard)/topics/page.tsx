@@ -15,6 +15,8 @@ interface TopicRow {
   responseCount: number;
   commentCount: number;
   createdAt: string;
+  author: { username: string; role: string } | null;
+  source: "system" | "ai_agent" | "human";
 }
 
 export default function AdminTopics() {
@@ -26,6 +28,7 @@ export default function AdminTopics() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterType, setFilterType] = useState("");
+  const [filterSource, setFilterSource] = useState("");
   const [generating, setGenerating] = useState(false);
 
   const fetchTopics = useCallback(async () => {
@@ -34,6 +37,7 @@ export default function AdminTopics() {
     if (search) params.set("search", search);
     if (filterStatus) params.set("status", filterStatus);
     if (filterType) params.set("type", filterType);
+    if (filterSource) params.set("source", filterSource);
 
     const res = await fetch(`/api/admin/topics?${params}`);
     const data = await res.json();
@@ -41,7 +45,7 @@ export default function AdminTopics() {
     setTotal(data.total);
     setTotalPages(data.totalPages);
     setLoading(false);
-  }, [page, search, filterStatus, filterType]);
+  }, [page, search, filterStatus, filterType, filterSource]);
 
   useEffect(() => {
     fetchTopics();
@@ -116,7 +120,6 @@ export default function AdminTopics() {
           <option value="">All Status</option>
           <option value="active">Active</option>
           <option value="archived">Archived</option>
-          <option value="generating">Generating</option>
         </select>
         <select
           value={filterType}
@@ -132,6 +135,21 @@ export default function AdminTopics() {
           <option value="discussion">Discussion</option>
           <option value="debate">Debate</option>
         </select>
+        <select
+          value={filterSource}
+          onChange={(e) => { setFilterSource(e.target.value); setPage(1); }}
+          className="rounded-md border px-3 py-1.5 text-sm"
+          style={{
+            background: "var(--color-input-bg)",
+            borderColor: "var(--border)",
+            color: "var(--foreground)",
+          }}
+        >
+          <option value="">All Sources</option>
+          <option value="system">System Generated</option>
+          <option value="ai_agent">AI Agent</option>
+          <option value="human">Human User</option>
+        </select>
       </div>
 
       {/* Table */}
@@ -143,9 +161,9 @@ export default function AdminTopics() {
           <thead>
             <tr style={{ background: "var(--card)" }}>
               <th className="px-4 py-3 text-left font-medium" style={{ color: "var(--muted)" }}>Title</th>
+              <th className="px-4 py-3 text-left font-medium" style={{ color: "var(--muted)" }}>Source</th>
               <th className="px-4 py-3 text-left font-medium" style={{ color: "var(--muted)" }}>Type</th>
               <th className="px-4 py-3 text-left font-medium" style={{ color: "var(--muted)" }}>Status</th>
-              <th className="px-4 py-3 text-left font-medium" style={{ color: "var(--muted)" }}>Domains</th>
               <th className="px-4 py-3 text-right font-medium" style={{ color: "var(--muted)" }}>Views</th>
               <th className="px-4 py-3 text-right font-medium" style={{ color: "var(--muted)" }}>Resp.</th>
               <th className="px-4 py-3 text-right font-medium" style={{ color: "var(--muted)" }}>Actions</th>
@@ -184,6 +202,23 @@ export default function AdminTopics() {
                     <span
                       className="rounded px-2 py-0.5 text-xs"
                       style={{
+                        background:
+                          t.source === "system" ? "var(--color-agent-dim)" :
+                          t.source === "ai_agent" ? "rgba(139,92,246,0.15)" :
+                          "var(--color-human-dim)",
+                        color:
+                          t.source === "system" ? "var(--color-agent)" :
+                          t.source === "ai_agent" ? "#a78bfa" :
+                          "var(--color-human)",
+                      }}
+                    >
+                      {t.source === "system" ? "System" : t.source === "ai_agent" ? "AI" : t.author?.username || "User"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className="rounded px-2 py-0.5 text-xs"
+                      style={{
                         background: t.type === "debate" ? "var(--color-agent-dim)" : "var(--color-human-dim)",
                         color: t.type === "debate" ? "var(--color-agent)" : "var(--color-human)",
                       }}
@@ -195,21 +230,12 @@ export default function AdminTopics() {
                     <span
                       className="rounded px-2 py-0.5 text-xs"
                       style={{
-                        background:
-                          t.status === "active" ? "var(--color-human-dim)" :
-                          t.status === "archived" ? "var(--color-error-bg)" :
-                          "var(--color-agent-dim)",
-                        color:
-                          t.status === "active" ? "var(--color-human)" :
-                          t.status === "archived" ? "var(--color-error)" :
-                          "var(--color-agent)",
+                        background: t.status === "active" ? "var(--color-human-dim)" : "var(--color-error-bg)",
+                        color: t.status === "active" ? "var(--color-human)" : "var(--color-error)",
                       }}
                     >
                       {t.status}
                     </span>
-                  </td>
-                  <td className="max-w-[200px] truncate px-4 py-3 text-xs" style={{ color: "var(--muted)" }}>
-                    {t.domains.map((d) => DOMAIN_LABELS[d] || d).join(", ")}
                   </td>
                   <td className="px-4 py-3 text-right" style={{ color: "var(--muted)" }}>
                     {t.viewCount}
@@ -234,15 +260,17 @@ export default function AdminTopics() {
                       >
                         Edit
                       </Link>
-                      {t.status === "active" && (
-                        <button
-                          onClick={() => handleArchive(t.id)}
-                          className="text-xs"
-                          style={{ color: "var(--color-error)" }}
-                        >
-                          Archive
-                        </button>
-                      )}
+                      <button
+                        onClick={() => {
+                          if (confirm(`Delete "${t.title}"? This cannot be undone.`)) {
+                            handleArchive(t.id);
+                          }
+                        }}
+                        className="text-xs"
+                        style={{ color: "var(--color-error)" }}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>

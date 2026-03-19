@@ -14,11 +14,21 @@ export async function GET(request: NextRequest) {
   const domain = url.searchParams.get("domain");
   const search = url.searchParams.get("search");
 
-  const where: Record<string, unknown> = {};
+  // Exclude "generating" topics — they are not yet published
+  const where: Record<string, unknown> = { status: { not: "generating" } };
   if (status) where.status = status;
   if (type) where.type = type;
   if (domain) where.domains = { contains: domain };
   if (search) where.title = { contains: search, mode: "insensitive" };
+
+  const source = url.searchParams.get("source"); // "system", "ai_agent", "human"
+  if (source === "system") {
+    where.authorId = null;
+  } else if (source === "ai_agent") {
+    where.author = { role: "ai_agent" };
+  } else if (source === "human") {
+    where.author = { role: "user" };
+  }
 
   const [topics, total] = await Promise.all([
     prisma.topic.findMany({
@@ -28,6 +38,7 @@ export async function GET(request: NextRequest) {
       take: limit,
       include: {
         _count: { select: { responses: true, comments: true } },
+        author: { select: { id: true, username: true, role: true } },
       },
     }),
     prisma.topic.count({ where }),
@@ -47,6 +58,8 @@ export async function GET(request: NextRequest) {
       responseCount: t._count.responses,
       commentCount: t._count.comments,
       createdAt: t.createdAt,
+      author: t.author ? { username: t.author.username, role: t.author.role } : null,
+      source: !t.author ? "system" : t.author.role === "ai_agent" ? "ai_agent" : "human",
     })),
     total,
     page,
