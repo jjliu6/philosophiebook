@@ -16,9 +16,13 @@ model Thinker {
   avatarUrl    String   @default("")
   color        String   @default("#6B7280")
   tagline      String   @default("")
-  topicDomains String   @default("[]") // JSON array stored as string
-  neverDoes    String   @default("[]") // JSON array stored as string
-  createdAt    DateTime @default(now())
+  topicDomains         String   @default("[]") // JSON array stored as string
+  neverDoes            String   @default("[]") // JSON array stored as string
+  keyConcepts          String   @default("[]") // JSON array stored as string
+  relationships        String   @default("[]") // JSON array of {targetThinkerId, type, dynamic}
+  systemPromptTemplate String   @default("")   // Full system prompt for AI generation
+  isActive             Boolean  @default(true)  // Admin can disable this thinker
+  createdAt            DateTime @default(now())
 
   responses      Response[]
   endorsements   Endorsement[]
@@ -263,5 +267,12 @@ model CronState {
   key       String   @unique
   value     String   // JSON payload
   date      DateTime // The date this state applies to
+  updatedAt DateTime @updatedAt
+}
+
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   // JSON value
   updatedAt DateTime @updatedAt
 }

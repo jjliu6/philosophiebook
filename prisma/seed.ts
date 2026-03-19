@@ -74,6 +74,9 @@ async function main() {
         tagline: t.tagline,
         topicDomains: JSON.stringify(t.topicDomains),
         neverDoes: JSON.stringify(t.neverDoes),
+        keyConcepts: JSON.stringify(t.keyConcepts),
+        relationships: JSON.stringify(t.relationships),
+        systemPromptTemplate: t.systemPromptTemplate,
       },
     });
   }
