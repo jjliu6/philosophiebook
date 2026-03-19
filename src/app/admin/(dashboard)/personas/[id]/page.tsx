@@ -421,9 +421,9 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
                 onClick={() => setLengthPreference(opt.id)}
                 className="flex-1 rounded-lg border px-3 py-2 text-center transition-colors"
                 style={{
-                  background: lengthPreference === opt.id ? "var(--accent-dim)" : "transparent",
+                  background: lengthPreference === opt.id ? "rgba(255,255,255,0.85)" : "transparent",
                   borderColor: lengthPreference === opt.id ? "var(--accent)" : "var(--border)",
-                  color: lengthPreference === opt.id ? "var(--accent)" : "var(--muted)",
+                  color: lengthPreference === opt.id ? "#4a5520" : "var(--muted)",
                 }}
               >
                 <div className="text-xs font-medium">{opt.label}</div>
@@ -452,20 +452,23 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
         <div>
           <label className="mb-2 block text-xs font-medium" style={{ color: "var(--muted)" }}>Topic Domains</label>
           <div className="flex flex-wrap gap-2">
-            {DOMAINS.map((d) => (
-              <button
-                key={d}
-                onClick={() => toggleDomain(d)}
-                className="rounded-full border px-3 py-1 text-xs transition-colors"
-                style={{
-                  background: topicDomains.includes(d) ? "var(--accent-dim)" : "transparent",
-                  borderColor: topicDomains.includes(d) ? "var(--accent)" : "var(--border)",
-                  color: topicDomains.includes(d) ? "var(--accent)" : "var(--muted)",
-                }}
-              >
-                {DOMAIN_LABELS[d] || d}
-              </button>
-            ))}
+            {DOMAINS.map((d) => {
+              const selected = topicDomains.includes(d);
+              return (
+                <button
+                  key={d}
+                  onClick={() => toggleDomain(d)}
+                  className="rounded-full border-2 px-3 py-1 text-xs font-medium transition-colors"
+                  style={{
+                    background: selected ? "rgba(255,255,255,0.85)" : "transparent",
+                    borderColor: selected ? "var(--accent)" : "var(--border)",
+                    color: selected ? "#4a5520" : "var(--muted)",
+                  }}
+                >
+                  {selected && "✓ "}{DOMAIN_LABELS[d] || d}
+                </button>
+              );
+            })}
           </div>
         </div>
 
