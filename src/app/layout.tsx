@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { headers } from "next/headers";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import AuthProvider from "@/components/providers/AuthProvider";
@@ -86,76 +87,89 @@ export default async function RootLayout({
 }>) {
   const user = await getCurrentUser();
 
+  // Detect admin routes — skip forum chrome (header, footer, etc.)
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") || "";
+  const isAdmin = pathname.startsWith("/admin");
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "PhilosophieBook",
-              url: SITE_URL,
-              description:
-                "A philosophical debate platform where 18 AI personas — modelled on history's greatest thinkers — discuss modern questions alongside human participants and external AI agents.",
-              publisher: {
-                "@type": "Organization",
-                name: "Philosophie AI",
-                url: "https://philosophie.ai",
-              },
-            }),
-          }}
-        />
+        {!isAdmin && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "PhilosophieBook",
+                url: SITE_URL,
+                description:
+                  "A philosophical debate platform where 18 AI personas — modelled on history's greatest thinkers — discuss modern questions alongside human participants and external AI agents.",
+                publisher: {
+                  "@type": "Organization",
+                  name: "Philosophie AI",
+                  url: "https://philosophie.ai",
+                },
+              }),
+            }}
+          />
+        )}
       </head>
       <body className={`${inter.variable} antialiased`}>
-        <AuthProvider initialUser={user}>
-          <ThemeProvider>
-            <ViewModeProvider>
-            <Header />
-            <main className="min-h-screen">{children}</main>
+        {isAdmin ? (
+          <AuthProvider initialUser={user}>
+            {children}
+          </AuthProvider>
+        ) : (
+          <AuthProvider initialUser={user}>
+            <ThemeProvider>
+              <ViewModeProvider>
+              <Header />
+              <main className="min-h-screen">{children}</main>
 
-            {/* End-of-book ornament */}
-            <div className="fleuron">
-              <span className="text-[10px] text-accent/30">&#10022;</span>
-            </div>
+              {/* End-of-book ornament */}
+              <div className="fleuron">
+                <span className="text-[10px] text-accent/30">&#10022;</span>
+              </div>
 
-            <footer className="pb-10 text-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo-full.png" alt="PhilosophieBook" className="mx-auto h-32 w-auto opacity-60" />
-              <p className="font-quote mt-3 text-[13px] italic text-muted/50">
-                Where ancient wisdom meets modern questions
-              </p>
-              <p className="folio mt-2">MMXXVI</p>
-              <p className="mt-4 text-[12px] text-muted/40">
-                Built by{" "}
-                <a
-                  href="https://www.linkedin.com/in/junjieliu/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent/50 transition-colors hover:text-accent"
-                >
-                  Junjie Liu
-                </a>
-                {" "}at{" "}
-                <a
-                  href="https://philosophie.ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent/50 transition-colors hover:text-accent"
-                >
-                  Philosophie AI
-                </a>
-              </p>
-              <p className="mt-2 text-[12px] text-muted/40">
-                Feedback?{" "}
-                <CopyEmail email="junjie@philosophie.ai" />
-              </p>
-            </footer>
-            </ViewModeProvider>
-          </ThemeProvider>
-        </AuthProvider>
+              <footer className="pb-10 text-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-full.png" alt="PhilosophieBook" className="mx-auto h-32 w-auto opacity-60" />
+                <p className="font-quote mt-3 text-[13px] italic text-muted/50">
+                  Where ancient wisdom meets modern questions
+                </p>
+                <p className="folio mt-2">MMXXVI</p>
+                <p className="mt-4 text-[12px] text-muted/40">
+                  Built by{" "}
+                  <a
+                    href="https://www.linkedin.com/in/junjieliu/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent/50 transition-colors hover:text-accent"
+                  >
+                    Junjie Liu
+                  </a>
+                  {" "}at{" "}
+                  <a
+                    href="https://philosophie.ai"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent/50 transition-colors hover:text-accent"
+                  >
+                    Philosophie AI
+                  </a>
+                </p>
+                <p className="mt-2 text-[12px] text-muted/40">
+                  Feedback?{" "}
+                  <CopyEmail email="junjie@philosophie.ai" />
+                </p>
+              </footer>
+              </ViewModeProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        )}
         <Analytics />
         <SpeedInsights />
       </body>

@@ -18,9 +18,13 @@ async function verifyAdmin(token: string): Promise<boolean> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Inject pathname header so root layout can detect admin routes
+  const response = NextResponse.next();
+  response.headers.set("x-pathname", pathname);
+
   // Skip auth for admin login page and its API
   if (pathname === "/admin/login" || pathname === "/api/admin/auth/login") {
-    return NextResponse.next();
+    return response;
   }
 
   // Protect all /admin/* and /api/admin/* routes
@@ -35,9 +39,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:png|jpg|svg|webp|woff2?)).*)"],
 };
