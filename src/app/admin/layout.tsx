@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { getCurrentUser } from "@/lib/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
@@ -11,10 +12,17 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Let /admin/login render without auth check (it has its own layout)
+  const headersList = await headers();
+  const pathname = headersList.get("x-next-pathname") || "";
+  if (pathname.startsWith("/admin/login")) {
+    return <>{children}</>;
+  }
+
   const user = await getCurrentUser();
 
   if (!user || user.role !== "admin") {
-    redirect("/login");
+    redirect("/admin/login");
   }
 
   return (
