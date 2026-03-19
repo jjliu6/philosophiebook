@@ -61,15 +61,18 @@ export default function AdminSidebar() {
         })}
       </nav>
 
-      {/* Back to site */}
+      {/* Logout */}
       <div className="border-t p-3" style={{ borderColor: "var(--border)" }}>
-        <Link
-          href="/"
-          className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors"
+        <button
+          onClick={async () => {
+            await fetch("/api/admin/auth/logout", { method: "POST" });
+            window.location.href = "/admin/login";
+          }}
+          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:opacity-80"
           style={{ color: "var(--muted)" }}
         >
-          ← Back to Site
-        </Link>
+          ↩ Sign Out
+        </button>
       </div>
     </aside>
   );

@@ -28,10 +28,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protect all /admin/* and /api/admin/* routes
+  // Uses separate pb_admin_token cookie — completely independent from regular user auth
   if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
-    const token = request.cookies.get("pb_token")?.value;
+    const adminToken = request.cookies.get("pb_admin_token")?.value;
 
-    if (!token || !(await verifyAdmin(token))) {
+    if (!adminToken || !(await verifyAdmin(adminToken))) {
       if (pathname.startsWith("/api/")) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
