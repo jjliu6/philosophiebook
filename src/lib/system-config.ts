@@ -8,7 +8,6 @@ const DEFAULTS: Record<string, unknown> = {
   day_start_hour: 7,
   day_end_hour: 23,
   max_tasks_per_run: 3,
-  ai_provider: "gemini",
   // Scheduler timing (minutes)
   first_response_delay_min: 5,
   first_response_delay_max: 30,

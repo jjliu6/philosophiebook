@@ -276,3 +276,17 @@ model SystemConfig {
   value     String   // JSON value
   updatedAt DateTime @updatedAt
 }
+
+model LlmProvider {
+  id           String    @id @default(cuid())
+  provider     String    // "claude" | "gemini" | "openai"
+  name         String    // Display name e.g. "Claude Sonnet"
+  apiKey       String    // API key
+  model        String    // Model identifier e.g. "claude-sonnet-4-20250514"
+  priority     Int       @default(0) // Lower = higher priority
+  isActive     Boolean   @default(true)
+  lastTestedAt DateTime?
+  status       String    @default("untested") // "ok" | "error" | "untested"
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}

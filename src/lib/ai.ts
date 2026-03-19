@@ -1,111 +1,169 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { prisma } from "./db";
 
 // ─── Provider types ──────────────────────────────────────────
-export type AIProvider = "claude" | "gemini";
+export type AIProvider = "claude" | "gemini" | "openai";
+
+interface ResolvedProvider {
+  provider: AIProvider;
+  apiKey: string;
+  model: string;
+}
 
 /**
- * Determine which provider to use.
- * Priority: explicit parameter > env AI_PROVIDER > whichever key is available.
+ * Get the ordered list of active providers from DB, falling back to env vars.
  */
+async function getDbProviders(): Promise<ResolvedProvider[]> {
+  try {
+    const rows = await prisma.llmProvider.findMany({
+      where: { isActive: true },
+      orderBy: { priority: "asc" },
+    });
+    if (rows.length > 0) {
+      return rows.map((r) => ({
+        provider: r.provider as AIProvider,
+        apiKey: r.apiKey,
+        model: r.model,
+      }));
+    }
+  } catch {
+    // DB not available or table doesn't exist yet — fall through to env vars
+  }
+  return [];
+}
+
+/**
+ * Resolve provider chain: DB providers first, then env var fallbacks.
+ */
+async function resolveProviders(explicit?: AIProvider): Promise<ResolvedProvider[]> {
+  const dbProviders = await getDbProviders();
+
+  if (dbProviders.length > 0) {
+    // If explicit provider requested, move matching ones to front
+    if (explicit) {
+      const matching = dbProviders.filter((p) => p.provider === explicit);
+      const rest = dbProviders.filter((p) => p.provider !== explicit);
+      return [...matching, ...rest];
+    }
+    return dbProviders;
+  }
+
+  // Fallback: build from env vars (backward compatible)
+  const envProviders: ResolvedProvider[] = [];
+
+  const envProvider = (explicit || process.env.AI_PROVIDER) as AIProvider | undefined;
+
+  if (
+    (envProvider === "gemini" || !envProvider) &&
+    process.env.GEMINI_API_KEY &&
+    process.env.GEMINI_API_KEY !== "your-gemini-api-key-here"
+  ) {
+    envProviders.push({
+      provider: "gemini",
+      apiKey: process.env.GEMINI_API_KEY,
+      model: process.env.GEMINI_MODEL || "gemini-2.5-pro",
+    });
+  }
+
+  if (
+    (envProvider === "claude" || !envProvider) &&
+    process.env.ANTHROPIC_API_KEY &&
+    process.env.ANTHROPIC_API_KEY !== "your-anthropic-api-key-here"
+  ) {
+    envProviders.push({
+      provider: "claude",
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: "claude-sonnet-4-20250514",
+    });
+  }
+
+  // If explicit was requested, sort it first
+  if (explicit) {
+    envProviders.sort((a, b) => (a.provider === explicit ? -1 : b.provider === explicit ? 1 : 0));
+  }
+
+  return envProviders.length > 0
+    ? envProviders
+    : [{ provider: "claude", apiKey: process.env.ANTHROPIC_API_KEY || "", model: "claude-sonnet-4-20250514" }];
+}
+
+// ─── Kept for backward compat ───────────────────────────────
 export function getProvider(explicit?: AIProvider): AIProvider {
   if (explicit) return explicit;
-
   const envProvider = process.env.AI_PROVIDER as AIProvider | undefined;
   if (envProvider === "claude" || envProvider === "gemini") return envProvider;
-
-  // Auto-detect: prefer whichever key is set
   if (process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== "your-anthropic-api-key-here") return "claude";
   if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== "your-gemini-api-key-here") return "gemini";
-
-  // Default
   return "claude";
 }
 
-// ─── Claude client (singleton) ───────────────────────────────
-const globalForAnthropic = globalThis as unknown as {
-  anthropic: Anthropic | undefined;
-};
+// ─── Generation by provider ─────────────────────────────────
 
-function getAnthropicClient(): Anthropic {
-  if (!globalForAnthropic.anthropic) {
-    globalForAnthropic.anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
+async function generateWithProvider(
+  resolved: ResolvedProvider,
+  systemPrompt: string,
+  userPrompt: string,
+  maxTokens: number
+): Promise<string> {
+  if (resolved.provider === "claude") {
+    const client = new Anthropic({ apiKey: resolved.apiKey });
+    const message = await client.messages.create({
+      model: resolved.model,
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userPrompt }],
     });
+    const textBlock = message.content.find((b) => b.type === "text");
+    if (!textBlock || textBlock.type !== "text") throw new Error("No text response from Claude");
+    return textBlock.text;
   }
-  return globalForAnthropic.anthropic;
-}
 
-// ─── Gemini client (singleton) ───────────────────────────────
-const globalForGemini = globalThis as unknown as {
-  gemini: GoogleGenerativeAI | undefined;
-};
-
-function getGeminiClient(): GoogleGenerativeAI {
-  if (!globalForGemini.gemini) {
-    globalForGemini.gemini = new GoogleGenerativeAI(
-      process.env.GEMINI_API_KEY || ""
-    );
+  if (resolved.provider === "gemini") {
+    const genAI = new GoogleGenerativeAI(resolved.apiKey);
+    const model = genAI.getGenerativeModel({
+      model: resolved.model,
+      systemInstruction: systemPrompt,
+      generationConfig: { maxOutputTokens: maxTokens },
+    });
+    const result = await model.generateContent(userPrompt);
+    const text = result.response.text();
+    if (!text) throw new Error(`No text response from Gemini (${resolved.model})`);
+    return text;
   }
-  return globalForGemini.gemini;
-}
 
-// ─── Claude generation ───────────────────────────────────────
-async function generateTextClaude(
-  systemPrompt: string,
-  userPrompt: string,
-  maxTokens: number
-): Promise<string> {
-  const client = getAnthropicClient();
-  const message = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: maxTokens,
-    system: systemPrompt,
-    messages: [{ role: "user", content: userPrompt }],
-  });
-
-  const textBlock = message.content.find((b) => b.type === "text");
-  if (!textBlock || textBlock.type !== "text") {
-    throw new Error("No text response from Claude");
+  if (resolved.provider === "openai") {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${resolved.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: resolved.model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        max_tokens: maxTokens,
+      }),
+    });
+    if (!res.ok) throw new Error(`OpenAI API error: ${res.status}`);
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || "";
   }
-  return textBlock.text;
-}
 
-// ─── Gemini generation ───────────────────────────────────────
-// Model priority: env GEMINI_MODEL > gemini-2.5-pro (stable default)
-// Set GEMINI_MODEL="gemini-3.1-pro-preview" in .env to use the latest
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-pro";
-
-async function generateTextGemini(
-  systemPrompt: string,
-  userPrompt: string,
-  maxTokens: number
-): Promise<string> {
-  const client = getGeminiClient();
-  const model = client.getGenerativeModel({
-    model: GEMINI_MODEL,
-    systemInstruction: systemPrompt,
-    generationConfig: {
-      maxOutputTokens: maxTokens,
-    },
-  });
-
-  const result = await model.generateContent(userPrompt);
-  const text = result.response.text();
-  if (!text) {
-    throw new Error(`No text response from Gemini (${GEMINI_MODEL})`);
-  }
-  return text;
+  throw new Error(`Unknown provider: ${resolved.provider}`);
 }
 
 // ─── Public API ──────────────────────────────────────────────
 
 /**
- * Generate text using the configured AI provider.
- * Supports Claude and Gemini. Provider selection:
- *   1. Explicit `provider` parameter
- *   2. `AI_PROVIDER` env var ("claude" | "gemini")
- *   3. Auto-detect based on which API key is set
+ * Generate text using AI with automatic fallback.
+ * Resolution order:
+ *   1. DB-configured providers (ordered by priority)
+ *   2. Environment variable API keys (backward compatible)
+ *   3. On failure: try next provider in chain
  */
 export async function generateText(
   systemPrompt: string,
@@ -113,12 +171,19 @@ export async function generateText(
   maxTokens = 1500,
   provider?: AIProvider
 ): Promise<string> {
-  const selected = getProvider(provider);
+  const chain = await resolveProviders(provider);
+  let lastError: Error | null = null;
 
-  if (selected === "gemini") {
-    return generateTextGemini(systemPrompt, userPrompt, maxTokens);
+  for (const resolved of chain) {
+    try {
+      return await generateWithProvider(resolved, systemPrompt, userPrompt, maxTokens);
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      console.warn(`[AI] ${resolved.provider}/${resolved.model} failed, trying next...`, lastError.message);
+    }
   }
-  return generateTextClaude(systemPrompt, userPrompt, maxTokens);
+
+  throw lastError || new Error("No AI providers available");
 }
 
 /**
