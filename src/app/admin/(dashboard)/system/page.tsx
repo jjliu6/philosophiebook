@@ -36,7 +36,7 @@ type TabId = (typeof TABS)[number]["id"];
 interface ConfigField {
   key: string;
   label: string;
-  type: "number" | "string";
+  type: "number" | "string" | "toggle";
   hint?: string;
 }
 
@@ -44,10 +44,11 @@ const CONTENT_FIELDS: ConfigField[][] = [
   // Topics
   [
     { key: "topics_per_day", label: "Topics Per Day", type: "number" },
-    { key: "debate_probability", label: "Debate Probability", type: "number", hint: "0-1" },
-    { key: "day_start_hour", label: "Day Start Hour (UTC)", type: "number" },
-    { key: "day_end_hour", label: "Day End Hour (UTC)", type: "number" },
+    { key: "debate_probability", label: "Debate / Discussion Ratio", type: "number", hint: "e.g. 0.2 = 20% debates, 80% discussions" },
+    { key: "day_start_hour", label: "Publish Window Start (UTC)", type: "number", hint: "hour 0-23" },
+    { key: "day_end_hour", label: "Publish Window End (UTC)", type: "number", hint: "hour 0-23" },
     { key: "min_gap_minutes", label: "Min Gap Between Topics (min)", type: "number" },
+    { key: "randomize_publish_time", label: "Randomize Publish Time", type: "toggle", hint: "Spread topics randomly within the time window" },
   ],
   // Thinker Selection
   [
@@ -236,22 +237,38 @@ export default function AdminSystem() {
               <label className="mb-1 block text-xs" style={{ color: "var(--muted)" }}>
                 {label}
                 {hint && <span className="ml-1 opacity-50">({hint})</span>}
-                {defaults[key] !== undefined && (
+                {type !== "toggle" && defaults[key] !== undefined && (
                   <span className="ml-1 opacity-40">default: {String(defaults[key])}</span>
                 )}
               </label>
-              <input
-                type={type === "number" ? "number" : "text"}
-                step={type === "number" ? "any" : undefined}
-                value={String(getValue(key))}
-                onChange={(e) => handleChange(key, e.target.value, type)}
-                className="w-full rounded-md border px-3 py-1.5 text-sm"
-                style={{
-                  background: key in dirty ? "var(--accent-dim)" : "var(--color-input-bg)",
-                  borderColor: key in dirty ? "var(--accent)" : "var(--border)",
-                  color: "var(--foreground)",
-                }}
-              />
+              {type === "toggle" ? (
+                <button
+                  onClick={() => {
+                    const current = getValue(key);
+                    handleChange(key, current === "yes" ? "no" : "yes", "string");
+                  }}
+                  className="rounded-md px-4 py-1.5 text-xs font-medium"
+                  style={{
+                    background: getValue(key) === "yes" ? "var(--color-human-dim)" : "var(--color-error-bg)",
+                    color: getValue(key) === "yes" ? "var(--color-human)" : "var(--color-error)",
+                  }}
+                >
+                  {getValue(key) === "yes" ? "✓ Enabled" : "✗ Disabled"}
+                </button>
+              ) : (
+                <input
+                  type={type === "number" ? "number" : "text"}
+                  step={type === "number" ? "any" : undefined}
+                  value={String(getValue(key))}
+                  onChange={(e) => handleChange(key, e.target.value, type)}
+                  className="w-full rounded-md border px-3 py-1.5 text-sm"
+                  style={{
+                    background: key in dirty ? "var(--accent-dim)" : "var(--color-input-bg)",
+                    borderColor: key in dirty ? "var(--accent)" : "var(--border)",
+                    color: "var(--foreground)",
+                  }}
+                />
+              )}
             </div>
           ))}
         </div>

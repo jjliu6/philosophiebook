@@ -7,6 +7,7 @@ const DEFAULTS: Record<string, unknown> = {
   min_gap_minutes: 90,
   day_start_hour: 7,
   day_end_hour: 23,
+  randomize_publish_time: "yes",
   max_tasks_per_run: 3,
   // Scheduler timing (minutes)
   first_response_delay_min: 5,
