@@ -189,7 +189,7 @@ export default function AdminTopicEdit({ params }: { params: Promise<{ id: strin
                 onClick={() => toggleDomain(d)}
                 className="rounded-full border px-3 py-1 text-xs transition-colors"
                 style={{
-                  background: domains.includes(d) ? "var(--accent-dim)" : "transparent",
+                  background: domains.includes(d) ? "rgba(165, 137, 64, 0.15)" : "transparent",
                   borderColor: domains.includes(d) ? "var(--accent)" : "var(--border)",
                   color: domains.includes(d) ? "var(--accent)" : "var(--muted)",
                 }}

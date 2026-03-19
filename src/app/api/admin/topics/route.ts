@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   } else if (source === "ai_agent") {
     where.user = { role: "ai_agent" };
   } else if (source === "human") {
-    where.user = { role: "user" };
+    where.user = { role: "human" };
   }
 
   const [topics, total] = await Promise.all([

@@ -257,7 +257,7 @@ export default function AdminSystem() {
                   onChange={(e) => handleChange(key, e.target.value, type)}
                   className="w-full rounded-md border px-3 py-1.5 text-sm"
                   style={{
-                    background: key in dirty ? "var(--accent-dim)" : "var(--color-input-bg)",
+                    background: key in dirty ? "rgba(165, 137, 64, 0.15)" : "var(--color-input-bg)",
                     borderColor: key in dirty ? "var(--accent)" : "var(--border)",
                     color: "var(--foreground)",
                   }}
@@ -319,7 +319,7 @@ export default function AdminSystem() {
                       <span
                         className="rounded-full px-3 py-1 text-xs font-medium"
                         style={{
-                          background: i === 0 ? "var(--accent-dim)" : "var(--color-input-bg)",
+                          background: i === 0 ? "rgba(165, 137, 64, 0.15)" : "var(--color-input-bg)",
                           color: i === 0 ? "var(--accent)" : "var(--muted)",
                           border: `1px solid ${i === 0 ? "var(--accent)" : "var(--border)"}`,
                         }}
@@ -481,7 +481,7 @@ export default function AdminSystem() {
                 onChange={(e) => handleChange("max_tasks_per_run", e.target.value, "number")}
                 className="w-full rounded-md border px-3 py-1.5 text-sm"
                 style={{
-                  background: "max_tasks_per_run" in dirty ? "var(--accent-dim)" : "var(--color-input-bg)",
+                  background: "max_tasks_per_run" in dirty ? "rgba(165, 137, 64, 0.15)" : "var(--color-input-bg)",
                   borderColor: "max_tasks_per_run" in dirty ? "var(--accent)" : "var(--border)",
                   color: "var(--foreground)",
                 }}

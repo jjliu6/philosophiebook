@@ -50,8 +50,9 @@ export default function AdminSidebar() {
               href={item.href}
               className="flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors"
               style={{
-                background: isActive ? "var(--accent-dim)" : "transparent",
+                background: isActive ? "rgba(165, 137, 64, 0.15)" : "transparent",
                 color: isActive ? "var(--accent)" : "var(--foreground)",
+                fontWeight: isActive ? 600 : 400,
               }}
             >
               <span className="text-base">{item.icon}</span>
