@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { verifyPassword, signToken, setAuthCookie } from "@/lib/auth";
+import { verifyPassword } from "@/lib/auth";
+import { SignJWT } from "jose";
+import { cookies } from "next/headers";
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || "fallback_dev_secret"
+);
+const ADMIN_COOKIE = "pb_admin_token";
+const TOKEN_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,39 +28,53 @@ export async function POST(request: NextRequest) {
         username: true,
         email: true,
         role: true,
-        bio: true,
-        avatarUrl: true,
         passwordHash: true,
       },
     });
 
-    if (!user || !(await verifyPassword(password, user.passwordHash))) {
+    if (!user || user.role !== "admin") {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    // Only allow admin users
-    if (user.role !== "admin") {
+    if (!(await verifyPassword(password, user.passwordHash))) {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    const authUser = {
+    // Sign a separate admin JWT (NOT the regular pb_token)
+    const token = await new SignJWT({
       id: user.id,
       username: user.username,
       email: user.email,
-      role: user.role,
-      bio: user.bio,
-      avatarUrl: user.avatarUrl,
-    };
-    const token = signToken(authUser);
-    await setAuthCookie(token);
+      role: "admin",
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(JWT_SECRET);
 
-    return NextResponse.json({ user: authUser });
+    // Set admin-only cookie — completely separate from pb_token
+    const cookieStore = await cookies();
+    cookieStore.set(ADMIN_COOKIE, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: TOKEN_MAX_AGE,
+      path: "/",
+    });
+
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (error) {
     console.error("Admin login error:", error);
     return NextResponse.json(
