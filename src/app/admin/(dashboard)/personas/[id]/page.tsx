@@ -139,6 +139,7 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
   const [neverDoes, setNeverDoes] = useState<string[]>([]);
   const [systemPromptTemplate, setSystemPromptTemplate] = useState("");
   const [isActive, setIsActive] = useState(true);
+  const [lengthPreference, setLengthPreference] = useState("balanced"); // "concise" | "balanced" | "verbose"
 
   useEffect(() => {
     fetch(`/api/admin/personas/${id}`)
@@ -156,6 +157,7 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
         setNeverDoes(data.neverDoes);
         setSystemPromptTemplate(data.systemPromptTemplate);
         setIsActive(data.isActive);
+        setLengthPreference(data.lengthPreference || "balanced");
         setAvatarUrl(data.avatarUrl || "");
         setLoading(false);
       });
@@ -167,7 +169,7 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name, chineseName, school, era, color, tagline,
+        name, chineseName, school, era, color, tagline, lengthPreference,
         topicDomains, keyConcepts, neverDoes, systemPromptTemplate, isActive,
       }),
     });
@@ -401,6 +403,34 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
             className="w-full rounded-md border px-3 py-2 text-sm"
             style={{ background: "var(--color-input-bg)", borderColor: "var(--border)", color: "var(--foreground)" }}
           />
+        </div>
+
+        {/* Response Length Preference */}
+        <div>
+          <label className="mb-2 block text-xs font-medium" style={{ color: "var(--muted)" }}>
+            Response Length Preference
+          </label>
+          <div className="flex gap-2">
+            {[
+              { id: "concise", label: "Concise", desc: "Short, punchy replies" },
+              { id: "balanced", label: "Balanced", desc: "Mix of lengths" },
+              { id: "verbose", label: "Verbose", desc: "Detailed, long-form" },
+            ].map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => setLengthPreference(opt.id)}
+                className="flex-1 rounded-lg border px-3 py-2 text-center transition-colors"
+                style={{
+                  background: lengthPreference === opt.id ? "var(--accent-dim)" : "transparent",
+                  borderColor: lengthPreference === opt.id ? "var(--accent)" : "var(--border)",
+                  color: lengthPreference === opt.id ? "var(--accent)" : "var(--muted)",
+                }}
+              >
+                <div className="text-xs font-medium">{opt.label}</div>
+                <div className="mt-0.5 text-[10px] opacity-60">{opt.desc}</div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Active toggle */}

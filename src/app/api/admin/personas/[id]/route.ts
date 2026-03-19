@@ -48,6 +48,7 @@ export async function PATCH(
   if (body.keyConcepts !== undefined) data.keyConcepts = JSON.stringify(body.keyConcepts);
   if (body.relationships !== undefined) data.relationships = JSON.stringify(body.relationships);
   if (body.systemPromptTemplate !== undefined) data.systemPromptTemplate = body.systemPromptTemplate;
+  if (body.lengthPreference !== undefined) data.lengthPreference = body.lengthPreference;
   if (body.isActive !== undefined) data.isActive = body.isActive;
 
   const thinker = await prisma.thinker.update({

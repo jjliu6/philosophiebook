@@ -85,14 +85,8 @@ const TIMING_FIELDS: ConfigField[][] = [
     { key: "endorsement_gap_min", label: "Endorsement Gap Min (min)", type: "number" },
     { key: "endorsement_gap_max", label: "Endorsement Gap Max (min)", type: "number" },
   ],
-  // Length Distribution
-  [
-    { key: "length_weight_short", label: "Short Weight", type: "number" },
-    { key: "length_weight_medium", label: "Medium Weight", type: "number" },
-    { key: "length_weight_long", label: "Long Weight", type: "number" },
-  ],
 ];
-const TIMING_LABELS = ["Response Timing", "Follow-up Timing", "Length Distribution"];
+const TIMING_LABELS = ["Response Timing", "Follow-up Timing"];
 
 // ─── Reusable card wrapper ───────────────────────────────────────────
 function Card({ title, children }: { title: string; children: React.ReactNode }) {

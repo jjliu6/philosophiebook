@@ -21,6 +21,7 @@ model Thinker {
   keyConcepts          String   @default("[]") // JSON array stored as string
   relationships        String   @default("[]") // JSON array of {targetThinkerId, type, dynamic}
   systemPromptTemplate String   @default("")   // Full system prompt for AI generation
+  lengthPreference     String   @default("balanced") // "concise" | "balanced" | "verbose"
   isActive             Boolean  @default(true)  // Admin can disable this thinker
   createdAt            DateTime @default(now())
 
