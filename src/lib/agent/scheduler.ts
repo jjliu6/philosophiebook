@@ -1,10 +1,29 @@
 import { prisma } from "@/lib/db";
 import { ALL_THINKERS, THINKER_MAP } from "@/personas";
+import { getAllThinkers } from "@/lib/persona-loader";
 import type { LengthHint } from "@/lib/ai-prompts";
 
 /** Random integer between min and max (inclusive) */
 function randomBetween(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Weighted sampling without replacement using the Efraimidis-Spirakis algorithm.
+ * Items with weight <= 0 are excluded. Returns up to `count` items.
+ */
+function weightedSampleWithoutReplacement<T>(
+  items: T[],
+  weightFn: (item: T) => number,
+  count: number
+): T[] {
+  if (count <= 0) return [];
+  const keyed = items
+    .map((item) => ({ item, w: weightFn(item) }))
+    .filter((x) => x.w > 0)
+    .map(({ item, w }) => ({ item, key: Math.pow(Math.random(), 1 / w) }));
+  keyed.sort((a, b) => b.key - a.key);
+  return keyed.slice(0, count).map((x) => x.item);
 }
 
 /**
@@ -300,11 +319,26 @@ export async function scheduleDailyThinkerActivity(): Promise<{
 }> {
   const DAY_START_HOUR = 7;
   const DAY_END_HOUR = 23;
+  const GLOBAL_INTERACTIONS_MIN = 1;
+  const GLOBAL_INTERACTIONS_MAX = 8;
 
-  // Pick 5-10 random thinkers
-  const shuffled = [...ALL_THINKERS].sort(() => Math.random() - 0.5);
-  const activateCount = randomBetween(5, 10);
-  const activatedThinkers = shuffled.slice(0, activateCount);
+  // Load personas from DB to pick up per-persona scheduling overrides.
+  // getAllThinkers() already filters out isActive=false rows.
+  const allActive = await getAllThinkers();
+
+  // Always-active personas are guaranteed to be picked
+  const alwaysOn = allActive.filter((t) => t.alwaysActive === true);
+  const pool = allActive.filter((t) => t.alwaysActive !== true);
+
+  // Weighted random sampling for the remaining pool (weight 0 → never picked)
+  const targetTotal = randomBetween(5, 10);
+  const remainingTarget = Math.max(0, targetTotal - alwaysOn.length);
+  const sampled = weightedSampleWithoutReplacement(
+    pool,
+    (t) => (typeof t.activationWeight === "number" ? Math.max(0, t.activationWeight) : 1),
+    remainingTarget
+  );
+  const activatedThinkers = [...alwaysOn, ...sampled];
 
   // Fetch recent topics (last 48h) with their responses
   const recentTopics = await prisma.topic.findMany({
@@ -348,8 +382,8 @@ export async function scheduleDailyThinkerActivity(): Promise<{
   );
 
   for (const thinker of activatedThinkers) {
-    const persona = THINKER_MAP[thinker.id];
-    if (!persona) continue;
+    // DB-loaded thinker IS the persona (includes relationships + overrides)
+    const persona = thinker;
 
     // Find eligible topics (domain overlap)
     const eligibleTopics = recentTopics.filter((topic) => {
@@ -364,16 +398,24 @@ export async function scheduleDailyThinkerActivity(): Promise<{
 
     if (eligibleTopics.length === 0) continue;
 
-    // Randomly decide interaction count: 1-8
-    const maxInteractions = randomBetween(1, 8);
+    // Per-persona overrides for interaction count and active hours
+    const interactionsMin =
+      persona.dailyInteractionsMin ?? GLOBAL_INTERACTIONS_MIN;
+    const interactionsMax =
+      persona.dailyInteractionsMax ?? GLOBAL_INTERACTIONS_MAX;
+    const startHour = persona.activeHourStart ?? DAY_START_HOUR;
+    const endHour = persona.activeHourEnd ?? DAY_END_HOUR;
+    const lo = Math.min(interactionsMin, interactionsMax);
+    const hi = Math.max(interactionsMin, interactionsMax);
+    const maxInteractions = randomBetween(lo, hi);
     let interactionCount = 0;
 
     // Generate random times for this thinker (spread across the day)
+    const windowMinutes = Math.max(1, (endHour - startHour) * 60);
     const thinkerTimes: Date[] = [];
     for (let i = 0; i < maxInteractions; i++) {
-      const totalMinutes = (DAY_END_HOUR - DAY_START_HOUR) * 60;
-      const randomMin = Math.floor(Math.random() * totalMinutes);
-      const hour = DAY_START_HOUR + Math.floor(randomMin / 60);
+      const randomMin = Math.floor(Math.random() * windowMinutes);
+      const hour = startHour + Math.floor(randomMin / 60);
       const minute = randomMin % 60;
       const scheduledTime = new Date(todayBase.getTime() + hour * 3600000 + minute * 60000);
 

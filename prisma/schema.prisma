@@ -23,6 +23,13 @@ model Thinker {
   systemPromptTemplate String   @default("")   // Full system prompt for AI generation
   lengthPreference     String   @default("balanced") // "concise" | "balanced" | "verbose"
   isActive             Boolean  @default(true)  // Admin can disable this thinker
+  // Per-persona scheduling overrides (null = use global SystemConfig default)
+  alwaysActive         Boolean  @default(false) // If true, always picked in daily activation (bypasses random sampling)
+  activationWeight     Float    @default(1.0)   // Weight for random daily selection (0 = never random, 2 = twice as likely)
+  dailyInteractionsMin Int?                     // Override daily_interactions_min
+  dailyInteractionsMax Int?                     // Override daily_interactions_max
+  activeHourStart      Int?                     // Override day_start_hour (0-23)
+  activeHourEnd        Int?                     // Override day_end_hour (0-23)
   createdAt            DateTime @default(now())
 
   responses      Response[]

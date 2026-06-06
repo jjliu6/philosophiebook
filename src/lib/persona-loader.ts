@@ -35,6 +35,12 @@ function dbRowToPersona(row: {
   relationships: string;
   systemPromptTemplate: string;
   isActive: boolean;
+  alwaysActive: boolean;
+  activationWeight: number;
+  dailyInteractionsMin: number | null;
+  dailyInteractionsMax: number | null;
+  activeHourStart: number | null;
+  activeHourEnd: number | null;
 }): ThinkerPersona & { isActive: boolean } {
   // Find matching seed persona for fallbacks
   const seed = SEED_THINKERS.find((t) => t.id === row.id);
@@ -71,6 +77,12 @@ function dbRowToPersona(row: {
     relationships,
     systemPromptTemplate,
     isActive: row.isActive,
+    alwaysActive: row.alwaysActive,
+    activationWeight: row.activationWeight,
+    dailyInteractionsMin: row.dailyInteractionsMin,
+    dailyInteractionsMax: row.dailyInteractionsMax,
+    activeHourStart: row.activeHourStart,
+    activeHourEnd: row.activeHourEnd,
   };
 }
 

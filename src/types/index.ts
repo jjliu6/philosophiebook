@@ -19,6 +19,13 @@ export interface ThinkerPersona {
   neverDoes: string[];
   keyConcepts: string[];
   systemPromptTemplate: string;
+  // Per-persona scheduling overrides (only set when loaded from DB)
+  alwaysActive?: boolean;
+  activationWeight?: number;
+  dailyInteractionsMin?: number | null;
+  dailyInteractionsMax?: number | null;
+  activeHourStart?: number | null;
+  activeHourEnd?: number | null;
 }
 
 export type TopicSourceType = "evergreen" | "news" | "user";

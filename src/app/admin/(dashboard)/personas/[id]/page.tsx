@@ -25,6 +25,12 @@ interface PersonaDetail {
   systemPromptTemplate: string;
   isActive: boolean;
   avatarUrl: string;
+  alwaysActive: boolean;
+  activationWeight: number;
+  dailyInteractionsMin: number | null;
+  dailyInteractionsMax: number | null;
+  activeHourStart: number | null;
+  activeHourEnd: number | null;
 }
 
 const DICEBEAR_STYLES = [
@@ -140,6 +146,13 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
   const [systemPromptTemplate, setSystemPromptTemplate] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [lengthPreference, setLengthPreference] = useState("balanced"); // "concise" | "balanced" | "verbose"
+  // Scheduling overrides
+  const [alwaysActive, setAlwaysActive] = useState(false);
+  const [activationWeight, setActivationWeight] = useState("1");
+  const [dailyInteractionsMin, setDailyInteractionsMin] = useState(""); // "" = use global
+  const [dailyInteractionsMax, setDailyInteractionsMax] = useState("");
+  const [activeHourStart, setActiveHourStart] = useState("");
+  const [activeHourEnd, setActiveHourEnd] = useState("");
 
   useEffect(() => {
     fetch(`/api/admin/personas/${id}`)
@@ -159,18 +172,47 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
         setIsActive(data.isActive);
         setLengthPreference(data.lengthPreference || "balanced");
         setAvatarUrl(data.avatarUrl || "");
+        setAlwaysActive(Boolean(data.alwaysActive));
+        setActivationWeight(
+          typeof data.activationWeight === "number" ? String(data.activationWeight) : "1"
+        );
+        setDailyInteractionsMin(
+          data.dailyInteractionsMin == null ? "" : String(data.dailyInteractionsMin)
+        );
+        setDailyInteractionsMax(
+          data.dailyInteractionsMax == null ? "" : String(data.dailyInteractionsMax)
+        );
+        setActiveHourStart(
+          data.activeHourStart == null ? "" : String(data.activeHourStart)
+        );
+        setActiveHourEnd(
+          data.activeHourEnd == null ? "" : String(data.activeHourEnd)
+        );
         setLoading(false);
       });
   }, [id]);
 
   const handleSave = async () => {
     setSaving(true);
+    const parseOptInt = (s: string): number | null => {
+      const t = s.trim();
+      if (t === "") return null;
+      const n = Number(t);
+      return Number.isFinite(n) ? Math.round(n) : null;
+    };
+    const w = Number(activationWeight);
     await fetch(`/api/admin/personas/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name, chineseName, school, era, color, tagline, lengthPreference,
         topicDomains, keyConcepts, neverDoes, systemPromptTemplate, isActive,
+        alwaysActive,
+        activationWeight: Number.isFinite(w) && w >= 0 ? w : 1,
+        dailyInteractionsMin: parseOptInt(dailyInteractionsMin),
+        dailyInteractionsMax: parseOptInt(dailyInteractionsMax),
+        activeHourStart: parseOptInt(activeHourStart),
+        activeHourEnd: parseOptInt(activeHourEnd),
       }),
     });
     setSaving(false);
@@ -446,6 +488,141 @@ export default function AdminPersonaEdit({ params }: { params: Promise<{ id: str
           >
             {isActive ? "Enabled" : "Disabled"}
           </button>
+        </div>
+
+        {/* Scheduling overrides */}
+        <div
+          className="rounded-md border p-4 space-y-3"
+          style={{ background: "var(--card-hover)", borderColor: "var(--border)" }}
+        >
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+              Scheduling
+            </h4>
+            <span className="text-[10px]" style={{ color: "var(--muted)" }}>
+              Leave numeric fields blank to use global defaults
+            </span>
+          </div>
+
+          {/* Always Active + Weight */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--muted)" }}>
+                Always Active <span className="opacity-50">(skip random sampling)</span>
+              </label>
+              <button
+                onClick={() => setAlwaysActive(!alwaysActive)}
+                className="rounded px-3 py-1 text-xs font-medium"
+                style={{
+                  background: alwaysActive ? "var(--color-human-dim)" : "var(--color-input-bg)",
+                  color: alwaysActive ? "var(--color-human)" : "var(--muted)",
+                }}
+              >
+                {alwaysActive ? "✓ Always picked daily" : "Random selection"}
+              </button>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--muted)" }}>
+                Activation Weight <span className="opacity-50">(0 = never, 1 = normal, 2 = 2× chance)</span>
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                value={activationWeight}
+                onChange={(e) => setActivationWeight(e.target.value)}
+                disabled={alwaysActive}
+                className="w-full rounded-md border px-3 py-1.5 text-sm disabled:opacity-50"
+                style={{
+                  background: "var(--color-input-bg)",
+                  borderColor: "var(--border)",
+                  color: "var(--foreground)",
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Daily Interactions Min/Max */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--muted)" }}>
+                Daily Interactions Min <span className="opacity-50">(default: 1)</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={dailyInteractionsMin}
+                onChange={(e) => setDailyInteractionsMin(e.target.value)}
+                placeholder="use global"
+                className="w-full rounded-md border px-3 py-1.5 text-sm"
+                style={{
+                  background: "var(--color-input-bg)",
+                  borderColor: "var(--border)",
+                  color: "var(--foreground)",
+                }}
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--muted)" }}>
+                Daily Interactions Max <span className="opacity-50">(default: 8)</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={dailyInteractionsMax}
+                onChange={(e) => setDailyInteractionsMax(e.target.value)}
+                placeholder="use global"
+                className="w-full rounded-md border px-3 py-1.5 text-sm"
+                style={{
+                  background: "var(--color-input-bg)",
+                  borderColor: "var(--border)",
+                  color: "var(--foreground)",
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Active Hour Start/End */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--muted)" }}>
+                Active Hour Start (UTC) <span className="opacity-50">(default: 7)</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="23"
+                value={activeHourStart}
+                onChange={(e) => setActiveHourStart(e.target.value)}
+                placeholder="use global"
+                className="w-full rounded-md border px-3 py-1.5 text-sm"
+                style={{
+                  background: "var(--color-input-bg)",
+                  borderColor: "var(--border)",
+                  color: "var(--foreground)",
+                }}
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--muted)" }}>
+                Active Hour End (UTC) <span className="opacity-50">(default: 23)</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="23"
+                value={activeHourEnd}
+                onChange={(e) => setActiveHourEnd(e.target.value)}
+                placeholder="use global"
+                className="w-full rounded-md border px-3 py-1.5 text-sm"
+                style={{
+                  background: "var(--color-input-bg)",
+                  borderColor: "var(--border)",
+                  color: "var(--foreground)",
+                }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Domains */}

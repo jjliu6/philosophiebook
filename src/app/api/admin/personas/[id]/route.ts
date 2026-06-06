@@ -50,6 +50,24 @@ export async function PATCH(
   if (body.systemPromptTemplate !== undefined) data.systemPromptTemplate = body.systemPromptTemplate;
   if (body.lengthPreference !== undefined) data.lengthPreference = body.lengthPreference;
   if (body.isActive !== undefined) data.isActive = body.isActive;
+  // Scheduling overrides
+  if (body.alwaysActive !== undefined) data.alwaysActive = Boolean(body.alwaysActive);
+  if (body.activationWeight !== undefined) {
+    const w = Number(body.activationWeight);
+    if (Number.isFinite(w) && w >= 0) data.activationWeight = w;
+  }
+  if (body.dailyInteractionsMin !== undefined) {
+    data.dailyInteractionsMin = body.dailyInteractionsMin === null ? null : Number(body.dailyInteractionsMin);
+  }
+  if (body.dailyInteractionsMax !== undefined) {
+    data.dailyInteractionsMax = body.dailyInteractionsMax === null ? null : Number(body.dailyInteractionsMax);
+  }
+  if (body.activeHourStart !== undefined) {
+    data.activeHourStart = body.activeHourStart === null ? null : Number(body.activeHourStart);
+  }
+  if (body.activeHourEnd !== undefined) {
+    data.activeHourEnd = body.activeHourEnd === null ? null : Number(body.activeHourEnd);
+  }
 
   const thinker = await prisma.thinker.update({
     where: { id },
