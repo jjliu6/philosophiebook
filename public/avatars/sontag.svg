@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip-sontag">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle-clip-sontag)">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="100" fill="#800020" opacity="0.2"/>
+    <!-- Shoulders / dark top -->
+    <path d="M25,200 Q35,160 55,148 Q75,140 100,137 Q125,140 145,148 Q165,160 175,200 Z" fill="#800020" opacity="0.45"/>
+    <!-- Turtleneck -->
+    <path d="M82,140 Q82,130 88,126 L112,126 Q118,130 118,140" fill="#800020" opacity="0.35"/>
+    <!-- Neck -->
+    <rect x="90" y="118" width="20" height="18" rx="5" fill="#E8C4A0"/>
+    <!-- Head shape - elegant, angular -->
+    <ellipse cx="100" cy="76" rx="38" ry="44" fill="#E8C4A0"/>
+    <!-- Hair - voluminous dark hair with signature white streak -->
+    <path d="M54,78 Q50,30 80,18 Q100,10 120,18 Q150,30 146,78" fill="#1A1A1A" opacity="0.6"/>
+    <!-- Hair volume - swept back -->
+    <path d="M54,76 Q52,40 78,24 Q100,14 122,24 Q148,40 146,76" fill="#1A1A1A" opacity="0.55"/>
+    <!-- Hair falling on sides -->
+    <path d="M54,78 Q50,90 48,110 Q46,130 52,140 Q58,130 56,110 Q56,90 58,78" fill="#1A1A1A" opacity="0.5"/>
+    <path d="M146,78 Q150,90 152,110 Q154,130 148,140 Q142,130 144,110 Q144,90 142,78" fill="#1A1A1A" opacity="0.5"/>
+    <!-- SIGNATURE WHITE STREAK in hair - left side -->
+    <path d="M72,22 Q68,34 66,50 Q64,66 66,78" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+    <path d="M74,24 Q70,36 68,52 Q66,68 68,78" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+    <!-- Hair texture -->
+    <path d="M80,20 Q84,32 82,46" fill="none" stroke="#1A1A1A" stroke-width="1.5" opacity="0.3"/>
+    <path d="M110,20 Q108,32 110,46" fill="none" stroke="#1A1A1A" stroke-width="1.5" opacity="0.3"/>
+    <path d="M130,26 Q126,38 128,50" fill="none" stroke="#1A1A1A" stroke-width="1.5" opacity="0.3"/>
+    <!-- Forehead exposed -->
+    <path d="M68,72 Q80,52 100,48 Q120,52 132,72" fill="#E8C4A0"/>
+    <!-- Ears (mostly hidden by hair) -->
+    <ellipse cx="58" cy="82" rx="4" ry="8" fill="#D4A882"/>
+    <ellipse cx="142" cy="82" rx="4" ry="8" fill="#D4A882"/>
+    <!-- Eyebrows - strong, defined -->
+    <path d="M68,70 Q78,65 92,68" fill="none" stroke="#800020" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+    <path d="M108,68 Q122,65 132,70" fill="none" stroke="#800020" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+    <!-- Eyes - intense, penetrating -->
+    <ellipse cx="80" cy="78" rx="7" ry="4.5" fill="white"/>
+    <circle cx="81" cy="78" r="3.5" fill="#2A1506"/>
+    <circle cx="82.5" cy="77" r="1.2" fill="white"/>
+    <ellipse cx="120" cy="78" rx="7" ry="4.5" fill="white"/>
+    <circle cx="119" cy="78" r="3.5" fill="#2A1506"/>
+    <circle cx="120.5" cy="77" r="1.2" fill="white"/>
+    <!-- Lower eyelids - intellectual intensity -->
+    <path d="M73,81 Q80,84 87,81" fill="none" stroke="#D4A882" stroke-width="0.8" opacity="0.4"/>
+    <path d="M113,81 Q120,84 127,81" fill="none" stroke="#D4A882" stroke-width="0.8" opacity="0.4"/>
+    <!-- Nose - straight, elegant -->
+    <path d="M100,82 L97,96 Q100,100 103,96 Z" fill="#D4A882"/>
+    <!-- Mouth - defined, serious -->
+    <path d="M88,106 Q94,110 100,110 Q106,110 112,106" fill="none" stroke="#800020" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+    <!-- Upper lip definition -->
+    <path d="M92,106 Q96,103 100,104 Q104,103 108,106" fill="#800020" opacity="0.15"/>
+    <!-- Cheekbones -->
+    <path d="M66,90 Q72,88 76,92" fill="none" stroke="#D4A882" stroke-width="0.8" opacity="0.3"/>
+    <path d="M134,90 Q128,88 124,92" fill="none" stroke="#D4A882" stroke-width="0.8" opacity="0.3"/>
+    <!-- Chin - angular -->
+    <path d="M90,118 Q100,124 110,118" fill="none" stroke="#D4A882" stroke-width="0.8" opacity="0.25"/>
+  </g>
+</svg>

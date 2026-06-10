@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip-machiavelli">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle-clip-machiavelli)">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="100" fill="#800020" opacity="0.2"/>
+    <!-- Renaissance clothing / shoulders -->
+    <path d="M25,200 Q35,158 55,145 Q78,136 100,134 Q122,136 145,145 Q165,158 175,200 Z" fill="#800020" opacity="0.5"/>
+    <!-- Renaissance collar -->
+    <path d="M70,145 Q76,138 85,140 Q92,142 100,138 Q108,142 115,140 Q124,138 130,145" fill="none" stroke="#800020" stroke-width="2" opacity="0.6"/>
+    <!-- Collar detail lines -->
+    <path d="M75,145 Q85,148 95,142" fill="none" stroke="#800020" stroke-width="1.2" opacity="0.4"/>
+    <path d="M105,142 Q115,148 125,145" fill="none" stroke="#800020" stroke-width="1.2" opacity="0.4"/>
+    <!-- Neck - thin -->
+    <rect x="90" y="120" width="20" height="18" rx="5" fill="#D2A679"/>
+    <!-- Head shape - thin, angular -->
+    <path d="M60,82 Q58,48 80,34 Q100,26 120,34 Q142,48 140,82 Q138,108 125,120 Q112,130 100,132 Q88,130 75,120 Q62,108 60,82 Z" fill="#D2A679"/>
+    <!-- Angular jaw emphasis -->
+    <path d="M68,100 Q75,118 100,126 Q125,118 132,100" fill="#C49565" opacity="0.15"/>
+    <!-- Dark cap / hat -->
+    <path d="M56,68 Q55,38 78,28 Q100,20 122,28 Q145,38 144,68 L140,68 Q140,42 120,32 Q100,24 80,32 Q60,42 60,68 Z" fill="#800020" opacity="0.7"/>
+    <path d="M56,68 L144,68" fill="none" stroke="#800020" stroke-width="3"/>
+    <!-- Hat brim -->
+    <path d="M52,68 Q100,62 148,68" fill="none" stroke="#800020" stroke-width="2" opacity="0.5"/>
+    <!-- Ears -->
+    <ellipse cx="58" cy="86" rx="5" ry="9" fill="#C49565"/>
+    <ellipse cx="142" cy="86" rx="5" ry="9" fill="#C49565"/>
+    <!-- Eyebrows - sharp, slightly arched, cunning -->
+    <path d="M70,76 Q78,70 92,74" fill="none" stroke="#800020" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M108,74 Q122,70 130,76" fill="none" stroke="#800020" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- Eyes - sharp, dark, cunning -->
+    <ellipse cx="82" cy="82" rx="7" ry="4" fill="white"/>
+    <circle cx="84" cy="82" r="3" fill="#2A0A0A"/>
+    <circle cx="85" cy="81" r="1" fill="white"/>
+    <ellipse cx="118" cy="82" rx="7" ry="4" fill="white"/>
+    <circle cx="116" cy="82" r="3" fill="#2A0A0A"/>
+    <circle cx="117" cy="81" r="1" fill="white"/>
+    <!-- Eyelid lines - slightly narrowed -->
+    <path d="M75,80 Q82,78 89,80" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.5"/>
+    <path d="M111,80 Q118,78 125,80" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.5"/>
+    <!-- Nose - sharp, angular -->
+    <path d="M100,84 L96,100 Q100,103 104,100 Z" fill="#C49565"/>
+    <!-- Slight smirk - asymmetric mouth -->
+    <path d="M88,112 Q95,109 100,110 Q108,109 114,114" fill="none" stroke="#800020" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Smirk line -->
+    <path d="M114,114 Q116,112 118,113" fill="none" stroke="#800020" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+    <!-- Thin jawline shadow -->
+    <path d="M68,100 Q72,114 85,122" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.3"/>
+    <path d="M132,100 Q128,114 115,122" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.3"/>
+    <!-- Cheekbone highlights -->
+    <path d="M70,92 Q74,90 78,92" fill="none" stroke="#B8895A" stroke-width="0.6" opacity="0.3"/>
+    <path d="M122,92 Q126,90 130,92" fill="none" stroke="#B8895A" stroke-width="0.6" opacity="0.3"/>
+    <!-- Nasolabial folds - adds to cunning expression -->
+    <path d="M92,100 Q88,106 86,112" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.35"/>
+    <path d="M108,100 Q112,106 114,112" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.35"/>
+    <!-- Chin detail -->
+    <path d="M94,124 Q100,128 106,124" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.3"/>
+  </g>
+</svg>

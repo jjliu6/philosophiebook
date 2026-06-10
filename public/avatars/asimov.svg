@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip-asimov">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle-clip-asimov)">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="100" fill="#2E86AB" opacity="0.2"/>
+    <!-- Shoulders / suit jacket -->
+    <path d="M25,200 Q35,160 55,148 Q75,140 100,137 Q125,140 145,148 Q165,160 175,200 Z" fill="#2E86AB" opacity="0.45"/>
+    <!-- Suit lapels -->
+    <path d="M72,148 L86,158 L100,148" fill="none" stroke="#2E86AB" stroke-width="2" opacity="0.5"/>
+    <path d="M128,148 L114,158 L100,148" fill="none" stroke="#2E86AB" stroke-width="2" opacity="0.5"/>
+    <!-- Bolo tie -->
+    <circle cx="100" cy="152" r="4" fill="#2E86AB" opacity="0.6"/>
+    <!-- Collar -->
+    <path d="M80,142 L90,136 L100,142 L110,136 L120,142" fill="none" stroke="#2E86AB" stroke-width="2" opacity="0.6"/>
+    <!-- Neck -->
+    <rect x="90" y="120" width="20" height="20" rx="5" fill="#D2A679"/>
+    <!-- Head shape - round, jovial -->
+    <ellipse cx="100" cy="78" rx="42" ry="46" fill="#D2A679"/>
+    <!-- Balding head - high hairline -->
+    <path d="M56,80 Q54,42 76,32 Q100,22 124,32 Q146,42 144,80" fill="#D2A679"/>
+    <!-- Remaining hair on sides -->
+    <path d="M56,78 Q54,68 58,60 Q62,72 60,82" fill="#2E86AB" opacity="0.35"/>
+    <path d="M144,78 Q146,68 142,60 Q138,72 140,82" fill="#2E86AB" opacity="0.35"/>
+    <!-- Side hair texture -->
+    <path d="M56,72 Q58,64 60,74" fill="none" stroke="#2E86AB" stroke-width="1.5" opacity="0.3"/>
+    <path d="M144,72 Q142,64 140,74" fill="none" stroke="#2E86AB" stroke-width="1.5" opacity="0.3"/>
+    <!-- Ears -->
+    <ellipse cx="56" cy="84" rx="5" ry="10" fill="#C49565"/>
+    <ellipse cx="144" cy="84" rx="5" ry="10" fill="#C49565"/>
+    <!-- Thick-rimmed glasses -->
+    <rect x="66" y="74" width="26" height="18" rx="4" fill="none" stroke="#2E86AB" stroke-width="3" opacity="0.7"/>
+    <rect x="108" y="74" width="26" height="18" rx="4" fill="none" stroke="#2E86AB" stroke-width="3" opacity="0.7"/>
+    <!-- Glasses bridge -->
+    <path d="M92,82 Q100,78 108,82" fill="none" stroke="#2E86AB" stroke-width="2.5" opacity="0.7"/>
+    <!-- Glasses arms -->
+    <path d="M66,80 L56,84" fill="none" stroke="#2E86AB" stroke-width="2" opacity="0.6"/>
+    <path d="M134,80 L144,84" fill="none" stroke="#2E86AB" stroke-width="2" opacity="0.6"/>
+    <!-- Eyebrows - bushy, expressive -->
+    <path d="M68,72 Q78,66 92,70" fill="none" stroke="#2E86AB" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+    <path d="M108,70 Q122,66 132,72" fill="none" stroke="#2E86AB" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+    <!-- Eyes behind glasses - warm, intelligent -->
+    <ellipse cx="80" cy="83" rx="6.5" ry="4.5" fill="white"/>
+    <circle cx="81" cy="83" r="3.2" fill="#3A2010"/>
+    <circle cx="82.5" cy="82" r="1.2" fill="white"/>
+    <ellipse cx="120" cy="83" rx="6.5" ry="4.5" fill="white"/>
+    <circle cx="119" cy="83" r="3.2" fill="#3A2010"/>
+    <circle cx="120.5" cy="82" r="1.2" fill="white"/>
+    <!-- Nose - prominent -->
+    <path d="M100,86 L96,100 Q100,104 104,100 Z" fill="#C49565"/>
+    <!-- Mutton chop sideburns -->
+    <path d="M58,80 Q54,88 56,100 Q58,110 64,112 Q68,108 66,96 Q64,86 62,80" fill="#2E86AB" opacity="0.35"/>
+    <path d="M142,80 Q146,88 144,100 Q142,110 136,112 Q132,108 134,96 Q136,86 138,80" fill="#2E86AB" opacity="0.35"/>
+    <!-- Mouth - friendly, slight smile -->
+    <path d="M88,110 Q94,116 100,116 Q106,116 112,110" fill="none" stroke="#B8895A" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+    <!-- Chin - round, double chin hint -->
+    <path d="M85,122 Q100,130 115,122" fill="none" stroke="#B8895A" stroke-width="0.8" opacity="0.25"/>
+    <path d="M88,126 Q100,132 112,126" fill="none" stroke="#B8895A" stroke-width="0.6" opacity="0.2"/>
+    <!-- Forehead shine -->
+    <ellipse cx="100" cy="56" rx="16" ry="8" fill="white" opacity="0.08"/>
+  </g>
+</svg>

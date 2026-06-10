@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip-laozi">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle-clip-laozi)">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="100" fill="#2E8B57" opacity="0.2"/>
+    <!-- Robe / shoulders - flowing natural lines -->
+    <path d="M20,200 Q35,160 55,148 Q75,138 100,136 Q125,138 145,148 Q165,160 180,200 Z" fill="#2E8B57" opacity="0.4"/>
+    <!-- Robe folds - flowing natural style -->
+    <path d="M70,148 Q85,165 100,175 Q115,165 130,148" fill="none" stroke="#2E8B57" stroke-width="2" opacity="0.6"/>
+    <path d="M60,155 Q80,170 100,180" fill="none" stroke="#2E8B57" stroke-width="1.5" opacity="0.4"/>
+    <!-- Neck -->
+    <rect x="90" y="123" width="20" height="16" rx="5" fill="#E0C8A8"/>
+    <!-- Head shape - high forehead, wise elder -->
+    <ellipse cx="100" cy="82" rx="37" ry="46" fill="#E0C8A8"/>
+    <!-- Very high bald forehead -->
+    <path d="M63,85 Q63,35 100,30 Q137,35 137,85" fill="#E0C8A8"/>
+    <!-- Remaining white hair on sides -->
+    <path d="M60,82 Q55,85 52,95 Q50,108 55,118 Q58,122 62,120" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    <path d="M58,88 Q53,92 50,100" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M140,82 Q145,85 148,95 Q150,108 145,118 Q142,122 138,120" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    <path d="M142,88 Q147,92 150,100" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <!-- Eyebrows - very long, flowing, white -->
+    <path d="M68,78 Q80,72 94,76" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+    <path d="M65,80 Q70,76 78,75" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+    <path d="M106,76 Q120,72 132,78" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+    <path d="M122,75 Q130,76 135,80" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+    <!-- Eyes - serene, half-closed, peaceful -->
+    <path d="M74,86 Q82,82 90,86" fill="none" stroke="#2E8B57" stroke-width="2" stroke-linecap="round"/>
+    <path d="M74,86 Q82,89 90,86" fill="none" stroke="#2E8B57" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    <circle cx="82" cy="86" r="2" fill="#2A3D20"/>
+    <path d="M110,86 Q118,82 126,86" fill="none" stroke="#2E8B57" stroke-width="2" stroke-linecap="round"/>
+    <path d="M110,86 Q118,89 126,86" fill="none" stroke="#2E8B57" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    <circle cx="118" cy="86" r="2" fill="#2A3D20"/>
+    <!-- Nose - rounded, gentle -->
+    <path d="M100,88 Q97,98 96,103 Q100,107 104,103 Q103,98 100,88" fill="#D0B890" stroke="#C4A878" stroke-width="0.5"/>
+    <!-- Mouth - gentle serene smile -->
+    <path d="M88,114 Q94,110 100,112 Q106,110 112,114" fill="none" stroke="#2E8B57" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Long flowing white beard -->
+    <path d="M78,118 Q72,145 65,180" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M85,120 Q78,150 72,190" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M92,122 Q87,155 82,200" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+    <path d="M100,124 Q98,160 95,200" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <path d="M108,122 Q113,155 118,200" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+    <path d="M115,120 Q122,150 128,190" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M122,118 Q128,145 135,180" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <!-- White mustache -->
+    <path d="M90,113 Q82,120 72,122" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+    <path d="M110,113 Q118,120 128,122" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+    <!-- Ears - large (sign of wisdom in Chinese culture) -->
+    <ellipse cx="59" cy="90" rx="7" ry="12" fill="#D0B890"/>
+    <ellipse cx="141" cy="90" rx="7" ry="12" fill="#D0B890"/>
+    <!-- Forehead wrinkles - wise elder -->
+    <path d="M78,55 Q100,50 122,55" fill="none" stroke="#C4A878" stroke-width="0.8" opacity="0.4"/>
+    <path d="M80,62 Q100,58 120,62" fill="none" stroke="#C4A878" stroke-width="0.8" opacity="0.35"/>
+    <path d="M82,69 Q100,66 118,69" fill="none" stroke="#C4A878" stroke-width="0.8" opacity="0.3"/>
+  </g>
+</svg>

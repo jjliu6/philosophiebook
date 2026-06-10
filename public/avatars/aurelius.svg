@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip-aurelius">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle-clip-aurelius)">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="100" fill="#708090" opacity="0.2"/>
+    <!-- Roman toga with armor hint / shoulders -->
+    <path d="M20,200 Q30,155 55,142 Q78,134 100,132 Q122,134 145,142 Q170,155 180,200 Z" fill="#708090" opacity="0.5"/>
+    <!-- Armor/toga neckline detail -->
+    <path d="M65,145 Q82,158 100,152 Q118,146 135,145" fill="none" stroke="#708090" stroke-width="2.5" opacity="0.6"/>
+    <path d="M72,148 L100,165 L128,148" fill="none" stroke="#708090" stroke-width="2" opacity="0.4"/>
+    <!-- Shoulder armor hint -->
+    <path d="M55,145 Q50,140 48,148" fill="none" stroke="#708090" stroke-width="2" opacity="0.4"/>
+    <path d="M145,145 Q150,140 152,148" fill="none" stroke="#708090" stroke-width="2" opacity="0.4"/>
+    <!-- Neck -->
+    <rect x="88" y="120" width="24" height="16" rx="6" fill="#D2A679"/>
+    <!-- Head shape -->
+    <ellipse cx="100" cy="80" rx="42" ry="46" fill="#D2A679"/>
+    <!-- Curly hair - Marcus Aurelius style -->
+    <path d="M58,78 Q55,42 75,30 Q90,22 100,20 Q110,22 125,30 Q145,42 142,78" fill="#708090" opacity="0.4"/>
+    <!-- Curly hair texture -->
+    <circle cx="72" cy="42" r="5" fill="#708090" opacity="0.35"/>
+    <circle cx="84" cy="34" r="5" fill="#708090" opacity="0.35"/>
+    <circle cx="96" cy="30" r="5" fill="#708090" opacity="0.35"/>
+    <circle cx="108" cy="30" r="5" fill="#708090" opacity="0.35"/>
+    <circle cx="120" cy="34" r="5" fill="#708090" opacity="0.35"/>
+    <circle cx="130" cy="42" r="5" fill="#708090" opacity="0.35"/>
+    <circle cx="65" cy="54" r="5" fill="#708090" opacity="0.3"/>
+    <circle cx="135" cy="54" r="5" fill="#708090" opacity="0.3"/>
+    <circle cx="60" cy="66" r="4" fill="#708090" opacity="0.25"/>
+    <circle cx="140" cy="66" r="4" fill="#708090" opacity="0.25"/>
+    <!-- Laurel crown -->
+    <path d="M58,56 Q100,44 142,56" fill="none" stroke="#708090" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+    <!-- Laurel leaves -->
+    <ellipse cx="66" cy="52" rx="5" ry="2.5" fill="#708090" opacity="0.5" transform="rotate(-25 66 52)"/>
+    <ellipse cx="78" cy="48" rx="5" ry="2.5" fill="#708090" opacity="0.5" transform="rotate(-12 78 48)"/>
+    <ellipse cx="92" cy="46" rx="5" ry="2.5" fill="#708090" opacity="0.5" transform="rotate(0 92 46)"/>
+    <ellipse cx="108" cy="46" rx="5" ry="2.5" fill="#708090" opacity="0.5" transform="rotate(0 108 46)"/>
+    <ellipse cx="122" cy="48" rx="5" ry="2.5" fill="#708090" opacity="0.5" transform="rotate(12 122 48)"/>
+    <ellipse cx="134" cy="52" rx="5" ry="2.5" fill="#708090" opacity="0.5" transform="rotate(25 134 52)"/>
+    <!-- Ears -->
+    <ellipse cx="56" cy="82" rx="6" ry="10" fill="#C49565"/>
+    <ellipse cx="144" cy="82" rx="6" ry="10" fill="#C49565"/>
+    <!-- Eyebrows - stoic, level -->
+    <path d="M70,72 Q80,68 92,71" fill="none" stroke="#708090" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M108,71 Q120,68 130,72" fill="none" stroke="#708090" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Eyes - stoic, calm, dignified -->
+    <ellipse cx="82" cy="80" rx="7.5" ry="4.5" fill="white"/>
+    <circle cx="83" cy="80" r="3" fill="#3A3A44"/>
+    <circle cx="84" cy="79" r="1" fill="white"/>
+    <ellipse cx="118" cy="80" rx="7.5" ry="4.5" fill="white"/>
+    <circle cx="117" cy="80" r="3" fill="#3A3A44"/>
+    <circle cx="118" cy="79" r="1" fill="white"/>
+    <!-- Nose -->
+    <path d="M100,83 L97,97 Q100,101 103,97 Z" fill="#C49565"/>
+    <!-- Mouth - set, stoic -->
+    <path d="M90,108 Q95,106 100,108 Q105,106 110,108" fill="none" stroke="#708090" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Curly beard -->
+    <path d="M64,98 Q62,114 66,132 Q74,146 100,152 Q126,146 134,132 Q138,114 136,98" fill="#708090" opacity="0.3"/>
+    <!-- Curly beard texture -->
+    <circle cx="75" cy="110" r="3.5" fill="#708090" opacity="0.2"/>
+    <circle cx="85" cy="118" r="3.5" fill="#708090" opacity="0.2"/>
+    <circle cx="95" cy="124" r="3.5" fill="#708090" opacity="0.2"/>
+    <circle cx="105" cy="124" r="3.5" fill="#708090" opacity="0.2"/>
+    <circle cx="115" cy="118" r="3.5" fill="#708090" opacity="0.2"/>
+    <circle cx="125" cy="110" r="3.5" fill="#708090" opacity="0.2"/>
+    <circle cx="80" cy="130" r="3" fill="#708090" opacity="0.18"/>
+    <circle cx="92" cy="136" r="3" fill="#708090" opacity="0.18"/>
+    <circle cx="108" cy="136" r="3" fill="#708090" opacity="0.18"/>
+    <circle cx="120" cy="130" r="3" fill="#708090" opacity="0.18"/>
+    <circle cx="100" cy="144" r="3" fill="#708090" opacity="0.15"/>
+    <!-- Beard outline strokes -->
+    <path d="M74,106 Q76,124 82,138" fill="none" stroke="#708090" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+    <path d="M126,106 Q124,124 118,138" fill="none" stroke="#708090" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+    <!-- Mustache -->
+    <path d="M90,106 Q82,110 70,108" fill="none" stroke="#708090" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+    <path d="M110,106 Q118,110 130,108" fill="none" stroke="#708090" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  </g>
+</svg>

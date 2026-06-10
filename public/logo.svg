@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 48" width="240" height="48">
+  <!-- Philosophie Book Logo: Two overlapping speech bubbles + wordmark -->
+
+  <g transform="translate(4, 4)">
+    <!-- Left speech bubble (behind, reduced opacity) -->
+    <rect x="0" y="6" width="19" height="15" rx="4" ry="4"
+          fill="none" stroke="#c8a850" stroke-width="1.6" opacity="0.55"/>
+    <path d="M6 21 L3.5 26 L9.5 21"
+          fill="none" stroke="#c8a850" stroke-width="1.6" stroke-linejoin="round" opacity="0.55"/>
+
+    <!-- Right speech bubble (front, overlapping, full opacity) -->
+    <rect x="12" y="1" width="24" height="19" rx="4.5" ry="4.5"
+          fill="none" stroke="#c8a850" stroke-width="1.6"/>
+    <path d="M29 20 L33.5 26.5 L26 20"
+          fill="none" stroke="#c8a850" stroke-width="1.6" stroke-linejoin="round"/>
+
+    <!-- Overlap accent: small dot at the intersection of minds -->
+    <circle cx="20" cy="12" r="1.3" fill="#c8a850" opacity="0.45"/>
+  </g>
+
+  <!-- Wordmark: "Philosophie" in light, "Book" in gold -->
+  <text x="50" y="30"
+        font-family="Georgia, 'Palatino Linotype', 'Book Antiqua', Palatino, serif"
+        font-size="19.5" fill="#f3f4f6" letter-spacing="0.5">Philosophie</text>
+  <text x="173" y="30"
+        font-family="Georgia, 'Palatino Linotype', 'Book Antiqua', Palatino, serif"
+        font-size="19.5" fill="#c8a850" letter-spacing="0.5">Book</text>
+</svg>

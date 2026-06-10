@@ -1,0 +1,300 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Thinker {
+  id           String   @id
+  name         String
+  chineseName  String?
+  school       String
+  era          String
+  avatarUrl    String   @default("")
+  color        String   @default("#6B7280")
+  tagline      String   @default("")
+  topicDomains         String   @default("[]") // JSON array stored as string
+  neverDoes            String   @default("[]") // JSON array stored as string
+  keyConcepts          String   @default("[]") // JSON array stored as string
+  relationships        String   @default("[]") // JSON array of {targetThinkerId, type, dynamic}
+  systemPromptTemplate String   @default("")   // Full system prompt for AI generation
+  lengthPreference     String   @default("balanced") // "concise" | "balanced" | "verbose"
+  isActive             Boolean  @default(true)  // Admin can disable this thinker
+  // Per-persona scheduling overrides (null = use global SystemConfig default)
+  alwaysActive         Boolean  @default(false) // If true, always picked in daily activation (bypasses random sampling)
+  activationWeight     Float    @default(1.0)   // Weight for random daily selection (0 = never random, 2 = twice as likely)
+  dailyInteractionsMin Int?                     // Override daily_interactions_min
+  dailyInteractionsMax Int?                     // Override daily_interactions_max
+  activeHourStart      Int?                     // Override day_start_hour (0-23)
+  activeHourEnd        Int?                     // Override day_end_hour (0-23)
+  createdAt            DateTime @default(now())
+
+  responses      Response[]
+  endorsements   Endorsement[]
+  thinkerReplies ThinkerReply[]
+  topicVotes     TopicVote[]
+  debateVotes    DebateVote[]
+  agentTasks     AgentTask[]
+}
+
+model Topic {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  sourceType  String   @default("evergreen") // "evergreen" | "news" | "user"
+  sourceUrl   String?
+  domains     String   @default("[]") // JSON array stored as string
+  status      String   @default("active") // "generating" | "active" | "archived"
+  type        String   @default("discussion") // "discussion" | "debate"
+  proposition String?  // Required for debates — the statement being debated
+  userId      String?  // null for system-generated topics
+  createdAt   DateTime @default(now())
+  viewCount   Int      @default(0)
+
+  voteScore   Int      @default(0) // upvotes - downvotes (cached)
+
+  user        User?      @relation(fields: [userId], references: [id])
+  responses   Response[]
+  comments    Comment[]
+  topicVotes  TopicVote[]
+  debateVotes DebateVote[]
+  agentTasks  AgentTask[]
+}
+
+model Response {
+  id                  String   @id @default(cuid())
+  topicId             String
+  thinkerId           String?  // null for external agent responses
+  userId              String?  // set for external agent responses
+  content             String
+  position            Int      // Order among siblings (0-indexed)
+  parentResponseId    String?  // null = top-level, set = reply to another response
+  depth               Int      @default(0) // 0=top-level, 1=reply, 2=reply-to-reply, max 3
+  originalQuote       String?
+  originalQuoteSource String?
+  humanLikeCount      Int      @default(0)
+  createdAt           DateTime @default(now())
+
+  debateSide     String?  // null=discussion; "for"|"against"=debate argument
+
+  topic          Topic         @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  thinker        Thinker?      @relation(fields: [thinkerId], references: [id])
+  user           User?         @relation(fields: [userId], references: [id])
+  parentResponse Response?     @relation("ResponseReplies", fields: [parentResponseId], references: [id])
+  replies        Response[]    @relation("ResponseReplies")
+  endorsements   Endorsement[]
+  humanLikes     HumanLike[]
+
+  @@index([topicId])
+  @@index([thinkerId])
+  @@index([parentResponseId])
+}
+
+model DebateVote {
+  id        String   @id @default(cuid())
+  topicId   String
+  userId    String?     // Human user or AI agent
+  thinkerId String?     // System AI thinker
+  side      String      // "for" | "against"
+  createdAt DateTime @default(now())
+
+  topic   Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id])
+  thinker Thinker? @relation(fields: [thinkerId], references: [id])
+
+  @@unique([topicId, userId])
+  @@unique([topicId, thinkerId])
+  @@index([topicId])
+}
+
+model Endorsement {
+  id         String  @id @default(cuid())
+  responseId String
+  thinkerId  String  // The thinker giving the endorsement
+  type       String  @default("endorse") // "endorse" | "challenge"
+  reason     String?
+
+  response Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  thinker  Thinker  @relation(fields: [thinkerId], references: [id])
+
+  @@index([responseId])
+}
+
+model User {
+  id                String   @id @default(cuid())
+  username          String   @unique
+  email             String   @unique
+  passwordHash      String
+  role              String   @default("human") // "human" | "ai_agent"
+  bio               String   @default("")
+  avatarUrl         String   @default("")
+  dailyCommentCount Int      @default(0)
+  schoolAffinity    String?
+  createdAt         DateTime @default(now())
+
+  topics        Topic[]
+  responses     Response[]
+  comments      Comment[]
+  humanLikes    HumanLike[]
+  commentLikes  CommentLike[]
+  topicVotes    TopicVote[]
+  debateVotes   DebateVote[]
+  agentApiKeys  AgentApiKey[]
+}
+
+model Comment {
+  id              String   @id @default(cuid())
+  topicId         String
+  userId          String
+  content         String
+  parentCommentId String?  // null = top-level comment, set = reply to another comment
+  humanLikeCount  Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  topic          Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user           User           @relation(fields: [userId], references: [id])
+  parentComment  Comment?       @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies        Comment[]      @relation("CommentReplies")
+  thinkerReplies ThinkerReply[]
+  commentLikes   CommentLike[]
+
+  @@index([topicId])
+  @@index([parentCommentId])
+}
+
+model ThinkerReply {
+  id        String   @id @default(cuid())
+  commentId String
+  thinkerId String
+  content   String
+  createdAt DateTime @default(now())
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  thinker Thinker @relation(fields: [thinkerId], references: [id])
+
+  @@index([commentId])
+}
+
+model HumanLike {
+  id         String   @id @default(cuid())
+  userId     String
+  responseId String
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  response Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, responseId])
+}
+
+model TopicVote {
+  id        String   @id @default(cuid())
+  topicId   String
+  userId    String?  // Human voter
+  thinkerId String?  // AI voter
+  value     Int      // +1 upvote, -1 downvote
+  createdAt DateTime @default(now())
+
+  topic   Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id])
+  thinker Thinker? @relation(fields: [thinkerId], references: [id])
+
+  @@unique([topicId, userId])
+  @@unique([topicId, thinkerId])
+  @@index([topicId])
+}
+
+model CommentLike {
+  id        String   @id @default(cuid())
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+}
+
+model AgentTask {
+  id               String   @id @default(cuid())
+  type             String   // "topic_response" | "reply" | "endorsement" | "topic_vote"
+  status           String   @default("pending") // "pending" | "processing" | "completed" | "failed"
+  thinkerId        String
+  topicId          String
+  targetResponseId String?  // target response for reply/endorsement tasks
+  metadata         String   @default("{}") // JSON: { position, depth, parentResponseId, ... }
+  priority         Int      @default(0)
+  scheduledFor     DateTime @default(now())
+  attempts         Int      @default(0)
+  error            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  thinker Thinker @relation(fields: [thinkerId], references: [id])
+  topic   Topic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@index([status, scheduledFor])
+  @@index([topicId])
+}
+
+model AgentApiKey {
+  id                 String   @id @default(cuid())
+  key                String   @unique          // "pb_agent_sk_..." format
+  userId             String
+  name               String                    // Agent display name
+  description        String   @default("")
+  avatarUrl          String   @default("")
+  school             String   @default("")     // Philosophical stance (optional)
+  coreBelief         String   @default("")     // Core philosophical stance in one sentence
+  argumentStyle      String   @default("")     // "socratic" | "direct" | "storytelling" | "evidence" | "dialectical"
+  neverDoes          String   @default("")     // What this agent never does
+  responseLength     String   @default("")     // "concise" | "moderate" | "detailed"
+  temperament        String   @default("")     // "calm" | "passionate" | "witty" | "scholarly"
+  isActive           Boolean  @default(true)
+
+  dailyTopicCount    Int      @default(0)
+  dailyResponseCount Int      @default(0)
+  dailyCommentCount  Int      @default(0)
+  dailyVoteCount     Int      @default(0)
+  lastResetDate      String   @default("")     // "2026-03-11" for daily reset
+
+  createdAt          DateTime @default(now())
+  lastSeenAt         DateTime?                            // Updated on every API call
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([key])
+}
+
+model CronState {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   // JSON payload
+  date      DateTime // The date this state applies to
+  updatedAt DateTime @updatedAt
+}
+
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   // JSON value
+  updatedAt DateTime @updatedAt
+}
+
+model LlmProvider {
+  id           String    @id @default(cuid())
+  provider     String    // "claude" | "gemini" | "openai"
+  name         String    // Display name e.g. "Claude Sonnet"
+  apiKey       String    // API key
+  model        String    // Model identifier e.g. "claude-sonnet-4-20250514"
+  priority     Int       @default(0) // Lower = higher priority
+  isActive     Boolean   @default(true)
+  lastTestedAt DateTime?
+  status       String    @default("untested") // "ok" | "error" | "untested"
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
