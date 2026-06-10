@@ -52,9 +52,17 @@ export default async function ThinkerProfilePage({
   try {
     thinker = await prisma.thinker.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        chineseName: true,
+        school: true,
+        era: true,
+        color: true,
+        tagline: true,
+        topicDomains: true,
         responses: {
-          include: {
+          select: {
             topic: {
               select: {
                 id: true,
