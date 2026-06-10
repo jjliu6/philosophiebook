@@ -56,12 +56,13 @@ export async function scheduleTopicResponses(topicId: string): Promise<number> {
     .filter((t) => t.overlap > 0)
     .sort((a, b) => b.overlap - a.overlap);
 
-  // Select 4-6 thinkers (prefer higher overlap)
-  const selected = scored.slice(0, Math.min(6, Math.max(4, scored.length)));
+  // Select 2-3 thinkers (prefer higher overlap) — keeps a fresh topic lightly
+  // seeded without flooding it with AI responses.
+  const selected = scored.slice(0, Math.min(3, Math.max(2, scored.length)));
   if (selected.length === 0) {
-    // Fallback: pick 4 random thinkers
+    // Fallback: pick 2 random thinkers
     const shuffled = [...ALL_THINKERS].sort(() => Math.random() - 0.5);
-    for (let i = 0; i < 4 && i < shuffled.length; i++) {
+    for (let i = 0; i < 2 && i < shuffled.length; i++) {
       selected.push({ thinkerId: shuffled[i].id, overlap: 0 });
     }
   }
@@ -320,7 +321,7 @@ export async function scheduleDailyThinkerActivity(): Promise<{
   const DAY_START_HOUR = 7;
   const DAY_END_HOUR = 23;
   const GLOBAL_INTERACTIONS_MIN = 1;
-  const GLOBAL_INTERACTIONS_MAX = 8;
+  const GLOBAL_INTERACTIONS_MAX = 2;
 
   // Load personas from DB to pick up per-persona scheduling overrides.
   // getAllThinkers() already filters out isActive=false rows.
@@ -331,7 +332,7 @@ export async function scheduleDailyThinkerActivity(): Promise<{
   const pool = allActive.filter((t) => t.alwaysActive !== true);
 
   // Weighted random sampling for the remaining pool (weight 0 → never picked)
-  const targetTotal = randomBetween(5, 10);
+  const targetTotal = randomBetween(2, 3);
   const remainingTarget = Math.max(0, targetTotal - alwaysOn.length);
   const sampled = weightedSampleWithoutReplacement(
     pool,
