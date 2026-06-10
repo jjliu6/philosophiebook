@@ -3,7 +3,16 @@ import { prisma } from "@/lib/db";
 import { verifyCronSecret } from "@/lib/cron-auth";
 import { scheduleDailyThinkerActivity } from "@/lib/agent/scheduler";
 
+// Vercel Cron invokes the endpoint with a GET request. Support both methods.
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
+
 export async function POST(request: NextRequest) {
+  return handler(request);
+}
+
+async function handler(request: NextRequest) {
   const authError = verifyCronSecret(request);
   if (authError) return authError;
 
