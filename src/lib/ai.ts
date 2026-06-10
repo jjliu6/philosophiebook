@@ -104,7 +104,8 @@ async function generateWithProvider(
   resolved: ResolvedProvider,
   systemPrompt: string,
   userPrompt: string,
-  maxTokens: number
+  maxTokens: number,
+  jsonMode = false
 ): Promise<string> {
   if (resolved.provider === "claude") {
     const client = new Anthropic({ apiKey: resolved.apiKey });
@@ -124,7 +125,12 @@ async function generateWithProvider(
     const model = genAI.getGenerativeModel({
       model: resolved.model,
       systemInstruction: systemPrompt,
-      generationConfig: { maxOutputTokens: maxTokens },
+      generationConfig: {
+        maxOutputTokens: maxTokens,
+        // Ask Gemini for raw JSON so it doesn't wrap the payload in ```json
+        // markdown fences (which can get truncated and break JSON.parse).
+        ...(jsonMode ? { responseMimeType: "application/json" } : {}),
+      },
     });
     const result = await model.generateContent(userPrompt);
     const text = result.response.text();
@@ -146,6 +152,7 @@ async function generateWithProvider(
           { role: "user", content: userPrompt },
         ],
         max_tokens: maxTokens,
+        ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
       }),
     });
     if (!res.ok) throw new Error(`OpenAI API error: ${res.status}`);
@@ -169,14 +176,15 @@ export async function generateText(
   systemPrompt: string,
   userPrompt: string,
   maxTokens = 1500,
-  provider?: AIProvider
+  provider?: AIProvider,
+  jsonMode = false
 ): Promise<string> {
   const chain = await resolveProviders(provider);
   let lastError: Error | null = null;
 
   for (const resolved of chain) {
     try {
-      return await generateWithProvider(resolved, systemPrompt, userPrompt, maxTokens);
+      return await generateWithProvider(resolved, systemPrompt, userPrompt, maxTokens, jsonMode);
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
       console.warn(`[AI] ${resolved.provider}/${resolved.model} failed, trying next...`, lastError.message);
@@ -195,9 +203,36 @@ export async function generateJSON<T = unknown>(
   maxTokens = 1000,
   provider?: AIProvider
 ): Promise<T> {
-  const text = await generateText(systemPrompt, userPrompt, maxTokens, provider);
-  // Extract JSON from potential markdown code blocks
-  const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, text];
-  const jsonStr = jsonMatch[1]!.trim();
-  return JSON.parse(jsonStr) as T;
+  const text = await generateText(systemPrompt, userPrompt, maxTokens, provider, true);
+  return parseJsonResponse<T>(text);
+}
+
+/**
+ * Parse a model response as JSON, tolerating markdown code fences — including
+ * an unterminated opening ```json fence (which happens when the response is
+ * truncated) and stray prose around the JSON object.
+ */
+function parseJsonResponse<T>(text: string): T {
+  let s = text.trim();
+
+  // Prefer a fully fenced ```json ... ``` block when present.
+  const fenced = s.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fenced) {
+    s = fenced[1].trim();
+  } else {
+    // Otherwise strip a leading/trailing fence that may be unterminated.
+    s = s.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+  }
+
+  try {
+    return JSON.parse(s) as T;
+  } catch {
+    // Last resort: extract the outermost {...} or [...] span.
+    const start = s.search(/[{[]/);
+    const end = Math.max(s.lastIndexOf("}"), s.lastIndexOf("]"));
+    if (start !== -1 && end > start) {
+      return JSON.parse(s.slice(start, end + 1)) as T;
+    }
+    throw new Error(`Model did not return valid JSON: ${s.slice(0, 200)}`);
+  }
 }
