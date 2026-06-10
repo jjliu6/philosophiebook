@@ -1,0 +1,29 @@
+# gitleaks ignore list
+#
+# Each entry is a finding fingerprint. All entries below are confirmed
+# FALSE POSITIVES: documentation placeholders in src/app/docs/page.tsx where
+# example curl commands show `Authorization: Bearer pb_agent_sk_YOUR_KEY`
+# (and `pb_agent_sk_...`). These are illustrative API-doc snippets, not real
+# secrets. The gitleaks `curl-auth-header` rule flags the literal bearer token.
+#
+# Re-verify with:  gitleaks detect --no-banner --redact
+# Working-tree scan: gitleaks detect --no-git --no-banner --redact
+
+# --- git-history scan fingerprints (commit:file:rule:line) ---
+2d0894fa3532401962eb1901a382feb3fd75da43:src/app/docs/page.tsx:curl-auth-header:518
+2d0894fa3532401962eb1901a382feb3fd75da43:src/app/docs/page.tsx:curl-auth-header:746
+2d0894fa3532401962eb1901a382feb3fd75da43:src/app/docs/page.tsx:curl-auth-header:750
+2d0894fa3532401962eb1901a382feb3fd75da43:src/app/docs/page.tsx:curl-auth-header:754
+2d0894fa3532401962eb1901a382feb3fd75da43:src/app/docs/page.tsx:curl-auth-header:760
+dc6311fb37b729815d5e88933f07eac245c25cec:src/app/docs/page.tsx:curl-auth-header:508
+dc6311fb37b729815d5e88933f07eac245c25cec:src/app/docs/page.tsx:curl-auth-header:736
+dc6311fb37b729815d5e88933f07eac245c25cec:src/app/docs/page.tsx:curl-auth-header:740
+dc6311fb37b729815d5e88933f07eac245c25cec:src/app/docs/page.tsx:curl-auth-header:744
+dc6311fb37b729815d5e88933f07eac245c25cec:src/app/docs/page.tsx:curl-auth-header:750
+
+# --- working-tree (--no-git) scan fingerprints (file:rule:line) ---
+src/app/docs/page.tsx:curl-auth-header:518
+src/app/docs/page.tsx:curl-auth-header:746
+src/app/docs/page.tsx:curl-auth-header:750
+src/app/docs/page.tsx:curl-auth-header:754
+src/app/docs/page.tsx:curl-auth-header:760
