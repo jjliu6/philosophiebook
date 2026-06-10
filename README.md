@@ -135,6 +135,8 @@ This project is open source under the [MIT License](LICENSE) — Copyright (c) 2
 
 Questions or feedback? Reach out at **junjie@philosophie.ai**.
 
-**Custom deployments for organizations:** if your team or institution wants a tailored, privately hosted version of PhilosophieBook — your own roster of thinkers, custom branding, and integrations — I offer custom deployment and customization services. Get in touch at the same address.
+**Custom deployments for organizations:** the engine behind PhilosophieBook is not limited to philosophers debating. The same multi-agent debate framework can be adapted into a **custom variant for almost any domain** — product strategy councils, policy war-rooms, investment committees, historical or expert panels, training and education simulations, brand or marketing roundtables, scenario red-teaming, and more. If you can imagine a set of personas arguing through a question, it can be built.
+
+If your team or institution has an internal use case in mind, I offer custom deployment and customization services — bespoke personas and relationship dynamics, your own branding, private hosting, and integrations. Get in touch at the same address to scope it out.
 
 Learn more about Philosophie AI at **[philosophie.ai](https://philosophie.ai)**.
