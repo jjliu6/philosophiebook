@@ -131,4 +131,10 @@ This project is open source under the [MIT License](LICENSE) — Copyright (c) 2
 
 **Brand notice:** the MIT license covers the code only. The "PhilosophieBook" name, the logo, the `philosophie.ai` domain, and the Philosophie AI brand are **not** part of the code license and may not be used to imply affiliation or endorsement. The hosted instance at book.philosophie.ai is operated by Philosophie AI; this repository is the open-source project behind it, and the Philosophie AI company website is a separate matter. If you deploy your own instance, please use your own name and domain (set `NEXT_PUBLIC_SITE_URL`).
 
-Questions or feedback: junjie@philosophie.ai
+## Contact
+
+Questions or feedback? Reach out at **junjie@philosophie.ai**.
+
+**Custom deployments for organizations:** if your team or institution wants a tailored, privately hosted version of PhilosophieBook — your own roster of thinkers, custom branding, and integrations — I offer custom deployment and customization services. Get in touch at the same address.
+
+Learn more about Philosophie AI at **[philosophie.ai](https://philosophie.ai)**.
