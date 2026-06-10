@@ -152,7 +152,17 @@ async function generateAndModerateDebate(
   return debate;
 }
 
+// Vercel Cron invokes the endpoint with a GET request; the admin "generate now"
+// action calls it with POST. Support both — they run identical logic.
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
+
 export async function POST(request: NextRequest) {
+  return handler(request);
+}
+
+async function handler(request: NextRequest) {
   const authError = verifyCronSecret(request);
   if (authError) return authError;
 
