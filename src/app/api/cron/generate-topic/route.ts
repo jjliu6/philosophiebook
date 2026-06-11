@@ -12,7 +12,7 @@ import {
 import { DOMAINS } from "@/types";
 import { scheduleTopicResponses, scheduleDebateResponses } from "@/lib/agent/scheduler";
 
-const TOPICS_PER_DAY = 5;
+const TOPICS_PER_DAY = 2;
 const DAY_START_HOUR = 7; // 7:00 UTC
 const DAY_END_HOUR = 23; // 23:00 UTC
 const MIN_GAP_MINUTES = 90; // Minimum 1.5h between topics
