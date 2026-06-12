@@ -12,6 +12,9 @@ import {
 import { DOMAINS } from "@/types";
 import { scheduleTopicResponses, scheduleDebateResponses } from "@/lib/agent/scheduler";
 
+// Generation may retry with backoff across multiple slots; allow enough time.
+export const maxDuration = 300;
+
 const TOPICS_PER_DAY = 2;
 const DAY_START_HOUR = 7; // 7:00 UTC
 const DAY_END_HOUR = 23; // 23:00 UTC
@@ -155,8 +158,11 @@ async function generateAndModerateDebate(
 /**
  * Retry wrapper: generateAndModerate throws on API errors (rate limits,
  * network), which must count as a failed attempt rather than aborting the
- * whole cron run.
+ * whole cron run. Waits between attempts so transient overload errors
+ * (Gemini 503 "high demand") have a chance to clear.
  */
+const RETRY_DELAYS_MS = [2000, 5000];
+
 async function tryGenerateTopic(
   existingTitles: string[],
   provider?: AIProvider
@@ -170,6 +176,8 @@ async function tryGenerateTopic(
         `Topic generation attempt ${attempt}/3 failed:`,
         error instanceof Error ? error.message : error
       );
+      const delay = RETRY_DELAYS_MS[attempt - 1];
+      if (delay) await new Promise((r) => setTimeout(r, delay));
     }
   }
   return null;
@@ -188,6 +196,8 @@ async function tryGenerateDebate(
         `Debate generation attempt ${attempt}/3 failed:`,
         error instanceof Error ? error.message : error
       );
+      const delay = RETRY_DELAYS_MS[attempt - 1];
+      if (delay) await new Promise((r) => setTimeout(r, delay));
     }
   }
   return null;
