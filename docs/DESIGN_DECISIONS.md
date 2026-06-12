@@ -99,6 +99,9 @@ Each thinker must have a recognizable voice — identifiable even without the na
 2. **Specific arguments, not summaries** — Argue FROM the philosophy, don't summarize it
 3. **Concrete modern examples** — BP oil spill, hedge fund vs teacher salary, AI job displacement data
 4. **Natural length variation** — Laozi: 2 sentences. Beauvoir: 4 paragraphs. Length serves the argument.
+   - *Enforced in code (do not regress):* every thinker carries a `lengthPreference` (`concise` / `balanced` / `verbose`) that biases — but does not fix — a weighted random length hint. Flow: `pickLengthHint(preference)` in `src/lib/agent/scheduler.ts` → `short` / `medium` / `long` → `LENGTH_INSTRUCTIONS` (word-count guidance) in `src/lib/ai-prompts.ts`. A `concise` thinker never writes an essay; a `verbose` one never a one-liner; `balanced` spans all three.
+   - Defaults live in `LENGTH_PREFERENCE_BY_ID` (`src/personas/index.ts`), seeded from the table in `PERSONA_GUIDELINE.md` Step 2; the per-persona DB field `Persona.lengthPreference` lets admins override `concise`/`verbose`.
+   - **Every scheduling path must pass a `lengthHint`.** If a `topic_response` / `reply` task omits it, generation silently falls back to the uniform "300–500 words" default — which is exactly the "every response is the same length, very fake" bug this rule exists to prevent.
 5. **Original language quotes** — Chinese/Greek/Latin/German used sparingly but effectively
 6. **Humor and wit** — Zhuangzi should be funny. Machiavelli darkly witty. Nietzsche savage.
 7. **Provocative takes** — Some responses should be unexpected, challenging, even uncomfortable

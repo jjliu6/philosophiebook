@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { ALL_THINKERS, THINKER_MAP } from "@/personas";
 import { getAllThinkers } from "@/lib/persona-loader";
 import type { LengthHint } from "@/lib/ai-prompts";
+import type { LengthPreference } from "@/types";
 
 /** Random integer between min and max (inclusive) */
 function randomBetween(min: number, max: number): number {
@@ -76,7 +77,10 @@ export async function scheduleTopicResponses(topicId: string): Promise<number> {
       type: "topic_response" as const,
       thinkerId: s.thinkerId,
       topicId,
-      metadata: JSON.stringify({ position: i }),
+      metadata: JSON.stringify({
+        position: i,
+        lengthHint: pickLengthHint(THINKER_MAP[s.thinkerId]?.lengthPreference),
+      }),
       priority: 100 - i,
       scheduledFor: new Date(now.getTime() + cumulativeMs),
     };
@@ -158,6 +162,7 @@ export async function scheduleFollowUps(topicId: string): Promise<number> {
             depth: 1,
             parentResponseId: response.id,
             relationshipDynamic: relationship.dynamic,
+            lengthHint: pickLengthHint(otherPersona.lengthPreference),
           }),
           priority: 50 - taskIndex,
           scheduledFor: new Date(now.getTime() + replyCumulativeMs),
@@ -281,7 +286,7 @@ export async function scheduleDebateResponses(topicId: string): Promise<number> 
       metadata: JSON.stringify({
         position: i,
         debateSide: s.side,
-        lengthHint: pickLengthHint(),
+        lengthHint: pickLengthHint(THINKER_MAP[s.thinkerId]?.lengthPreference),
       }),
       priority: 100 - i,
       scheduledFor: new Date(now.getTime() + cumulativeMs),
@@ -298,13 +303,22 @@ export async function scheduleDebateResponses(topicId: string): Promise<number> 
   return tasks.length;
 }
 
-const LENGTH_HINTS: LengthHint[] = ["short", "medium", "long"];
-const LENGTH_WEIGHTS = [0.3, 0.45, 0.25]; // 30% short, 45% medium, 25% long
+// Probability of [short, medium, long] per persona length preference.
+// Length stays varied (not fixed), but biased so it reads as personality:
+// a "concise" thinker never writes an essay, a "verbose" one never a one-liner.
+const LENGTH_WEIGHTS_BY_PREFERENCE: Record<LengthPreference, [number, number, number]> = {
+  concise: [0.72, 0.28, 0.0],
+  balanced: [0.3, 0.45, 0.25],
+  verbose: [0.0, 0.3, 0.7],
+};
 
-function pickLengthHint(): LengthHint {
+/** Pick a length hint, weighted toward the thinker's characteristic length. */
+function pickLengthHint(preference: LengthPreference = "balanced"): LengthHint {
+  const [short, medium] =
+    LENGTH_WEIGHTS_BY_PREFERENCE[preference] ?? LENGTH_WEIGHTS_BY_PREFERENCE.balanced;
   const r = Math.random();
-  if (r < LENGTH_WEIGHTS[0]) return "short";
-  if (r < LENGTH_WEIGHTS[0] + LENGTH_WEIGHTS[1]) return "medium";
+  if (r < short) return "short";
+  if (r < short + medium) return "medium";
   return "long";
 }
 
@@ -434,7 +448,7 @@ export async function scheduleDailyThinkerActivity(): Promise<{
     for (const scheduledTime of thinkerTimes) {
       // Pick a random eligible topic
       const topic = eligibleTopics[Math.floor(Math.random() * eligibleTopics.length)];
-      const lengthHint = pickLengthHint();
+      const lengthHint = pickLengthHint(persona.lengthPreference);
 
       // Determine interaction type
       const existingThinkerResponses = topic.responses.filter(

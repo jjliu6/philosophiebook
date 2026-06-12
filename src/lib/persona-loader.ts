@@ -1,6 +1,6 @@
 import { prisma } from "./db";
 import { ALL_THINKERS as SEED_THINKERS } from "@/personas";
-import type { ThinkerPersona, ThinkerRelationship } from "@/types";
+import type { ThinkerPersona, ThinkerRelationship, LengthPreference } from "@/types";
 
 /**
  * Simple in-memory cache for persona data.
@@ -34,6 +34,7 @@ function dbRowToPersona(row: {
   keyConcepts: string;
   relationships: string;
   systemPromptTemplate: string;
+  lengthPreference: string;
   isActive: boolean;
   alwaysActive: boolean;
   activationWeight: number;
@@ -63,6 +64,13 @@ function dbRowToPersona(row: {
 
   const systemPromptTemplate = row.systemPromptTemplate || seed?.systemPromptTemplate || "";
 
+  // Only an explicit "concise"/"verbose" override wins; otherwise fall back to
+  // the thinker's characteristic length from seed (the DB default is "balanced").
+  const lengthPreference: LengthPreference =
+    row.lengthPreference === "concise" || row.lengthPreference === "verbose"
+      ? row.lengthPreference
+      : seed?.lengthPreference ?? "balanced";
+
   return {
     id: row.id,
     name: row.name,
@@ -76,6 +84,7 @@ function dbRowToPersona(row: {
     keyConcepts,
     relationships,
     systemPromptTemplate,
+    lengthPreference,
     isActive: row.isActive,
     alwaysActive: row.alwaysActive,
     activationWeight: row.activationWeight,

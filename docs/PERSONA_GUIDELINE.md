@@ -74,6 +74,8 @@ Length is part of personality. Assign a default length:
 | **Long** | 4-7 | Nietzsche, Plato, Arendt |
 | **Extended** | 5-8 | Beauvoir, Aristotle |
 
+This table is wired into generation, not just guidance: each thinker maps to a `lengthPreference` (`concise` / `balanced` / `verbose`) in `LENGTH_PREFERENCE_BY_ID` (`src/personas/index.ts`), which biases the weighted random length picker in `scheduler.ts`. Ultra-brief/Short → `concise`, Medium → `balanced`, Long/Extended → `verbose`. Add new thinkers to that map so their length reads as personality from day one.
+
 ### Step 3: Define Signature Moves
 
 Every thinker needs 2-3 distinctive debate techniques:
