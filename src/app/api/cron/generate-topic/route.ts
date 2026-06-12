@@ -152,6 +152,47 @@ async function generateAndModerateDebate(
   return debate;
 }
 
+/**
+ * Retry wrapper: generateAndModerate throws on API errors (rate limits,
+ * network), which must count as a failed attempt rather than aborting the
+ * whole cron run.
+ */
+async function tryGenerateTopic(
+  existingTitles: string[],
+  provider?: AIProvider
+): Promise<GeneratedTopic | null> {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const topic = await generateAndModerate(existingTitles, provider);
+      if (topic) return topic;
+    } catch (error) {
+      console.warn(
+        `Topic generation attempt ${attempt}/3 failed:`,
+        error instanceof Error ? error.message : error
+      );
+    }
+  }
+  return null;
+}
+
+async function tryGenerateDebate(
+  existingTitles: string[],
+  provider?: AIProvider
+): Promise<GeneratedDebate | null> {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const debate = await generateAndModerateDebate(existingTitles, provider);
+      if (debate) return debate;
+    } catch (error) {
+      console.warn(
+        `Debate generation attempt ${attempt}/3 failed:`,
+        error instanceof Error ? error.message : error
+      );
+    }
+  }
+  return null;
+}
+
 // Vercel Cron invokes the endpoint with a GET request; the admin "generate now"
 // action calls it with POST. Support both — they run identical logic.
 export async function GET(request: NextRequest) {
@@ -261,11 +302,7 @@ async function handler(request: NextRequest) {
 
       if (shouldBeDebate) {
         // --- Generate a debate ---
-        let debate: GeneratedDebate | null = null;
-        for (let attempt = 0; attempt < 3; attempt++) {
-          debate = await generateAndModerateDebate(existingTitles, provider);
-          if (debate) break;
-        }
+        const debate = await tryGenerateDebate(existingTitles, provider);
 
         if (!debate) {
           console.error(`Failed to generate debate for slot ${slot.hour}:${slot.minute}, falling back to discussion`);
@@ -297,15 +334,13 @@ async function handler(request: NextRequest) {
       }
 
       // --- Generate a discussion ---
-      let generatedTopic: GeneratedTopic | null = null;
-      for (let attempt = 0; attempt < 3; attempt++) {
-        generatedTopic = await generateAndModerate(existingTitles, provider);
-        if (generatedTopic) break;
-      }
+      const generatedTopic = await tryGenerateTopic(existingTitles, provider);
 
       if (!generatedTopic) {
-        console.error(`Failed to generate topic for slot ${slot.hour}:${slot.minute}`);
-        slot.generated = true;
+        // Leave the slot unmarked so the next hourly run retries it.
+        console.error(
+          `Failed to generate topic for slot ${slot.hour}:${slot.minute}, will retry next run`
+        );
         continue;
       }
 
@@ -366,11 +401,7 @@ async function generateSingleTopic(provider: AIProvider, selectedProvider: strin
   });
   const existingTitles = recentTopics.map((t) => t.title);
 
-  let generatedTopic: GeneratedTopic | null = null;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    generatedTopic = await generateAndModerate(existingTitles, provider);
-    if (generatedTopic) break;
-  }
+  const generatedTopic = await tryGenerateTopic(existingTitles, provider);
 
   if (!generatedTopic) {
     return NextResponse.json(
@@ -413,11 +444,7 @@ async function generateSingleDebate(provider: AIProvider, selectedProvider: stri
   });
   const existingTitles = recentTopics.map((t) => t.title);
 
-  let debate: GeneratedDebate | null = null;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    debate = await generateAndModerateDebate(existingTitles, provider);
-    if (debate) break;
-  }
+  const debate = await tryGenerateDebate(existingTitles, provider);
 
   if (!debate) {
     return NextResponse.json(
