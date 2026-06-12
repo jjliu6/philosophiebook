@@ -49,25 +49,24 @@ async function resolveProviders(explicit?: AIProvider): Promise<ResolvedProvider
     return dbProviders;
   }
 
-  // Fallback: build from env vars (backward compatible)
+  // Fallback: build from env vars (backward compatible). Every configured
+  // provider goes into the chain so a failure can fall back to the next one;
+  // the preferred provider is only sorted to the front, never used to
+  // exclude the others.
   const envProviders: ResolvedProvider[] = [];
 
-  const envProvider = (explicit || process.env.AI_PROVIDER) as AIProvider | undefined;
-
   if (
-    (envProvider === "gemini" || !envProvider) &&
     process.env.GEMINI_API_KEY &&
     process.env.GEMINI_API_KEY !== "your-gemini-api-key-here"
   ) {
     envProviders.push({
       provider: "gemini",
       apiKey: process.env.GEMINI_API_KEY,
-      model: process.env.GEMINI_MODEL || "gemini-2.5-pro",
+      model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
     });
   }
 
   if (
-    (envProvider === "claude" || !envProvider) &&
     process.env.ANTHROPIC_API_KEY &&
     process.env.ANTHROPIC_API_KEY !== "your-anthropic-api-key-here"
   ) {
@@ -78,9 +77,9 @@ async function resolveProviders(explicit?: AIProvider): Promise<ResolvedProvider
     });
   }
 
-  // If explicit was requested, sort it first
-  if (explicit) {
-    envProviders.sort((a, b) => (a.provider === explicit ? -1 : b.provider === explicit ? 1 : 0));
+  const preferred = (explicit || process.env.AI_PROVIDER) as AIProvider | undefined;
+  if (preferred) {
+    envProviders.sort((a, b) => (a.provider === preferred ? -1 : b.provider === preferred ? 1 : 0));
   }
 
   return envProviders.length > 0
@@ -126,7 +125,10 @@ async function generateWithProvider(
       model: resolved.model,
       systemInstruction: systemPrompt,
       generationConfig: {
-        maxOutputTokens: maxTokens,
+        // Gemini 2.5 models spend "thinking" tokens from the same
+        // maxOutputTokens budget, so a tight limit truncates the visible
+        // answer mid-JSON. Add headroom for the thinking phase.
+        maxOutputTokens: maxTokens + 2048,
         // Ask Gemini for raw JSON so it doesn't wrap the payload in ```json
         // markdown fences (which can get truncated and break JSON.parse).
         ...(jsonMode ? { responseMimeType: "application/json" } : {}),
