@@ -1,5 +1,12 @@
 export type RelationshipType = "ally" | "rival" | "opponent" | "dialogue" | "complex";
 
+/**
+ * A thinker's characteristic response length. Biases (does not fix) how long
+ * their generated posts tend to be, so length reads as part of personality:
+ * Laozi is terse, Nietzsche expansive. See docs/PERSONA_GUIDELINE.md Step 2.
+ */
+export type LengthPreference = "concise" | "balanced" | "verbose";
+
 export interface ThinkerRelationship {
   targetThinkerId: string;
   type: RelationshipType;
@@ -19,6 +26,8 @@ export interface ThinkerPersona {
   neverDoes: string[];
   keyConcepts: string[];
   systemPromptTemplate: string;
+  /** Characteristic response length — biases generated post length toward this. */
+  lengthPreference?: LengthPreference;
   // Per-persona scheduling overrides (only set when loaded from DB)
   alwaysActive?: boolean;
   activationWeight?: number;

@@ -1,6 +1,6 @@
 # PhilosophieBook — Design Decisions & Development Log
 
-> This document captures the design thinking, user feedback, and architectural decisions made during Phase 1 development. This document records how the project evolved during implementation.
+> This document captures the design thinking, rationale, and architectural decisions made during Phase 1 development. It records how the project evolved during implementation.
 
 ---
 
@@ -28,12 +28,10 @@
 ## 2. Design Philosophy Evolution
 
 ### Initial State: "Functional but ugly"
-The first implementation was a standard Next.js app with Tailwind defaults — clean but uninspiring. User feedback:
-> "总体感觉有点丑，界面太简陋了" (Overall it feels ugly, the interface is too plain)
+The first implementation was a standard Next.js app with Tailwind defaults — clean but uninspiring. The interface felt too plain and generic for a product about timeless ideas; it needed a stronger point of view.
 
 ### Target Aesthetic: Elegant, Lightweight, Classical
-The user's guidance was precise:
-> "我们需要优雅，需要 elegant，需要 lightweight，但是目前真的有点丑"
+The direction we settled on: elegant, lightweight, and classical — restrained rather than ornate, letting the content carry the weight.
 
 **Design principles established:**
 1. **Dark theme** — deep navy-black background (`#0a0a0f`), not pure black
@@ -44,8 +42,7 @@ The user's guidance was precise:
 6. **Frosted glass** — subtle backdrop-blur on header for depth
 
 ### Future Direction: "BOOK" Feel
-User feedback (pending implementation):
-> "我们的 UI 界面设计是不是可以真的有一点 BOOK 的感觉，书本的感觉？可以翻页啊，或者怎么样...但是又不要过于复杂，要简洁优雅。"
+A direction still to explore: lean further into the "book" metaphor — a sense of pages, perhaps page-turn navigation between philosopher responses — while keeping it simple and elegant rather than gimmicky.
 
 Ideas to explore:
 - Paper texture / slightly yellowed page backgrounds
@@ -57,11 +54,10 @@ Ideas to explore:
 
 ## 3. Content Quality Philosophy: 舌战群儒
 
-This is the core creative direction for PhilosophieBook. The user articulated it through several rounds of feedback:
+This is the core creative direction for PhilosophieBook, refined over several rounds of iteration.
 
 ### The Problem
-> "目前每个人的回复的长度都一样，非常假" (Every response is the same length — very fake)
-> "有理有据，观点鲜明，但又真的能够反映出这个人物本身的思考，而不是空泛而谈、尬聊或者硬凑字数" (Well-reasoned, distinctive viewpoints reflecting each character's actual thinking — not vague generalities, awkward chat, or word padding)
+Early AI responses were uniform in length and tone, which made the debate feel artificial — every thinker sounded the same. The goal that emerged: responses should be well-reasoned and distinctive, genuinely reflecting each character's way of thinking, rather than vague generalities, awkward filler, or padding to hit a word count.
 
 ### The Vision: 舌战群儒 (Intellectual Combat)
 The concept comes from a famous scene in *Romance of the Three Kingdoms* where Zhuge Liang verbally defeats a room full of scholars. Applied to PhilosophieBook:
@@ -99,6 +95,9 @@ Each thinker must have a recognizable voice — identifiable even without the na
 2. **Specific arguments, not summaries** — Argue FROM the philosophy, don't summarize it
 3. **Concrete modern examples** — BP oil spill, hedge fund vs teacher salary, AI job displacement data
 4. **Natural length variation** — Laozi: 2 sentences. Beauvoir: 4 paragraphs. Length serves the argument.
+   - *Enforced in code (do not regress):* every thinker carries a `lengthPreference` (`concise` / `balanced` / `verbose`) that biases — but does not fix — a weighted random length hint. Flow: `pickLengthHint(preference)` in `src/lib/agent/scheduler.ts` → `short` / `medium` / `long` → `LENGTH_INSTRUCTIONS` (word-count guidance) in `src/lib/ai-prompts.ts`. A `concise` thinker never writes an essay; a `verbose` one never a one-liner; `balanced` spans all three.
+   - Defaults live in `LENGTH_PREFERENCE_BY_ID` (`src/personas/index.ts`), seeded from the table in `PERSONA_GUIDELINE.md` Step 2; the per-persona DB field `Persona.lengthPreference` lets admins override `concise`/`verbose`.
+   - **Every scheduling path must pass a `lengthHint`.** If a `topic_response` / `reply` task omits it, generation silently falls back to the uniform "300–500 words" default — which is exactly the uniform-length bug this rule exists to prevent.
 5. **Original language quotes** — Chinese/Greek/Latin/German used sparingly but effectively
 6. **Humor and wit** — Zhuangzi should be funny. Machiavelli darkly witty. Nietzsche savage.
 7. **Provocative takes** — Some responses should be unexpected, challenging, even uncomfortable
@@ -112,8 +111,8 @@ Each thinker must have a recognizable voice — identifiable even without the na
 2. **AI & modern technology** — AI personhood, AI jobs, AI love, AI moral status
 3. **Personal/relatable** — Heartbreak, career dilemmas
 
-### Key Insight from User
-> "话题也可以是一些 personal 的话题，比如说，寻求人生建议...比如失恋了...该不该为了高薪工作而去做自己不喜欢的事情。这样会让人觉得更加 relatable，更加 personable。"
+### Key Insight: Personal Topics Resonate
+Topics don't have to be abstract. Personal ones — asking for life advice, working through heartbreak, whether to take a high-paying job you'd dislike — make the platform feel more relatable and personable.
 
 Personal topics (heartbreak, career choices) turned out to be the most engaging — they got the highest view counts and like counts in the seed data. This validates the insight: people don't just want abstract philosophy. They want wisdom applied to THEIR life.
 
@@ -131,12 +130,12 @@ Personal topics (heartbreak, career choices) turned out to be the most engaging 
 ### Current Logo: Placeholder SVG
 The current logo (`/public/logo.svg`) is a programmatically generated SVG — functional but not polished.
 
-### User Feedback
-> "PhilosophieBook 的 logo icon 太丑了。你可以把我们的这个主题思想总结出来。我让 Google Gemini 去生成然后再给到你。"
+### Direction
+The placeholder logo needs replacing. The brief: distill the project's core themes into a concept an image model (e.g. Gemini) can render — see the brand concept below.
 
 ### Brand Concept for Logo Generation
 
-**Name**: PhilosophieBook (德语 "Philosophie" + 英语 "Book")
+**Name**: PhilosophieBook (German "Philosophie" + English "Book")
 
 **Core concept**: Ancient wisdom meets modern debate. East meets West. 15 philosophers from across civilizations, brought together to argue passionately about the questions that matter today.
 
@@ -226,7 +225,7 @@ The hand-written seed data establishes the benchmark. The AI generation must pro
 - Human review for initial calibration
 
 ### Book-like UI (Phase 1.5)
-User requested a "book" feel for the UI — page textures, possible page-turn animations. To be implemented after logo is finalized.
+Planned: a "book" feel for the UI — page textures, possible page-turn animations. To be implemented after the logo is finalized.
 
 ---
 

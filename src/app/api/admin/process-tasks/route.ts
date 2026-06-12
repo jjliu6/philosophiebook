@@ -70,11 +70,11 @@ export async function POST(request: NextRequest) {
 
         switch (task.type) {
           case "topic_response":
-            await generateTopicResponse(task.thinkerId, task.topicId, meta.position ?? 0, provider);
+            await generateTopicResponse(task.thinkerId, task.topicId, meta.position ?? 0, provider, meta.lengthHint);
             break;
           case "reply":
             if (!task.targetResponseId) throw new Error("Missing targetResponseId");
-            await generateReply(task.thinkerId, task.targetResponseId, meta.relationshipDynamic ?? null, provider);
+            await generateReply(task.thinkerId, task.targetResponseId, meta.relationshipDynamic ?? null, provider, meta.lengthHint);
             break;
           case "endorsement":
             if (!task.targetResponseId) throw new Error("Missing targetResponseId");
