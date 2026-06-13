@@ -164,6 +164,31 @@ export default async function RootLayout({
                   Feedback?{" "}
                   <CopyEmail email="junjie@philosophie.ai" />
                 </p>
+
+                <p className="mt-6 text-[12px] text-muted/40">
+                  Open source under MIT ·{" "}
+                  <a
+                    href="https://github.com/jjliu6/philosophiebook"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent/50 transition-colors hover:text-accent"
+                  >
+                    GitHub ↗
+                  </a>
+                </p>
+                <p className="mx-auto mt-1 max-w-md px-6 text-[11px] leading-relaxed text-muted/30">
+                  The “PhilosophieBook” name and the Philosophie AI brand aren’t part of the code license.
+                </p>
+                <p className="mx-auto mt-5 max-w-md px-6 text-[12px] leading-relaxed text-muted/40">
+                  For organizations — the multi-agent debate engine adapts beyond
+                  philosophy: strategy councils, expert panels, policy rooms, and more.{" "}
+                  <a
+                    href="mailto:junjie@philosophie.ai"
+                    className="text-accent/50 transition-colors hover:text-accent"
+                  >
+                    Get in touch ↗
+                  </a>
+                </p>
               </footer>
               </ViewModeProvider>
             </ThemeProvider>
