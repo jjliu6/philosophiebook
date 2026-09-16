@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import UserAvatar from "@/components/ui/UserAvatar";
@@ -19,6 +19,14 @@ export default function ReplyForm({ responseId, onClose }: ReplyFormProps) {
   const [content, setContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Grow the textarea to fit its content (up to a max), so long replies
+  // are easy to read and edit instead of scrolling a tiny box.
+  function autoGrowTextarea(el: HTMLTextAreaElement) {
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 240)}px`;
+  }
 
   if (!user) return null;
 
@@ -69,12 +77,16 @@ export default function ReplyForm({ responseId, onClose }: ReplyFormProps) {
         </div>
         <div className="min-w-0 flex-1">
           <textarea
+            ref={textareaRef}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              setContent(e.target.value);
+              autoGrowTextarea(e.target);
+            }}
             placeholder="Write your reply..."
             maxLength={MAX_LENGTH}
             rows={3}
-            className="w-full resize-none bg-transparent text-[14px] leading-relaxed text-foreground placeholder:text-muted/30 focus:outline-none"
+            className="max-h-[240px] w-full resize-none overflow-y-auto bg-transparent text-[14px] leading-relaxed text-foreground placeholder:text-muted/30 focus:outline-none"
             autoFocus
           />
           <div className="flex items-center justify-between">
