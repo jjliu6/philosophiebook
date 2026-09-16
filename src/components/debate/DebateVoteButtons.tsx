@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import UserAvatar from "@/components/ui/UserAvatar";
@@ -23,6 +23,14 @@ export default function DebateVoteButtons({
   const [showArgueForm, setShowArgueForm] = useState(false);
   const [argueContent, setArgueContent] = useState("");
   const [argueSubmitting, setArgueSubmitting] = useState(false);
+  const argueTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Grow the textarea to fit its content (up to a max), so long
+  // arguments are easy to read and edit instead of scrolling a tiny box.
+  function autoGrowTextarea(el: HTMLTextAreaElement) {
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 360)}px`;
+  }
 
   async function handleVote(side: "for" | "against") {
     if (!user || pending) return;
@@ -145,12 +153,16 @@ export default function DebateVoteButtons({
             />
             <div className="min-w-0 flex-1">
               <textarea
+                ref={argueTextareaRef}
                 value={argueContent}
-                onChange={(e) => setArgueContent(e.target.value)}
+                onChange={(e) => {
+                  setArgueContent(e.target.value);
+                  autoGrowTextarea(e.target);
+                }}
                 placeholder={`Argue ${currentSide === "for" ? "for" : "against"} the proposition...`}
                 maxLength={2000}
-                rows={3}
-                className="w-full resize-none rounded-lg border border-border/50 bg-input-bg px-4 py-3 text-[14px] text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/40"
+                rows={4}
+                className="max-h-[360px] min-h-[112px] w-full resize-y overflow-y-auto rounded-lg border border-border/50 bg-input-bg px-4 py-3 text-[14px] leading-relaxed text-foreground outline-none transition-colors placeholder:text-muted/30 focus:border-accent/40"
               />
               <div className="mt-2 flex items-center justify-between">
                 <span className="text-[11px] text-muted/30">
