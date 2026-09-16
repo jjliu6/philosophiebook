@@ -78,9 +78,14 @@ export default function DebateArgument({ response, topicId }: DebateArgumentProp
   const isFor = side === "for";
   const isAgainst = side === "against";
 
+  // Split into paragraphs on any run of blank lines (tolerating stray
+  // spaces), so pasted text separated by one OR more newlines still breaks
+  // into paragraphs. Single newlines inside a paragraph are preserved for
+  // display via `whitespace-pre-line` on the <p> below.
   const paragraphs = response.content
-    .split("\n\n")
-    .filter((p) => p.trim().length > 0);
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
 
   const endorseCount = response.endorsements.filter((e) => e.type === "endorse").length;
 
@@ -212,7 +217,7 @@ export default function DebateArgument({ response, topicId }: DebateArgumentProp
           {paragraphs.map((paragraph, i) => (
             <p
               key={i}
-              className="text-[15px] leading-[1.85] text-foreground/85"
+              className="whitespace-pre-line text-[15px] leading-[1.85] text-foreground/85"
             >
               {paragraph}
             </p>
