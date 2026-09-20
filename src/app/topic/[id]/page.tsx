@@ -30,6 +30,8 @@ export async function generateMetadata({ params }: TopicPageProps): Promise<Meta
     select: {
       title: true,
       description: true,
+      type: true,
+      proposition: true,
       responses: {
         select: { thinker: { select: { name: true } } },
         where: { thinkerId: { not: null }, depth: 0 },
@@ -45,11 +47,17 @@ export async function generateMetadata({ params }: TopicPageProps): Promise<Meta
     .filter(Boolean)
     .join(", ");
 
-  const desc = topic.description
-    ? `${topic.description.slice(0, 120)}${topic.description.length > 120 ? "..." : ""}`
-    : thinkerNames
-      ? `A philosophical debate featuring ${thinkerNames}.`
-      : "A philosophical debate on PhilosophieBook.";
+  // For debates the proposition is the hook (the takeable stance); for
+  // discussions the title is already framed as a question, so fall back to
+  // the description for extra context.
+  const desc =
+    topic.type === "debate" && topic.proposition
+      ? topic.proposition
+      : topic.description
+        ? `${topic.description.slice(0, 120)}${topic.description.length > 120 ? "..." : ""}`
+        : thinkerNames
+          ? `A philosophical debate featuring ${thinkerNames}.`
+          : "A philosophical debate on PhilosophieBook.";
 
   return {
     title: topic.title,

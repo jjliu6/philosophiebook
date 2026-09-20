@@ -18,6 +18,8 @@ export default async function OGImage({
     where: { id },
     select: {
       title: true,
+      type: true,
+      proposition: true,
       responses: {
         select: { thinker: { select: { name: true } } },
         where: { thinkerId: { not: null }, depth: 0 },
@@ -32,7 +34,15 @@ export default async function OGImage({
     .filter(Boolean)
     .join(", ");
 
-  const fontSize = title.length > 80 ? 36 : title.length > 50 ? 42 : 48;
+  // For debates, the proposition is the hook — make it the hero and demote the
+  // short title to a small kicker above it. Discussions have no proposition and
+  // their title is already framed as a question, so the title stays the hero.
+  const isDebate = topic?.type === "debate" && Boolean(topic?.proposition);
+  const heroText = isDebate ? `“${topic!.proposition}”` : title;
+
+  const len = heroText.length;
+  const fontSize =
+    len > 120 ? 30 : len > 90 ? 34 : len > 60 ? 40 : len > 40 ? 46 : 52;
 
   return new ImageResponse(
     (
@@ -83,11 +93,28 @@ export default async function OGImage({
           />
         </div>
 
-        {/* Title */}
+        {/* Short title as a small kicker above the proposition (debates only) */}
+        {isDebate ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "18px",
+              fontSize: "22px",
+              fontWeight: 300,
+              color: "rgba(235, 233, 229, 0.55)",
+            }}
+          >
+            {title}
+          </div>
+        ) : null}
+
+        {/* Hero: proposition for debates, title for discussions */}
         <div
           style={{
             display: "flex",
             justifyContent: "center",
+            textAlign: "center",
             maxWidth: "900px",
             fontSize: `${fontSize}px`,
             fontWeight: 300,
@@ -95,7 +122,7 @@ export default async function OGImage({
             lineHeight: 1.3,
           }}
         >
-          {title}
+          {heroText}
         </div>
 
         {/* Thinker names */}
