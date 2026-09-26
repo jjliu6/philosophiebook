@@ -1,7 +1,8 @@
 """Score for the promo, arranged from recorded instrument samples (not synthesis).
 
-Instruments (fetch with audio/fetch_samples.sh; CC BY 3.0 — credits in NOTES.md §8):
-  Salamander Grand Piano V3 (3 velocity layers), violin, cello, contrabass, harp.
+Instruments: VS Chamber Orchestra Community Edition (VSCO-2 CE) — CC0 1.0, public
+domain, no attribution required. Fetch with audio/fetch_samples.sh.
+  Upright piano (pp / mf / f), violin section, cello section, solo contrabass, harp.
 
 80 BPM, one bar = 3.0 s, D major. The arrangement follows the film's sections
 (stage/scenes.js): a lone piano for the hook, strings open up when the Forum appears,
@@ -18,7 +19,7 @@ import numpy as np
 import soundfile as sf
 
 ROOT = Path(__file__).resolve().parents[1]
-SAMPLES = ROOT / ".cache" / "samples"
+SAMPLES = ROOT / ".cache" / "vsco"
 CUT = os.environ.get("PROMO_CUT", "long")  # "long" | "short" (30-second cut)
 OUT = ROOT / "build" / ("music.wav" if CUT == "long" else f"music-{CUT}.wav")
 SR = 44100
@@ -37,29 +38,33 @@ def midi_of(name):
     return 12 * (octv + 1) + NOTE[n] + (1 if acc else 0)
 
 
-def load_dir(d, pattern=r"^([A-G](?:#|s)?-?\d)(?:v\d+)?\.mp3$"):
+def load_dir(d, must=""):
+    """One sample per note from a VSCO-2 CE folder; the note name is the `_C4_` token."""
     out = {}
-    for f in sorted(Path(d).iterdir()):
-        m = re.match(pattern, f.name)
-        if not m:
+    for f in sorted(Path(d).glob("*.wav")):
+        m = re.search(r"_([A-G]#?-?\d)_", f.name)
+        if not m or must not in f.name:
+            continue
+        midi = midi_of(m.group(1))
+        if midi in out:
             continue
         x, sr = sf.read(f, always_2d=True)
-        assert sr == SR, (f, sr)
-        keep_stereo = "piano" in str(d) and x.shape[1] == 2
-        out[midi_of(m.group(1))] = x if keep_stereo else x.mean(1)
+        if sr != SR:
+            n = int(len(x) * SR / sr)
+            x = np.stack([np.interp(np.linspace(0, len(x) - 1, n), np.arange(len(x)), x[:, c]) for c in range(x.shape[1])], 1)
+        out[midi] = x if x.shape[1] == 2 else x.mean(1)
+    assert out, (d, must)
     return out
 
 
-def piano_layers():
-    return {v: load_dir(SAMPLES / f"audio-samples-piano-mp3-velocity{v}" / "audio") for v in (4, 8, 12)}
-
-
+V = SAMPLES
 INSTR = {
-    "piano": piano_layers(),
-    "violin": load_dir(SAMPLES / "tonejs-instrument-violin-mp3"),
-    "cello": load_dir(SAMPLES / "tonejs-instrument-cello-mp3"),
-    "bass": load_dir(SAMPLES / "tonejs-instrument-contrabass-mp3"),
-    "harp": load_dir(SAMPLES / "tonejs-instrument-harp-mp3"),
+    "piano": {4: load_dir(V / "Keys/Upright Nr1", "_pp_"), 8: load_dir(V / "Keys/Upright Nr1", "_mf_"),
+              12: load_dir(V / "Keys/Upright Nr1", "_f_")},
+    "violin": load_dir(V / "Strings/Violin Section/susVib", "_v1"),
+    "cello": load_dir(V / "Strings/Cello Section/susvib", "_v1"),
+    "bass": load_dir(V / "Strings/Solo Contrabass/SusVib", "_v1"),
+    "harp": load_dir(V / "Strings/Harp"),
 }
 
 

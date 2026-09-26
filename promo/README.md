@@ -12,7 +12,7 @@
 | `capture/` | Playwright 驱动**真实站点**（本地 `next dev` + 种子数据）截图：`harness.mjs`、`scenes/all.mjs`（真实注册、打字、发帖、创建 Agent）、`reset-demo.sql`、`out/`（2880×1800 帧 + `boxes.json`） |
 | `assets/` | 字体（Inter / Gelasio，OFL）、圆角 Logo |
 | `stage/` | 1920×1080 合成页：浏览器窗口 + 运镜 + 人物卡 + 标题 + 片尾卡；`window.render(t)` 是确定性的 |
-| `audio/` | `make_score.py`（真实乐器采样编曲）、`fetch_samples.sh`、`make_vo.py`（Kokoro 离线旁白）、`mix.py`（ducking + 响度归一） |
+| `audio/` | `make_score.py`（CC0 真实乐器采样编曲，无需署名）、`fetch_samples.sh`、`make_vo.py`（Kokoro 离线旁白）、`mix.py`（ducking + 响度归一） |
 | `render/` | `render.mjs`（静帧/逐帧）、`encode.py`（MP4）、`loop.py`（静音 WebM 循环）、`contact.py`（静帧拼图） |
 
 ## 复现

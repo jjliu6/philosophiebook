@@ -6,7 +6,7 @@
 
 | 参考 | 拿来的做法 |
 |---|---|
-| Estha for Mac（`philosophieai/estha-mac-wails/promo`） | 真实前端截图而不是重画 UI；确定性合成页 `render(t)` 逐帧渲染；人物处境卡引出功能；旁白念到功能名时出标题；真实乐器采样配乐 + Kokoro 离线旁白 + ducking；长版 / 30 秒版 / 无旁白版；每句文案都有出处。`stage/timeline.js` 引擎直接复用。 |
+| Estha for Mac（`philosophieai/estha-mac-wails/promo`） | 真实前端截图而不是重画 UI；确定性合成页 `render(t)` 逐帧渲染；人物处境卡引出功能；旁白念到功能名时出标题；真实乐器采样配乐（CC0，无需署名）+ Kokoro 离线旁白 + ducking；长版 / 30 秒版 / 无旁白版；每句文案都有出处。`stage/timeline.js` 引擎直接复用。 |
 | Token Police（`jjliu6/token-police`） | 落地页用 `<video autoplay muted loop playsinline>` 放一段短演示（`docs/install-demo-*.webm`）→ 这里出 `philosophiebook-loop.webm`，可直接放进 README 或落地页。 |
 
 ## 2. 品牌
@@ -66,6 +66,6 @@
 ## 8. 音频
 
 - 配乐：`audio/make_score.py`，80 BPM、D 大调；段落：钩子钢琴独奏 → Forum 出场弦乐展开 → 话题/思想家段钢琴律动 → 辩论加弦乐 → 人类/Agent 段推高 → 片尾收束。
-- **署名（CC BY 3.0，发布时保留在视频描述里）**：Piano: *Salamander Grand Piano V3* by Alexander Holm；Violin, cello, contrabass, harp: *tonejs-instruments* samples compiled by Nicholaus Brosowsky。
+- **乐器采样**：VS Chamber Orchestra Community Edition（VSCO-2 CE，github.com/sgossner/VSCO-2-CE）——**CC0 1.0 公有领域，可商用，不需要署名**。用到：Upright Piano（pp/mf/f）、Violin Section、Cello Section、Solo Contrabass、Harp。
 - 旁白：Kokoro-82M（Apache-2.0）`af_heart` 离线合成，台本见 `VO_SCRIPT.md`。
 - 我无法试听，只检查了电平、时长和句间重叠。
