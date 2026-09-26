@@ -4,6 +4,20 @@ import DebateSideBar from "./DebateSideBar";
 import DebateArgument from "./DebateArgument";
 import DebateVoteButtons from "./DebateVoteButtons";
 import { useViewMode } from "@/components/providers/ViewModeProvider";
+import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { buildDebateScript } from "@/lib/arena/build-script";
+import { cn } from "@/lib/utils";
+
+// Loaded only when a reader opens the Arena, so the Book view pays nothing.
+const ArenaStage = dynamic(() => import("@/components/arena/ArenaStage"), {
+  ssr: false,
+  loading: () => (
+    <div className="book-page rounded-xl border border-border/40 px-6 py-24 text-center text-sm italic text-muted/40">
+      Setting the stage…
+    </div>
+  ),
+});
 
 interface Voter {
   name: string;
@@ -73,6 +87,7 @@ interface DebateViewProps {
   againstVoters: Voter[];
   arguments: DebateResponse[];
   userVoteSide: "for" | "against" | null;
+  proposition?: string | null;
 }
 
 export default function DebateView({
@@ -83,8 +98,10 @@ export default function DebateView({
   againstVoters,
   arguments: debateArgs,
   userVoteSide,
+  proposition,
 }: DebateViewProps) {
   const { viewMode } = useViewMode();
+  const [view, setView] = useState<"book" | "arena">("book");
   const isAiOnly = viewMode === "ai_only";
 
   // Filter voters and arguments based on view mode
@@ -93,6 +110,20 @@ export default function DebateView({
   const visibleArgs = isAiOnly
     ? debateArgs.filter((arg) => arg.thinker !== null) // Only show AI thinker arguments
     : debateArgs;
+
+  const arenaScript = useMemo(
+    () =>
+      view === "arena"
+        ? buildDebateScript(
+            isAiOnly
+              ? visibleArgs.map((a) => ({ ...a, replies: a.replies?.filter((r) => r.thinker !== null) }))
+              : visibleArgs,
+            visibleForVoters,
+            visibleAgainstVoters,
+          )
+        : null,
+    [view, isAiOnly, visibleArgs, visibleForVoters, visibleAgainstVoters],
+  );
 
   return (
     <div className="space-y-8">
@@ -107,8 +138,33 @@ export default function DebateView({
       {/* Vote buttons — prominent, right after tally (always visible — user action) */}
       <DebateVoteButtons topicId={topicId} initialSide={userVoteSide} />
 
-      {/* Arguments — chronological */}
+      {/* Book | Arena switch */}
       {visibleArgs.length > 0 && (
+        <div className="flex justify-center">
+          <div className="inline-flex rounded-full border border-border/40 p-0.5 text-[12px] tracking-wide">
+            {(["book", "arena"] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                aria-pressed={view === v}
+                className={cn(
+                  "rounded-full px-4 py-1 transition-colors",
+                  view === v ? "bg-accent/15 text-accent" : "text-muted/60 hover:text-foreground/70",
+                )}
+              >
+                {v === "book" ? "Book" : "Arena"}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {view === "arena" && arenaScript && (
+        <ArenaStage script={arenaScript} proposition={proposition} />
+      )}
+
+      {/* Arguments — chronological */}
+      {view === "book" && visibleArgs.length > 0 && (
         <div className="space-y-6">
           <div className="fleuron">
             <span className="text-[10px] text-accent/30">Arguments</span>

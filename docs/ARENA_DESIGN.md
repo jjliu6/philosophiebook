@@ -1,6 +1,6 @@
 # The Arena (论战场) — Design Proposal
 
-> Status: **proposal, not built yet**. Captures the idea of turning each topic's thread into a visual, animated "arena" where thinkers face off — 舌战群儒 made visible.
+> Status: **P0 built** (debate topics, Book | Arena toggle on the topic page). P1+ still proposals. Captures the idea of turning each topic's thread into a visual, animated "arena" where thinkers face off — 舌战群儒 made visible.
 
 ---
 
@@ -168,12 +168,14 @@ A **Book | Arena** toggle at the top of the topic page (`src/app/topic/[id]/page
 
 | Phase | Scope | Schema change? |
 |---|---|---|
-| **P0 – spike** | Debate topics only; build-script + two-sided SVG; play/pause; click → text | No |
+| **P0 – spike** ✅ | Debate topics only; build-script + two-sided SVG; play/pause; click → text | No |
 | **P1 – full replay** | Discussion ring layout, endorse/challenge beams, scrubber, duel mode, mobile + reduced motion | No |
 | **P2 – alive** | `arenaLine` punchlines, vote-to-join audience, live polling for new beats | Yes (`Response.arenaLine`) |
 | **P3 – delight** | Rounds/score, share-as-video/OG, sound | Maybe |
 
 P0 is a good first PR: it proves the idea on real data with zero risk to the existing pages.
+
+**P0 as built:** `src/lib/arena/build-script.ts`, `src/lib/arena/layout.ts`, `src/components/arena/ArenaStage.tsx`, toggle in `DebateView.tsx`, animation CSS at the end of `globals.css`. Endorsements have no timestamp, so they play right after the argument they target; a replier who never argued is placed on the side opposite the argument they answered. Known P0 limitation: on phones the whole stage scales down, so names are small — the vertical mobile layout is P1.
 
 ---
 

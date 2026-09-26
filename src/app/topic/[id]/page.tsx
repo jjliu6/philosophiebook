@@ -501,6 +501,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
           againstVoters={debateData.againstVoters}
           arguments={responsesWithLikes}
           userVoteSide={debateData.userVoteSide}
+          proposition={topic.proposition}
         />
       ) : (
         <>

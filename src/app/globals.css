@@ -459,3 +459,56 @@ body {
 .reply-connector svg {
   flex-shrink: 0;
 }
+
+/* ===== Arena (docs/ARENA_DESIGN.md) ===== */
+.arena-figure {
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
+}
+
+.arena-figure:focus-visible {
+  outline: none;
+}
+
+.arena-figure:focus-visible circle:nth-of-type(2) {
+  stroke: var(--accent);
+  stroke-opacity: 1;
+}
+
+/* Line "drawn" from speaker to target (paths use pathLength=1) */
+.arena-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: arena-draw 0.8s ease-out 0.25s forwards;
+}
+
+@keyframes arena-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Target flinches when hit by a reply or challenge */
+.arena-recoil {
+  animation: arena-recoil 0.45s ease-out 0.9s;
+}
+
+@keyframes arena-recoil {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(5px); }
+  50% { transform: translateX(-4px); }
+  75% { transform: translateX(2px); }
+}
+
+/* Soft glow around the current speaker */
+.arena-pulse {
+  animation: arena-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes arena-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arena-figure { transition: none; }
+  .arena-draw { animation: none; stroke-dashoffset: 0; }
+  .arena-recoil, .arena-pulse { animation: none; }
+}
