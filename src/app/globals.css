@@ -507,8 +507,118 @@ body {
   50% { opacity: 1; }
 }
 
+/* Camera glides between clashes */
+.arena-camera {
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.arena-bubble-pos {
+  transition: left 0.9s cubic-bezier(0.22, 1, 0.36, 1), top 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.arena-bubble {
+  animation: arena-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+
+@keyframes arena-pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.arena-momentum {
+  transition: width 0.8s ease, left 0.8s ease;
+}
+
+/* A bright comet head travels along the strike path (pathLength=1) */
+.arena-comet {
+  stroke-dasharray: 0.06 1;
+  stroke-dashoffset: 0.06;
+  opacity: 0;
+  animation: arena-comet 0.7s cubic-bezier(0.5, 0, 0.75, 0) 0.15s forwards;
+}
+
+@keyframes arena-comet {
+  0% { stroke-dashoffset: 0.06; opacity: 1; }
+  99% { opacity: 1; }
+  100% { stroke-dashoffset: -0.94; opacity: 0; }
+}
+
+/* Lightning: flickers in fast */
+.arena-bolt {
+  opacity: 0;
+  animation: arena-bolt 0.6s steps(1, end) 0.3s forwards;
+}
+
+@keyframes arena-bolt {
+  0% { opacity: 1; }
+  15% { opacity: 0.2; }
+  30% { opacity: 1; }
+  45% { opacity: 0.4; }
+  60%, 100% { opacity: 1; }
+}
+
+/* Impact burst at the target */
+.arena-burst,
+.arena-sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: arena-burst 0.6s ease-out 0.82s;
+}
+
+.arena-sparkle {
+  animation-duration: 0.9s;
+}
+
+@keyframes arena-burst {
+  0% { opacity: 1; transform: scale(0.3); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+.arena-hit-ring {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: arena-hit-ring 0.9s ease-out 0.85s;
+}
+
+@keyframes arena-hit-ring {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+
+/* Round / siege title card */
+.arena-banner {
+  animation: arena-banner 2.4s ease both;
+}
+
+@keyframes arena-banner {
+  0% { opacity: 0; transform: translateY(-8px); letter-spacing: 0.5em; }
+  15% { opacity: 1; transform: translateY(0); }
+  70% { opacity: 1; }
+  100% { opacity: 0.25; }
+}
+
+/* The crowd jumps at a clash */
+.arena-crowd-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.arena-crowd {
+  animation: arena-crowd 0.5s ease-out 2;
+}
+
+@keyframes arena-crowd {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-7px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .arena-figure { transition: none; }
-  .arena-draw { animation: none; stroke-dashoffset: 0; }
-  .arena-recoil, .arena-pulse { animation: none; }
+  .arena-figure, .arena-camera, .arena-bubble-pos, .arena-momentum { transition: none; }
+  .arena-draw, .arena-comet { animation: none; stroke-dashoffset: 0; }
+  .arena-comet { opacity: 0; }
+  .arena-bolt { animation: none; opacity: 1; }
+  .arena-recoil, .arena-pulse, .arena-burst, .arena-sparkle, .arena-hit-ring,
+  .arena-banner, .arena-bubble, .arena-crowd { animation: none; }
 }

@@ -27,6 +27,8 @@ export type ArenaBeat =
 export interface ArenaScript {
   actors: ArenaActor[];
   beats: ArenaBeat[];
+  /** Human / external-agent voters — drawn as the audience. */
+  crowd: { for: number; against: number };
 }
 
 interface PersonRef {
@@ -44,6 +46,8 @@ export interface ArenaArgumentInput extends PersonRef {
   id: string;
   content: string;
   debateSide: string | null;
+  /** Set on replies — the topic page passes replies in the same flat list. */
+  parentResponseId?: string | null;
   createdAt: Date | string;
   endorsements: {
     type: string;
@@ -120,7 +124,8 @@ export function buildDebateScript(
     | { at: number; type: "arg"; arg: ArenaArgumentInput }
     | { at: number; type: "reply"; reply: ArenaReplyInput; parent: ArenaArgumentInput };
   const timed: Timed[] = [];
-  for (const arg of args) {
+  // Replies arrive both nested under their argument and in the flat list; keep top-level only.
+  for (const arg of args.filter((a) => !a.parentResponseId)) {
     timed.push({ at: new Date(arg.createdAt).getTime(), type: "arg", arg });
     for (const reply of arg.replies ?? []) {
       timed.push({ at: new Date(reply.createdAt).getTime(), type: "reply", reply, parent: arg });
@@ -186,5 +191,61 @@ export function buildDebateScript(
   addVoters(forVoters, "for");
   addVoters(againstVoters, "against");
 
-  return { actors: [...actors.values()], beats };
+  const crowd = {
+    for: forVoters.filter((v) => !v.isThinker).length,
+    against: againstVoters.filter((v) => !v.isThinker).length,
+  };
+
+  return { actors: [...actors.values()], beats, crowd };
+}
+
+export interface BeatState {
+  /** Tug-of-war score so far (For vs Against). */
+  momentum: { for: number; against: number };
+  /** For each actor, the distinct opponents who have hit them so far. */
+  attackers: Map<string, Set<string>>;
+  /** How many moves each actor has been part of so far — drives their glow. */
+  heat: Map<string, number>;
+}
+
+const MOVE_WEIGHT: Record<ArenaBeat["kind"], number> = {
+  speak: 1,
+  reply: 1.5,
+  challenge: 1,
+  endorse: 0.75,
+};
+
+/** Cumulative state after each beat — precomputed so scrubbing is instant. */
+export function computeBeatStates(script: ArenaScript): BeatState[] {
+  const sideOf = new Map(script.actors.map((a) => [a.id, a.side]));
+  const momentum = { for: 0, against: 0 };
+  const attackers = new Map<string, Set<string>>();
+  const heat = new Map<string, number>();
+  const bump = (id: string) => heat.set(id, (heat.get(id) ?? 0) + 1);
+
+  return script.beats.map((beat) => {
+    // Endorsing lends weight to the endorsed side; everything else scores for the mover.
+    const scorer =
+      beat.kind === "speak" ? beat.actor : beat.kind === "endorse" ? beat.to : beat.from;
+    const side = sideOf.get(scorer);
+    if (side === "for" || side === "against") momentum[side] += MOVE_WEIGHT[beat.kind];
+
+    if (beat.kind === "speak") {
+      bump(beat.actor);
+    } else {
+      bump(beat.from);
+      bump(beat.to);
+      if (beat.kind === "reply" || beat.kind === "challenge") {
+        const set = attackers.get(beat.to) ?? new Set<string>();
+        set.add(beat.from);
+        attackers.set(beat.to, set);
+      }
+    }
+
+    return {
+      momentum: { ...momentum },
+      attackers: new Map([...attackers].map(([k, v]) => [k, new Set(v)])),
+      heat: new Map(heat),
+    };
+  });
 }

@@ -160,7 +160,7 @@ A **Book | Arena** toggle at the top of the topic page (`src/app/topic/[id]/page
 - **Reduced motion.** Respect `prefers-reduced-motion`: show the final state as a static diagram with no animation.
 - **Mobile.** Two-sided layout becomes a vertical stack (For on top, Against below); side panel becomes a bottom sheet.
 - **Accessibility.** Every figure and line is a focusable element with a text label; the beat list is also available as an ordered list.
-- **Tone.** Gold/emerald/rose on the dark navy background; no health bars, no "K.O." — the drama comes from the words.
+- **Tone.** Gold/emerald/rose on a dark theatre stage; a momentum bar but no health bars, no "K.O.", no declared winner — the drama serves the words.
 
 ---
 
@@ -175,7 +175,9 @@ A **Book | Arena** toggle at the top of the topic page (`src/app/topic/[id]/page
 
 P0 is a good first PR: it proves the idea on real data with zero risk to the existing pages.
 
-**P0 as built:** `src/lib/arena/build-script.ts`, `src/lib/arena/layout.ts`, `src/components/arena/ArenaStage.tsx`, toggle in `DebateView.tsx`, animation CSS at the end of `globals.css`. Endorsements have no timestamp, so they play right after the argument they target; a replier who never argued is placed on the side opposite the argument they answered. Known P0 limitation: on phones the whole stage scales down, so names are small — the vertical mobile layout is P1.
+**P0 as built:** `src/lib/arena/build-script.ts`, `src/lib/arena/layout.ts`, `src/components/arena/ArenaStage.tsx`, toggle in `DebateView.tsx`, animation CSS at the end of `globals.css`. Endorsements have no timestamp, so they play right after the argument they target; a replier who never argued is placed on the side opposite the argument they answered. **P0.5 — bringing back the 舌战群儒 vibe** (first P0 felt too much like a diagram): the stage is now a dark theatre with a camera that zooms onto each clash; speech bubbles type the line out above the speaker; replies fly as a comet along the arc and burst on impact, challenges strike as red lightning and shake the stage; a thinker attacked by 2+ different opponents is marked *Under siege · 1 against N* with a ⚔ tally; a momentum tug-of-war bar and a reacting audience row frame the fight; each argument opens with a *Round N* title card. Replay autoplays on open (unless reduced motion). This deliberately relaxes the "no scoring" guardrail to a *momentum* bar — no winner is declared.
+
+Known P0 limitation: on phones the whole stage scales down, so names are small — the vertical mobile layout is P1.
 
 ---
 
