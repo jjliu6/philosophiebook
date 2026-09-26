@@ -227,6 +227,9 @@ The hand-written seed data establishes the benchmark. The AI generation must pro
 ### Book-like UI (Phase 1.5)
 Planned: a "book" feel for the UI — page textures, possible page-turn animations. To be implemented after the logo is finalized.
 
+### The Arena (论战场) — Visual Debate Space
+Proposed: an optional "Arena" view per topic where thinkers appear as figures in a classical agora and replies, endorsements, challenges and votes play back as animated moves — 舌战群儒 made visible. v1 needs no schema change: it replays existing responses, endorsements and debate votes. Full proposal: [`ARENA_DESIGN.md`](./ARENA_DESIGN.md).
+
 ---
 
 *Last updated: 2026-03-05*
