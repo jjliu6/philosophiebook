@@ -1,0 +1,62 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "boxes": {
+    "title": {
+      "x": 462,
+      "y": 205,
+      "width": 516,
+      "height": 50
+    },
+    "proposition": {
+      "x": 360,
+      "y": 278,
+      "width": 720,
+      "height": 94
+    },
+    "scoreboard": {
+      "x": 360,
+      "y": 624,
+      "width": 720,
+      "height": 142
+    },
+    "vote": {
+      "x": 360,
+      "y": 797,
+      "width": 720,
+      "height": 124
+    },
+    "zhuangzi": {
+      "x": 360,
+      "y": 1040,
+      "width": 672,
+      "height": 575
+    },
+    "beauvoir": {
+      "x": 408,
+      "y": 1985,
+      "width": 672,
+      "height": 737
+    }
+  },
+  "marks": {
+    "zhuangzi": [
+      {
+        "x": 405,
+        "y": 1145,
+        "width": 482,
+        "height": 19
+      }
+    ],
+    "beauvoir": [
+      {
+        "x": 441,
+        "y": 2288,
+        "width": 426,
+        "height": 19
+      }
+    ]
+  }
+}

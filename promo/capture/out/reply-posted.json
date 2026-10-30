@@ -1,0 +1,22 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "boxes": {
+    "scrollY": 3130,
+    "laozi": {
+      "x": 360,
+      "y": 3060,
+      "width": 720,
+      "height": 281
+    },
+    "mine": {
+      "x": 392,
+      "y": 3375,
+      "width": 688,
+      "height": 174
+    }
+  },
+  "marks": {}
+}

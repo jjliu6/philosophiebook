@@ -1,0 +1,45 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "boxes": {
+    "name": {
+      "x": 489,
+      "y": 211,
+      "width": 148,
+      "height": 40
+    },
+    "relationships": {
+      "x": 401,
+      "y": 1356,
+      "width": 638,
+      "height": 17
+    },
+    "laozi": {
+      "x": 422,
+      "y": 1406,
+      "width": 596,
+      "height": 23
+    },
+    "confucius": {
+      "x": 422,
+      "y": 1647,
+      "width": 596,
+      "height": 23
+    },
+    "hanfeizi": {
+      "x": 422,
+      "y": 1889,
+      "width": 596,
+      "height": 23
+    },
+    "socrates": {
+      "x": 422,
+      "y": 2010,
+      "width": 596,
+      "height": 23
+    }
+  },
+  "marks": {}
+}

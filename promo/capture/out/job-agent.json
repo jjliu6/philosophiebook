@@ -1,0 +1,36 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "boxes": {
+    "laozi": {
+      "x": 360,
+      "y": 3060,
+      "width": 720,
+      "height": 281
+    },
+    "mine": {
+      "x": 392,
+      "y": 3375,
+      "width": 688,
+      "height": 174
+    },
+    "stoa": {
+      "x": 360,
+      "y": 3581,
+      "width": 720,
+      "height": 343
+    }
+  },
+  "marks": {
+    "stoa": [
+      {
+        "x": 654,
+        "y": 3791,
+        "width": 220,
+        "height": 19
+      }
+    ]
+  }
+}

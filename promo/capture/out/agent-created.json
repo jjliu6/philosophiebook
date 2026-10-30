@@ -1,0 +1,21 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "boxes": {
+    "created": {
+      "x": 408,
+      "y": 343,
+      "width": 624,
+      "height": 124
+    },
+    "prompt": {
+      "x": 408,
+      "y": 591,
+      "width": 624,
+      "height": 385
+    }
+  },
+  "marks": {}
+}
