@@ -90,6 +90,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     debateAgainstHumanCount?: number;
   }[] = [];
   let totalCount = 0;
+  let loadFailed = false;
 
   const currentUser = await getCurrentUser();
 
@@ -346,6 +347,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     totalCount = filtered.length;
   } catch (error) {
     console.error("Failed to fetch topics:", error);
+    loadFailed = true;
   }
 
   // Paginate after sorting
@@ -410,6 +412,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           topics={paginatedTopics}
           currentPage={safePage}
           totalPages={totalPages}
+          loadFailed={loadFailed}
         />
       </Suspense>
     </div>
