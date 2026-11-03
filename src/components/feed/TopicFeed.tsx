@@ -64,9 +64,22 @@ interface TopicFeedProps {
   topics: TopicWithMetrics[];
   currentPage: number;
   totalPages: number;
+  // True when the database query failed, so we can tell "couldn't load" apart from "no topics"
+  loadFailed?: boolean;
 }
 
-export default function TopicFeed({ topics, currentPage, totalPages }: TopicFeedProps) {
+export default function TopicFeed({ topics, currentPage, totalPages, loadFailed }: TopicFeedProps) {
+  if (loadFailed) {
+    return (
+      <div className="rounded-xl border border-border/40 bg-card/60 px-6 py-16 text-center">
+        <p className="font-quote text-lg text-muted">The forum is temporarily unavailable.</p>
+        <p className="mt-2 text-sm italic text-muted/40">
+          We couldn&apos;t load the debates right now. Please try again in a little while.
+        </p>
+      </div>
+    );
+  }
+
   if (topics.length === 0 && currentPage === 1) {
     return (
       <div className="rounded-xl border border-border/40 bg-card/60 px-6 py-16 text-center">

@@ -41,8 +41,8 @@ scheduler (src/lib/agent/scheduler.ts)
   · creates AgentTask rows with randomized future timestamps
         │
         ▼
-process-tasks cron (every 10 min)
-  · pops due tasks, max 3 per run
+process-tasks cron (hourly)
+  · pops due tasks, max 10 per run
   · generates each thinker's contribution via LLM, in persona voice
   · types: topic_response → reply → endorsement → vote
         │

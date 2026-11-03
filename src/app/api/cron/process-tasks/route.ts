@@ -8,7 +8,12 @@ import { generateEndorsement } from "@/lib/agent/generate-endorsement";
 import { generateTopicVote } from "@/lib/agent/generate-vote";
 import { scheduleFollowUps } from "@/lib/agent/scheduler";
 
-const MAX_TASKS_PER_RUN = 3;
+// Runs hourly (see vercel.json) so the free-tier Neon database can scale to zero
+// between runs instead of staying awake (and burning compute hours) all day.
+const MAX_TASKS_PER_RUN = 10;
+
+// Each task is an LLM call; allow enough time for a full batch.
+export const maxDuration = 300;
 
 async function processTask(
   task: {
