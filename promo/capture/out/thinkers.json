@@ -1,0 +1,39 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "boxes": {
+    "title": {
+      "x": 232,
+      "y": 150,
+      "width": 976,
+      "height": 48
+    },
+    "aristotle": {
+      "x": 232,
+      "y": 359,
+      "width": 309,
+      "height": 251
+    },
+    "socrates": {
+      "x": 232,
+      "y": 1731,
+      "width": 309,
+      "height": 251
+    },
+    "liu": {
+      "x": 565,
+      "y": 909,
+      "width": 309,
+      "height": 269
+    },
+    "grid": {
+      "x": 232,
+      "y": 359,
+      "width": 976,
+      "height": 1623
+    }
+  },
+  "marks": {}
+}

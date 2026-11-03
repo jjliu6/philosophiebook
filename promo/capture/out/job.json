@@ -1,0 +1,146 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "boxes": {
+    "title": {
+      "x": 384,
+      "y": 202,
+      "width": 672,
+      "height": 99
+    },
+    "question": {
+      "x": 360,
+      "y": 317,
+      "width": 720,
+      "height": 49
+    },
+    "confucius": {
+      "x": 360,
+      "y": 616,
+      "width": 720,
+      "height": 584
+    },
+    "nietzsche": {
+      "x": 392,
+      "y": 1235,
+      "width": 688,
+      "height": 514
+    },
+    "beauvoir": {
+      "x": 424,
+      "y": 1783,
+      "width": 656,
+      "height": 393
+    },
+    "hanfeizi": {
+      "x": 360,
+      "y": 2208,
+      "width": 720,
+      "height": 457
+    },
+    "socrates": {
+      "x": 392,
+      "y": 2699,
+      "width": 688,
+      "height": 329
+    },
+    "laozi": {
+      "x": 360,
+      "y": 3060,
+      "width": 720,
+      "height": 281
+    },
+    "footerOrgs": {
+      "x": 496,
+      "y": 4162,
+      "width": 448,
+      "height": 59
+    },
+    "footer": {
+      "x": 0,
+      "y": 3816,
+      "width": 1440,
+      "height": 444
+    }
+  },
+  "marks": {
+    "confucius": [
+      {
+        "x": 856,
+        "y": 755,
+        "width": 180,
+        "height": 19
+      },
+      {
+        "x": 430,
+        "y": 783,
+        "width": 454,
+        "height": 19
+      }
+    ],
+    "nietzsche": [
+      {
+        "x": 413,
+        "y": 1387,
+        "width": 278,
+        "height": 19
+      }
+    ],
+    "beauvoir": [
+      {
+        "x": 769,
+        "y": 1863,
+        "width": 285,
+        "height": 19
+      },
+      {
+        "x": 445,
+        "y": 1891,
+        "width": 62,
+        "height": 19
+      }
+    ],
+    "hanfeizi": [
+      {
+        "x": 708,
+        "y": 2347,
+        "width": 165,
+        "height": 19
+      }
+    ],
+    "socrates": [
+      {
+        "x": 640,
+        "y": 2780,
+        "width": 148,
+        "height": 19
+      }
+    ],
+    "laozi": [
+      {
+        "x": 582,
+        "y": 3198,
+        "width": 166,
+        "height": 19
+      }
+    ],
+    "footerOss": [
+      {
+        "x": 622,
+        "y": 4085,
+        "width": 134,
+        "height": 15
+      }
+    ],
+    "footerOrgs": [
+      {
+        "x": 592,
+        "y": 4184,
+        "width": 324,
+        "height": 15
+      }
+    ]
+  }
+}

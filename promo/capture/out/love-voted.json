@@ -1,0 +1,22 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "boxes": {
+    "scrollY": 364,
+    "scoreboard": {
+      "x": 360,
+      "y": 624,
+      "width": 720,
+      "height": 142
+    },
+    "vote": {
+      "x": 360,
+      "y": 797,
+      "width": 720,
+      "height": 329
+    }
+  },
+  "marks": {}
+}

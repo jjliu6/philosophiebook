@@ -1,0 +1,21 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "boxes": {
+    "hero": {
+      "x": 360,
+      "y": 150,
+      "width": 720,
+      "height": 48
+    },
+    "firstCard": {
+      "x": 878,
+      "y": 379,
+      "width": 89,
+      "height": 32
+    }
+  },
+  "marks": {}
+}
